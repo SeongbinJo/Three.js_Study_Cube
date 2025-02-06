@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber"
 import { useRef } from "react"
 
-function Dummy3DModel() {
+function Dummy3DModel({position, color}) {
     // const refMesh = useRef()
 
     // useFrame : 매 프레임이 렌더링되기 직전 호출
@@ -14,9 +14,9 @@ function Dummy3DModel() {
         <>
             <directionalLight position={[1,1,1]} />
             
-            <mesh>
-                <boxGeometry />
-                <meshStandardMaterial color="blue" />
+            <mesh position={position}>
+                <boxGeometry args={[1,1,1]} />
+                <meshStandardMaterial color={color} />
             </mesh>
         </>
     )
