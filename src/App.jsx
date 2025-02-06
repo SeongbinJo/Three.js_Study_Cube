@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import './App.css'
+import './CanvasBox/CanvasBox'
+import CanvasBox from './CanvasBox/CanvasBox'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      Digitmix Study
+        <div class="model-box">
+          <CanvasBox></CanvasBox>
+        </div>
     </>
   )
 }
