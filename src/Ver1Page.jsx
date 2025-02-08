@@ -1,11 +1,11 @@
 import './App.css'
-import CanvasBox from './CanvasBox/CanvasBox'
+import Ver1CanvasBox from './CanvasBox/Ver1CanvasBox'
 
 function Ver1Page() {
     return (
         <>
         <div className='model-box'>
-            <CanvasBox yModelCount={3} xModelCount={4} spacing={1.5}></CanvasBox>
+            <Ver1CanvasBox yModelCount={3} xModelCount={4} spacing={1.5}></Ver1CanvasBox>
         </div>
         </>
     )
