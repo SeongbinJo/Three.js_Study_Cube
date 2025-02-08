@@ -7,7 +7,6 @@ function App() {
   return (
     <Router>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-        <h1>Welcome to the App</h1>
         <div>
           <Link to="/ver1">
             <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Go to Ver1</button>
