@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useEffect } from "react"
 
 function Ver2Model({ position, color }) {
     const [hovered, setHovered] = useState(false)

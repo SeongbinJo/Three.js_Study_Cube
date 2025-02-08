@@ -1,7 +1,7 @@
 import { useState } from "react"
 import * as THREE from "three"
 
-function Dummy3DModel({ position, color }) {
+function Dummy3DModel({ position, color, onHover }) {
     const [hovered, setHovered] = useState(false)
 
     return (
@@ -11,9 +11,14 @@ function Dummy3DModel({ position, color }) {
             <mesh position={position} onPointerOver={(event) => {
                 event.stopPropagation()
                 setHovered(true)
+                onHover(true, event.clientX, event.clientY)
             }
             }
-                onPointerOut={() => setHovered(false)}>
+                onPointerOut={() => {
+                    setHovered(false)
+                    onHover(false)
+                }
+                }>
                 <boxGeometry args={[1, 1, 1]} />
                 <meshStandardMaterial color={color}
                 transparent={true}
