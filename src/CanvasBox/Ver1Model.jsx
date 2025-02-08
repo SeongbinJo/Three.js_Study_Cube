@@ -1,7 +1,4 @@
-import { useFrame } from "@react-three/fiber"
-import { useRef } from "react"
-
-function Ver13DModel({position, color}) {
+function Ver1Model({position, color}) {
 
     return (
         <>
@@ -15,4 +12,4 @@ function Ver13DModel({position, color}) {
     )
 }
 
-export default Ver13DModel
+export default Ver1Model

@@ -1,15 +1,14 @@
 import './App.css'
 import CanvasBox from './CanvasBox/CanvasBox'
-import Ver2Page from './Ver2Page'
 
-function App() {
+function Ver2Page() {
   return (
     <>
       <div className="model-box">
-        <Ver2Page />
+        <CanvasBox yModelCount={3} xModelCount={4} spacing={1.5}></CanvasBox>
       </div>
     </>
   )
 }
 
-export default App
+export default Ver2Page

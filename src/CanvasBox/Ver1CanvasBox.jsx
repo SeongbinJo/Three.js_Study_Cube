@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { Canvas } from "@react-three/fiber"
-import Dummy3DModel from "./Dummy3DModel"
+import Ver1Model from "./Ver1Model"
 import { OrbitControls } from "@react-three/drei"
 
-function CanvasBox({ yModelCount, xModelCount, spacing }) {
+function Ver1CanvasBox({ yModelCount, xModelCount, spacing }) {
     const [numYModel, setNumYModel] = useState(yModelCount)
     const [numXModel, setNumXModel] = useState(xModelCount)
 
@@ -13,7 +13,7 @@ function CanvasBox({ yModelCount, xModelCount, spacing }) {
         for (let i = 1; i <= numYModel; i++) {
             const z = (-i) * (spacing)
             yModels.push(
-                <Dummy3DModel key={`yModel - ${i}`} position={[0, 0, z]} color="blue" />
+                <Ver1Model key={`yModel - ${i}`} position={[0, 0, z]} color="blue" />
             )
         }
         return yModels
@@ -24,7 +24,7 @@ function CanvasBox({ yModelCount, xModelCount, spacing }) {
         for (let i = 1; i <= numYModel; i++) {
             const z = (-i) * (spacing)
             yModels.push(
-                <Dummy3DModel key={`yModel - ${i}`} position={[(numXModel - 1) * (spacing), 0, z]} color="yellow" />
+                <Ver1Model key={`yModel - ${i}`} position={[(numXModel - 1) * (spacing), 0, z]} color="yellow" />
             )
         }
         return yModels
@@ -36,7 +36,7 @@ function CanvasBox({ yModelCount, xModelCount, spacing }) {
         for (let i = 0; i < numXModel; i++) {
             const x = i * spacing
             xModels.push(
-                <Dummy3DModel key={`xModel - ${i}`} position={[x, 0, 0]} color="green" />
+                <Ver1Model key={`xModel - ${i}`} position={[x, 0, 0]} color="green" />
             )
         }
         return xModels
@@ -52,4 +52,4 @@ function CanvasBox({ yModelCount, xModelCount, spacing }) {
     )
 }
 
-export default CanvasBox
+export default Ver1CanvasBox

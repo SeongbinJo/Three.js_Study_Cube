@@ -1,7 +1,6 @@
 import { useState } from "react"
-import * as THREE from "three"
 
-function Dummy3DModel({ position, color }) {
+function Ver2Model({ position, color }) {
     const [hovered, setHovered] = useState(false)
 
     return (
@@ -25,4 +24,4 @@ function Dummy3DModel({ position, color }) {
     )
 }
 
-export default Dummy3DModel
+export default Ver2Model
