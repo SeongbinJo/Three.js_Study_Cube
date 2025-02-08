@@ -43,11 +43,6 @@ function CanvasBox({ yModelCount, xModelCount, spacing }) {
         return xModels
     }
 
-    // useEffect(() => {
-    //     setNumYModel([...createLeadingYModel(), ...createTrailingYModel()])
-    //     setNumXModel(createXModel())
-    // }, [yModelCount, xModelCount, spacing])
-
     return (
         <Canvas>
             <OrbitControls />
