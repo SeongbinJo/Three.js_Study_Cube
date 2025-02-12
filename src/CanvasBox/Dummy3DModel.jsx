@@ -14,6 +14,11 @@ function Dummy3DModel({ position, color, onHover }) {
                 onHover(true, event.clientX, event.clientY)
             }
             }
+            onPointerMove={(event) => {
+                if (hovered) {
+                    onHover(true, event.clientX, event.clientY)
+                }
+            }}
                 onPointerOut={() => {
                     setHovered(false)
                     onHover(false)
@@ -21,9 +26,9 @@ function Dummy3DModel({ position, color, onHover }) {
                 }>
                 <boxGeometry args={[1, 1, 1]} />
                 <meshStandardMaterial color={color}
-                transparent={true}
-                opacity={hovered ? 0.7 : 1}
-                blending={THREE.NormalBlending}
+                    transparent={true}
+                    opacity={hovered ? 0.7 : 1}
+                    blending={THREE.NormalBlending}
                 />
             </mesh>
         </>
