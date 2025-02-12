@@ -1,7 +1,7 @@
 import './App.css'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
-import Ver1Page from './Ver1Page'
-import Ver2Page from './Ver2Page'
+import Ver1Page from './Ver1/Ver1Page'
+import Ver2Page from './Ver2/Ver2Page'
 
 function App() {
   return (

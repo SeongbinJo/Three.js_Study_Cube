@@ -1,5 +1,5 @@
-import './App.css'
-import Ver1CanvasBox from './CanvasBox/Ver1CanvasBox'
+import '../App.css'
+import Ver1CanvasBox from './Ver1CanvasBox'
 
 function Ver1Page() {
     return (
