@@ -2,6 +2,7 @@ import './App.css'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import Ver1Page from './Ver1/Ver1Page'
 import Ver2Page from './Ver2/Ver2Page'
+import Ver3Page from './Ver3/Ver3Page'
 
 function App() {
   return (
@@ -14,10 +15,14 @@ function App() {
           <Link to="/ver2">
             <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver2</button>
           </Link>
+          <Link to="/ver3">
+            <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver3</button>
+          </Link>
         </div>
         <Routes>
           <Route path="/ver1" element={<Ver1Page />} />
           <Route path="/ver2" element={<Ver2Page />} />
+          <Route path="/ver3" element={<Ver3Page />} />
         </Routes>
       </div>
     </Router>
