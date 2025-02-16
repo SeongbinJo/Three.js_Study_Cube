@@ -1,8 +1,9 @@
 import { useState } from "react"
-import { Canvas } from "@react-three/fiber"
+import { Canvas, useThree } from "@react-three/fiber"
 import Ver3Model from "./Ver3Model"
 import { OrbitControls } from "@react-three/drei"
 import { useEffect } from "react"
+import * as THREE from "three"
 
 function Ver3CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData }) {
     // 박스 모델의 Y, X별 모델 개수 useState
