@@ -1,5 +1,6 @@
 import '../App.css'
 import './Ver3ClickedBox.css'
+import './Ver3HoveredBox.css'
 import Ver3CanvasBox from './Ver3CanvasBox';
 import { useState } from 'react';
 
