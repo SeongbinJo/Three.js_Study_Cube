@@ -3,7 +3,7 @@ import { useRef } from "react"
 import { useState } from "react"
 import * as THREE from "three"
 
-function Ver3Model({ id, position, color, onHover }) {
+function Ver3Model({ id, position, color, onHover, onClick }) {
     const [hovered, setHovered] = useState(false)
     const meshRef = useRef(null)
     const { camera } = useThree()
@@ -34,6 +34,7 @@ function Ver3Model({ id, position, color, onHover }) {
 
         if (intersects.length > 0) {
             console.log(id)
+            onClick(id)
         }
     }
 

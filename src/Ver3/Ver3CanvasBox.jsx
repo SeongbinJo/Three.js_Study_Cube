@@ -2,10 +2,8 @@ import { useState } from "react"
 import { Canvas, useThree } from "@react-three/fiber"
 import Ver3Model from "./Ver3Model"
 import { OrbitControls } from "@react-three/drei"
-import { useEffect } from "react"
-import * as THREE from "three"
 
-function Ver3CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData }) {
+function Ver3CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setClickedModel }) {
     // 박스 모델의 Y, X별 모델 개수 useState
     const [numYModel, setNumYModel] = useState(yModelCount)
     const [numXModel, setNumXModel] = useState(xModelCount)
@@ -21,7 +19,9 @@ function Ver3CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData }) {
                     id={`left yModel - ${i}`}
                     position={[0, 0, z]}
                     color="blue"
-                    onHover={setHoveredData} />
+                    onHover={setHoveredData} 
+                    onClick={setClickedModel}
+                    />
             )
         }
         return yModels
@@ -37,7 +37,9 @@ function Ver3CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData }) {
                     id={`right yModel - ${i}`}
                     position={[(numXModel - 1) * (spacing), 0, z]}
                     color="yellow"
-                    onHover={setHoveredData} />
+                    onHover={setHoveredData} 
+                    onClick={setClickedModel}
+                    />
             )
         }
         return yModels
@@ -54,7 +56,9 @@ function Ver3CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData }) {
                     id={`xModel - ${i}`}
                     position={[x, 0, 0]}
                     color="green"
-                    onHover={setHoveredData} />
+                    onHover={setHoveredData} 
+                    onClick={setClickedModel}
+                    />
             )
         }
         return xModels
