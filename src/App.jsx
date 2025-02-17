@@ -10,13 +10,13 @@ function App() {
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
         <div>
           <Link to="/ver1">
-            <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver1</button>
+            <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver1_25.02.06</button>
           </Link>
           <Link to="/ver2">
-            <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver2</button>
+            <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver2_25.02.12</button>
           </Link>
           <Link to="/ver3">
-            <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver3</button>
+            <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver3_25.02.17</button>
           </Link>
         </div>
         <Routes>
