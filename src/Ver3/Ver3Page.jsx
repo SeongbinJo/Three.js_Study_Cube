@@ -28,7 +28,7 @@ function Ver3Page() {
   }
 
   const saveButton = () => {
-
+    setClickedModel({ visible: false, id: "" })
   }
 
   return (
