@@ -6,6 +6,8 @@ import { useState } from 'react';
 function Ver3Page() {
   const [hoveredData, setHoveredData] = useState({ hovered: false, x: 0, y: 0, id: "" })
   const [clickedModel, setClickedModel] = useState({ visible: false, id: "" })
+  const [selectedButtons, setSelectedButtons] = useState([])
+  const eventBoxButtons = ['충치', '발치', '임플란트', '레진']
 
   const hoverHandler = (hovered, x, y, id = "") => {
     setHoveredData({ hovered, x, y, id })
@@ -17,6 +19,12 @@ function Ver3Page() {
 
   const closeBox = () => {
     setClickedModel({ visible: false, id: "" })
+  }
+
+  const toggleButton = (button) => {
+    setSelectedButtons((prevSelected) =>
+      prevSelected.includes(button) ? prevSelected.filter((btn) => btn !== button) : [...prevSelected, button]
+    )
   }
 
   return (
@@ -42,6 +50,16 @@ function Ver3Page() {
           <div className='ver3-clicked-box'>
             <button className='close-button' onClick={closeBox}>X</button>
             <p>{clickedModel.id}</p>
+            {eventBoxButtons.map((button) => (
+        <button
+          key={button}
+          className={`toggle-button ${selectedButtons.includes(button) ? 'selected' : ''}`}
+          onClick={() => toggleButton(button)}
+        >
+          {button}
+        </button>
+      ))}
+      <div>치아 상태 : {selectedButtons.join(', ')}</div>
           </div>
         )}
       </div>
