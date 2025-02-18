@@ -58,3 +58,11 @@
   color: white;
   border-color: #007BFF;
 }
+
+.eventBox-textarea {
+  margin-top: -10px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  /* resize: none; */
+}

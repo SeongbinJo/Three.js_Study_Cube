@@ -51,15 +51,19 @@ function Ver3Page() {
             <button className='close-button' onClick={closeBox}>X</button>
             <p>{clickedModel.id}</p>
             {eventBoxButtons.map((button) => (
-        <button
-          key={button}
-          className={`toggle-button ${selectedButtons.includes(button) ? 'selected' : ''}`}
-          onClick={() => toggleButton(button)}
-        >
-          {button}
-        </button>
-      ))}
-      <div>치아 상태 : {selectedButtons.join(', ')}</div>
+              <button
+                key={button}
+                className={`toggle-button ${selectedButtons.includes(button) ? 'selected' : ''}`}
+                onClick={() => toggleButton(button)}
+              >
+                {button}
+              </button>
+            ))}
+            <p/>
+            <div>치아 상태 : {selectedButtons.join(', ')}</div>
+            <p/>
+            <p>메모</p>
+            <textarea className='eventBox-textarea' rows='10' cols='50'></textarea>
           </div>
         )}
       </div>
