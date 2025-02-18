@@ -17,14 +17,18 @@ function Ver3Page() {
     setClickedModel({ visible: true, id })
   }
 
-  const closeBox = () => {
-    setClickedModel({ visible: false, id: "" })
-  }
-
   const toggleButton = (button) => {
     setSelectedButtons((prevSelected) =>
       prevSelected.includes(button) ? prevSelected.filter((btn) => btn !== button) : [...prevSelected, button]
     )
+  }
+
+  const closeButton = () => {
+    setClickedModel({ visible: false, id: "" })
+  }
+
+  const saveButton = () => {
+
   }
 
   return (
@@ -48,7 +52,6 @@ function Ver3Page() {
         )}
         {clickedModel.visible && (
           <div className='ver3-clicked-box'>
-            <button className='close-button' onClick={closeBox}>X</button>
             <p>{clickedModel.id}</p>
             {eventBoxButtons.map((button) => (
               <button
@@ -59,11 +62,15 @@ function Ver3Page() {
                 {button}
               </button>
             ))}
-            <p/>
+            <p />
             <div>치아 상태 : {selectedButtons.join(', ')}</div>
-            <p/>
+            <p />
             <p>메모</p>
             <textarea className='eventBox-textarea' rows='10' cols='50'></textarea>
+            <div className='close-save-box'>
+              <button className='close-button' onClick={closeButton}>닫기</button>
+              <button className='save-button' onClick={closeButton}>저장</button>
+            </div>
           </div>
         )}
       </div>

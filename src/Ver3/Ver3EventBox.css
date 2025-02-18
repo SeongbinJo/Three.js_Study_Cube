@@ -11,22 +11,6 @@
     padding: 16px;
     overflow: auto;
   }
-  
-  .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    border: none;
-    background: #ff5c5c;
-    color: white;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
 
   .ver3-hovered-box {
     position: absolute;
@@ -50,7 +34,6 @@
   border-radius: 5px;
   background-color: #f0f0f0;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .toggle-button.selected {
@@ -65,4 +48,29 @@
   max-width: 100%;
   box-sizing: border-box;
   /* resize: none; */
+}
+
+.close-save-box {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.close-button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.save-button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #007BFF;
+  cursor: pointer;
 }
