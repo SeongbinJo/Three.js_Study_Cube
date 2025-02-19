@@ -75,7 +75,7 @@ function Ver4CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
     }
 
     return (
-        <Canvas camera={{ position: [13, 10, -20], fov: 30 }} onMouseDown={wheelHandler}>
+        <Canvas camera={{ position: [13, 10, -20], fov: 30 }} onMouseUp={wheelHandler}>
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
             <directionalLight position={[20, -20, 30]} />

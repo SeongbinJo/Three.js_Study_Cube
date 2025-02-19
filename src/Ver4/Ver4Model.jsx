@@ -50,7 +50,7 @@ function Ver4Model({ id, position, color, onHover, onClick }) {
                     }
                 }}
                 onPointerOut={mouseOutHandler}
-                onPointerDown={mouseClickHandler}
+                onPointerUp={mouseClickHandler}
             >
                 <boxGeometry args={[1, 1, 1]} />
                 <meshStandardMaterial color={color}
