@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import Ver1Page from './Ver1/Ver1Page'
 import Ver2Page from './Ver2/Ver2Page'
 import Ver3Page from './Ver3/Ver3Page'
+import Ver4Page from './Ver4/Ver4Page'
 
 function App() {
   return (
@@ -18,11 +19,15 @@ function App() {
           <Link to="/ver3">
             <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver3_25.02.17</button>
           </Link>
+          <Link to="/ver4">
+            <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver4_25.02.19</button>
+          </Link>
         </div>
         <Routes>
           <Route path="/ver1" element={<Ver1Page />} />
           <Route path="/ver2" element={<Ver2Page />} />
           <Route path="/ver3" element={<Ver3Page />} />
+          <Route path="/ver4" element={<Ver4Page />} />
         </Routes>
       </div>
     </Router>
