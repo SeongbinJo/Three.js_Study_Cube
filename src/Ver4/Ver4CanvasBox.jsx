@@ -2,8 +2,11 @@ import { useState } from "react"
 import { Canvas, useThree } from "@react-three/fiber"
 import Ver4Model from "./Ver4Model"
 import { OrbitControls } from "@react-three/drei"
+import { useRef } from "react"
 
 function Ver4CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setClickedModel }) {
+    const orbitRef = useRef()
+    
     // 박스 모델의 Y, X별 모델 개수 useState
     const [numYModel, setNumYModel] = useState(yModelCount)
     const [numXModel, setNumXModel] = useState(xModelCount)
@@ -64,13 +67,20 @@ function Ver4CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
         return xModels
     }
 
+    // 마우스 휠 클릭 핸들러
+    const wheelHandler = (event) => {
+        if (event.button === 1) {
+            orbitRef.current.reset()
+        }
+    }
+
     return (
-        <Canvas camera={{ position: [13, 10, -20], fov: 30 }}>
+        <Canvas camera={{ position: [13, 10, -20], fov: 30 }} onMouseDown={wheelHandler}>
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
             <directionalLight position={[20, -20, 30]} />
             <directionalLight position={[-10, 0, 0]} />
-            <OrbitControls />
+            <OrbitControls ref={orbitRef} />
             {createLeadingYModel()}
             {createXModel()}
             {createTrailingYModel()}
