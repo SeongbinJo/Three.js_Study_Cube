@@ -1,7 +1,9 @@
 import '../App.css'
 import './Ver4EventBox.css'
-import Ver4CanvasBox from './Ver4CanvasBox';
-import { useState } from 'react';
+import Ver4CanvasBox from './Ver4CanvasBox'
+import Ver4NavBar from './Ver4NavBar'
+import Ver4HelpButton from './Ver4HelpButton'
+import { useState } from 'react'
 
 function Ver4Page() {
   const [hoveredData, setHoveredData] = useState({ hovered: false, x: 0, y: 0, id: "" })
@@ -33,6 +35,7 @@ function Ver4Page() {
 
   return (
     <>
+    <Ver4NavBar/>
       <div className="model-box">
         <Ver4CanvasBox
           yModelCount={3}
