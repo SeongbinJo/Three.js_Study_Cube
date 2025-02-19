@@ -60,7 +60,7 @@ function Ver2CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData }) {
     }
 
     return (
-        <Canvas>
+        <Canvas camera={{ position: [13, 10, -20], fov: 30}}>
             <OrbitControls />
             {createLeadingYModel()}
             {createXModel()}
