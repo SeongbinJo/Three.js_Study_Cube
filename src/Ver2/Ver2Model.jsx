@@ -6,8 +6,6 @@ function Ver2Model({ id, position, color, onHover }) {
 
     return (
         <>
-            <directionalLight position={[1, 1, 1]} />
-
             <mesh position={position} onPointerOver={(event) => {
                 event.stopPropagation()
                 setHovered(true)

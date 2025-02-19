@@ -19,9 +19,9 @@ function Ver4CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
                     id={`left yModel - ${i}`}
                     position={[0, 0, z]}
                     color="blue"
-                    onHover={setHoveredData} 
+                    onHover={setHoveredData}
                     onClick={setClickedModel}
-                    />
+                />
             )
         }
         return yModels
@@ -37,9 +37,9 @@ function Ver4CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
                     id={`right yModel - ${i}`}
                     position={[(numXModel - 1) * (spacing), 0, z]}
                     color="yellow"
-                    onHover={setHoveredData} 
+                    onHover={setHoveredData}
                     onClick={setClickedModel}
-                    />
+                />
             )
         }
         return yModels
@@ -56,16 +56,20 @@ function Ver4CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
                     id={`xModel - ${i}`}
                     position={[x, 0, 0]}
                     color="green"
-                    onHover={setHoveredData} 
+                    onHover={setHoveredData}
                     onClick={setClickedModel}
-                    />
+                />
             )
         }
         return xModels
     }
 
     return (
-        <Canvas camera={{ position: [13, 10, -20], fov: 30}}>
+        <Canvas camera={{ position: [13, 10, -20], fov: 30 }}>
+            <directionalLight position={[10, 15, -30]} />
+            <directionalLight position={[10, 30, -30]} />
+            <directionalLight position={[20, -20, 30]} />
+            <directionalLight position={[-10, 0, 0]} />
             <OrbitControls />
             {createLeadingYModel()}
             {createXModel()}

@@ -1,10 +1,13 @@
 import './Ver4HelpButton.css'
 
 function Ver4HelpButton() {
+
+    const clickHelpButton = () => {
+        console.log(`Help button clicked.`)
+    }
+
     return (
-        <div>
-            hi
-        </div>
+        <button className='help-button' onClick={clickHelpButton}>?</button>
     )
 }
 

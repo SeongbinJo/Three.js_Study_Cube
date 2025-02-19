@@ -77,6 +77,7 @@ function Ver4Page() {
           </div>
         )}
       </div>
+      <Ver4HelpButton/>
     </>
   )
 }

@@ -44,6 +44,10 @@ function Ver1CanvasBox({ yModelCount, xModelCount, spacing }) {
 
     return (
         <Canvas camera={{ position: [13, 10, -20], fov: 30}}>
+            <directionalLight position={[10, 15, -30]} />
+            <directionalLight position={[10, 30, -30]} />
+            <directionalLight position={[20, -20, 30]} />
+            <directionalLight position={[-10, 0, 0]} />
             <OrbitControls />
             {createLeadingYModel()}
             {createXModel()}

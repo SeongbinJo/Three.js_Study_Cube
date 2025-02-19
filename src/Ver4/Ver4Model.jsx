@@ -40,8 +40,6 @@ function Ver4Model({ id, position, color, onHover, onClick }) {
 
     return (
         <>
-            <directionalLight position={[1, 1, 1]} />
-
             <mesh
                 ref={meshRef}
                 position={position}

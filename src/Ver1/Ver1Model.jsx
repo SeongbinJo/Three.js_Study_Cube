@@ -2,8 +2,6 @@ function Ver1Model({position, color}) {
 
     return (
         <>
-            <directionalLight position={[1,1,1]} />
-            
             <mesh position={position}>
                 <boxGeometry args={[1,1,1]} />
                 <meshStandardMaterial color={color} />
