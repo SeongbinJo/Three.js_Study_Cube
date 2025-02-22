@@ -4,6 +4,7 @@ import Ver1Page from './Ver1/Ver1Page'
 import Ver2Page from './Ver2/Ver2Page'
 import Ver3Page from './Ver3/Ver3Page'
 import Ver4Page from './Ver4/Ver4Page'
+import Ver5Page from './Ver5/Ver5Page'
 import Home from './Home'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/ver2" element={<Ver2Page />} />
         <Route path="/ver3" element={<Ver3Page />} />
         <Route path="/ver4" element={<Ver4Page />} />
+        <Route path="/ver5" element={<Ver5Page />} />
       </Routes>
     </Router>
   )
