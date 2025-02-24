@@ -4,6 +4,7 @@ import Ver5CanvasBox from './Ver5CanvasBox'
 import Ver5NavBar from './Ver5NavBar'
 import Ver5HelpButton from './Ver5HelpButton'
 import { useState } from 'react'
+import { useEffect } from 'react'
 
 function Ver5Page() {
   const [hoveredData, setHoveredData] = useState({ hovered: false, x: 0, y: 0, id: "" })
@@ -16,7 +17,7 @@ function Ver5Page() {
   }
 
   const clickHandler = (id) => {
-    setClickedModel({ visible: true, id })
+    setClickedModel({ visible: true, id: id })
   }
 
   const toggleButton = (button) => {
@@ -43,6 +44,7 @@ function Ver5Page() {
           spacing={1.5}
           setHoveredData={hoverHandler}
           setClickedModel={clickHandler}
+          clickedModel={clickedModel}
         />
         {hoveredData.hovered && (
           <div className='ver5-hovered-box'

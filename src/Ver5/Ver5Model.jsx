@@ -1,9 +1,10 @@
 import { useThree } from "@react-three/fiber"
+import { useEffect } from "react"
 import { useRef } from "react"
 import { useState } from "react"
 import * as THREE from "three"
 
-function Ver5Model({ id, position, color, onHover, onClick }) {
+function Ver5Model({ id, position, color, onHover, onClick, clickedModel }) {
     const [hovered, setHovered] = useState(false)
     const meshRef = useRef(null)
     const { camera } = useThree()
@@ -38,6 +39,10 @@ function Ver5Model({ id, position, color, onHover, onClick }) {
         }
     }
 
+    useEffect(() => {
+        console.log(`clickedModel 값 변경. id: ${clickedModel.id}, visible: ${clickedModel.visible}`)
+    }, [clickedModel])
+
     return (
         <>
             <mesh
@@ -53,7 +58,7 @@ function Ver5Model({ id, position, color, onHover, onClick }) {
                 onPointerUp={mouseClickHandler}
             >
                 <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color={color}
+                <meshStandardMaterial color={clickedModel.visible && id == clickedModel.id ? `#000000` : color}
                     transparent={true}
                     opacity={hovered ? 0.7 : 1}
                     blending={THREE.NormalBlending}

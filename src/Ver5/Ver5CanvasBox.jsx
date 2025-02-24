@@ -4,7 +4,7 @@ import Ver5Model from "./Ver5Model"
 import { OrbitControls } from "@react-three/drei"
 import { useRef } from "react"
 
-function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setClickedModel }) {
+function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setClickedModel, clickedModel }) {
     const orbitRef = useRef()
     
     // 박스 모델의 Y, X별 모델 개수 useState
@@ -24,6 +24,7 @@ function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
                     color="blue"
                     onHover={setHoveredData}
                     onClick={setClickedModel}
+                    clickedModel={clickedModel}
                 />
             )
         }
@@ -42,6 +43,7 @@ function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
                     color="yellow"
                     onHover={setHoveredData}
                     onClick={setClickedModel}
+                    clickedModel={clickedModel}
                 />
             )
         }
@@ -61,6 +63,7 @@ function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
                     color="green"
                     onHover={setHoveredData}
                     onClick={setClickedModel}
+                    clickedModel={clickedModel}
                 />
             )
         }
