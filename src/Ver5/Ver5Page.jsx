@@ -4,7 +4,6 @@ import Ver5CanvasBox from './Ver5CanvasBox'
 import Ver5NavBar from './Ver5NavBar'
 import Ver5HelpButton from './Ver5HelpButton'
 import { useState } from 'react'
-import { useEffect } from 'react'
 
 function Ver5Page() {
   const [hoveredData, setHoveredData] = useState({ hovered: false, x: 0, y: 0, id: "" })
@@ -20,6 +19,7 @@ function Ver5Page() {
     setClickedModel({ visible: true, id: id })
   }
 
+  // 모델 클릭시 나오는 팝업창의 치아상태 버튼
   const toggleButton = (button) => {
     setSelectedButtons((prevSelected) =>
       prevSelected.includes(button) ? prevSelected.filter((btn) => btn !== button) : [...prevSelected, button]
@@ -36,7 +36,7 @@ function Ver5Page() {
 
   return (
     <>
-    <Ver5NavBar/>
+    <Ver5NavBar searchedModel={clickHandler}/>
       <div className="model-box">
         <Ver5CanvasBox
           yModelCount={3}
