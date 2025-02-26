@@ -21,7 +21,7 @@ function Ver5Page() {
     const getStoredData = localStorage.getItem(id)
     if (getStoredData) {
       const parsedData = JSON.parse(getStoredData)
-      setClickedModel({ visible: true, id: parsedData.id})
+      setClickedModel({ visible: true, id: parsedData.id })
       setSelectedButtons(parsedData.status)
       setMemoText(parsedData.memo)
     } else {
@@ -43,12 +43,16 @@ function Ver5Page() {
   }
 
   const saveButton = () => {
+    if (!clickedModel.id) return
+
+    const updateData = new Ver5ModelInfo(clickedModel.id, selectedButtons, memoText)
+    localStorage.setItem(clickedModel.id, JSON.stringify(updateData))
     setClickedModel({ visible: false, id: "" })
   }
 
   return (
     <>
-    <Ver5NavBar searchedModel={clickHandler}/>
+      <Ver5NavBar searchedModel={clickHandler} />
       <div className="model-box">
         <Ver5CanvasBox
           yModelCount={3}
@@ -83,15 +87,21 @@ function Ver5Page() {
             <div>치아 상태 : {selectedButtons.join(', ')}</div>
             <p />
             <p>메모</p>
-            <textarea className='eventBox-textarea' rows='10' cols='50' value={memoText}></textarea>
+            <textarea
+              className='eventBox-textarea'
+              rows='10'
+              cols='50'
+              value={memoText}
+              onChange={(e) => setMemoText(e.target.value)}
+            ></textarea>
             <div className='close-save-box'>
               <button className='close-button' onClick={closeButton}>닫기</button>
-              <button className='save-button' onClick={closeButton}>저장</button>
+              <button className='save-button' onClick={saveButton}>저장</button>
             </div>
           </div>
         )}
       </div>
-      <Ver5HelpButton/>
+      <Ver5HelpButton />
     </>
   )
 }
