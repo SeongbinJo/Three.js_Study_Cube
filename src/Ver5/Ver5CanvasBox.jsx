@@ -115,7 +115,7 @@ function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
             {createXModel()}
             {createTrailingYModel()}
 
-            {/* <axesHelper args={[10]}></axesHelper> */}
+            <axesHelper args={[10]}></axesHelper>
         </Canvas>
     )
 }
