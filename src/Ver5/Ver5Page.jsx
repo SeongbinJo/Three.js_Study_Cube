@@ -3,12 +3,14 @@ import './Ver5EventBox.css'
 import Ver5CanvasBox from './Ver5CanvasBox'
 import Ver5NavBar from './Ver5NavBar'
 import Ver5HelpButton from './Ver5HelpButton'
+import Ver5ModelInfo from './Ver5ModelInfo'
 import { useState } from 'react'
 
 function Ver5Page() {
   const [hoveredData, setHoveredData] = useState({ hovered: false, x: 0, y: 0, id: "" })
   const [clickedModel, setClickedModel] = useState({ visible: false, id: "" })
   const [selectedButtons, setSelectedButtons] = useState([])
+  const [memoText, setMemoText] = useState("")
   const eventBoxButtons = ['충치', '발치', '임플란트', '레진']
 
   const hoverHandler = (hovered, x, y, id = "") => {
@@ -16,7 +18,17 @@ function Ver5Page() {
   }
 
   const clickHandler = (id) => {
-    setClickedModel({ visible: true, id: id })
+    const getStoredData = localStorage.getItem(id)
+    if (getStoredData) {
+      const parsedData = JSON.parse(getStoredData)
+      setClickedModel({ visible: true, id: parsedData.id})
+      setSelectedButtons(parsedData.status)
+      setMemoText(parsedData.memo)
+    } else {
+      setClickedModel({ visible: true, id: id })
+      setSelectedButtons([])
+      setMemoText("")
+    }
   }
 
   // 모델 클릭시 나오는 팝업창의 치아상태 버튼
@@ -71,7 +83,7 @@ function Ver5Page() {
             <div>치아 상태 : {selectedButtons.join(', ')}</div>
             <p />
             <p>메모</p>
-            <textarea className='eventBox-textarea' rows='10' cols='50'></textarea>
+            <textarea className='eventBox-textarea' rows='10' cols='50' value={memoText}></textarea>
             <div className='close-save-box'>
               <button className='close-button' onClick={closeButton}>닫기</button>
               <button className='save-button' onClick={closeButton}>저장</button>
