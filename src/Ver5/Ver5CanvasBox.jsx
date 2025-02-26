@@ -3,6 +3,8 @@ import { Canvas, useThree } from "@react-three/fiber"
 import Ver5Model from "./Ver5Model"
 import { OrbitControls } from "@react-three/drei"
 import { useRef } from "react"
+import { useEffect } from "react"
+import Ver5ModelInfo from "./Ver5ModelInfo"
 
 function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setClickedModel, clickedModel }) {
     const orbitRef = useRef()
@@ -11,6 +13,27 @@ function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
     const [numYModel, setNumYModel] = useState(yModelCount)
     const [numXModel, setNumXModel] = useState(xModelCount)
 
+    // 생성될 모델의 id를 배열에 담음 - localStorage 처음 세팅할때 사용
+    const modelIds = []
+
+    for (let i = 1; i <= numYModel; i++) {
+        modelIds.push(`left yModel - ${i}`)
+        modelIds.push(`right yModel - ${i}`)
+    }
+    for (let i = 0; i < numXModel; i++) {
+        modelIds.push(`xModel - ${i}`)
+    }
+
+    // modelIds 사용하여 localStorage 세팅
+    useEffect(() => {
+        modelIds.forEach((id) => {
+            if (!localStorage.getItem(id)) {
+                const emptyData = new Ver5ModelInfo(id, [], "")
+                localStorage.setItem(id, JSON.stringify(emptyData))
+            }
+        })
+    }, [])
+
     // 세로 부분 배치
     const createLeadingYModel = () => {
         const yModels = []
@@ -18,7 +41,7 @@ function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
             const z = (-i) * (spacing)
             yModels.push(
                 <Ver5Model
-                    key={`yModel - ${i}`}
+                    key={`left yModel - ${i}`}
                     id={`left yModel - ${i}`}
                     position={[0, 0, z]}
                     color="blue"
@@ -37,7 +60,7 @@ function Ver5CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
             const z = (-i) * (spacing)
             yModels.push(
                 <Ver5Model
-                    key={`yModel - ${i}`}
+                    key={`right yModel - ${i}`}
                     id={`right yModel - ${i}`}
                     position={[(numXModel - 1) * (spacing), 0, z]}
                     color="yellow"

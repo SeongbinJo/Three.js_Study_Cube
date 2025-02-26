@@ -5,9 +5,12 @@ import Ver2Page from './Ver2/Ver2Page'
 import Ver3Page from './Ver3/Ver3Page'
 import Ver4Page from './Ver4/Ver4Page'
 import Ver5Page from './Ver5/Ver5Page'
+import Ver5ModelInfo from './Ver5/Ver5ModelInfo'
 import Home from './Home'
+import { useEffect } from 'react'
 
 function App() {
+
   return (
     <Router>
       <Routes>
