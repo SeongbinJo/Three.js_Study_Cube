@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 function Home() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Link to="/ver1">
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver1_25.02.06</button>
         </Link>
@@ -20,7 +20,7 @@ function Home() {
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver5_25.02.26</button>
         </Link>
         <Link to="/ver6">
-          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver6</button>
+          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver6_ing</button>
         </Link>
       </div>
     </div>
