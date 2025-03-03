@@ -6,6 +6,7 @@ import { AxesHelper } from "three"
 import { useRef } from "react"
 import { useEffect } from "react"
 import Ver6ModelInfo from "./Ver6ModelInfo"
+import './Ver6EventBox.css'
 
 function Ver6CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setClickedModel, clickedModel }) {
     const orbitRef = useRef()
@@ -104,7 +105,9 @@ function Ver6CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
     }
 
     return (
-        <Canvas camera={{ position: [-10, 10, 10], fov: 35 }} onMouseUp={wheelHandler}>
+        <div style={{position: "relative", width: "100%", height: "100%"}}>
+
+            <Canvas camera={{ position: [-10, 10, 10], fov: 35 }} onMouseUp={wheelHandler}>
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
             <directionalLight position={[20, -20, 30]} />
@@ -118,6 +121,8 @@ function Ver6CanvasBox({ yModelCount, xModelCount, spacing, setHoveredData, setC
             <axesHelper args={[10]}></axesHelper>
             
         </Canvas>
+        <div className="dot"></div>
+        </div>
     )
 }
 
