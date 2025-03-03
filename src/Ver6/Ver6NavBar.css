@@ -1,0 +1,45 @@
+.navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+    height: 7vh;
+    background-color: #007BFF;
+    color: white;
+  }
+  
+  .navbar-left {
+    display: flex;
+    gap: 10px;
+    margin-left: 10px;
+  }
+  
+  .nav-button {
+    background-color: transparent;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .nav-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .navbar-right {
+    display: flex;
+  }
+  
+  .nav-search {
+    width: 12vw;
+    height: 25px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+  }
+  
