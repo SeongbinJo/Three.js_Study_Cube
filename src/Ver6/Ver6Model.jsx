@@ -39,10 +39,6 @@ function Ver6Model({ id, position, color, onHover, onClick, clickedModel }) {
         }
     }
 
-    useEffect(() => {
-        console.log(`clickedModel 값 변경. id: ${clickedModel.id}, visible: ${clickedModel.visible}`)
-    }, [clickedModel])
-
     return (
         <>
             <mesh

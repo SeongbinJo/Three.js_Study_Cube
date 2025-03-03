@@ -19,6 +19,9 @@ function Home() {
         <Link to="/ver5">
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver5_25.02.26</button>
         </Link>
+        <Link to="/ver6">
+          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver6</button>
+        </Link>
       </div>
     </div>
   )
