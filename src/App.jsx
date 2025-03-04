@@ -7,7 +7,7 @@ import Ver4Page from './Ver4/Ver4Page'
 import Ver5Page from './Ver5/Ver5Page'
 import Ver6Page from './Ver6/Ver6Page'
 import Home from './Home'
-import { useEffect } from 'react'
+import SidePage from './SidePage/SidePage'
 
 function App() {
 
@@ -21,6 +21,7 @@ function App() {
         <Route path="/ver4" element={<Ver4Page />} />
         <Route path="/ver5" element={<Ver5Page />} />
         <Route path="/ver6" element={<Ver6Page />} />
+        <Route path="/sidepage" element={<SidePage />} />
       </Routes>
     </Router>
   )
