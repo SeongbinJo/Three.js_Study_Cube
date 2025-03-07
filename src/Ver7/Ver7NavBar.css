@@ -1,0 +1,72 @@
+.navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100vw;
+  height: 7vh;
+  background-color: #007BFF;
+  color: white;
+}
+
+.navbar-left {
+  display: flex;
+  gap: 10px;
+  margin-left: 10px;
+}
+
+.nav-button {
+  background-color: transparent;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.nav-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.navbar-right {
+  display: flex;
+}
+
+.nav-search {
+  width: 12vw;
+  height: 25px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+}
+
+.nav-search-container {
+  position: relative;
+}
+
+.dropdown-list {
+  position: fixed; /* navbar 밖으로 띄우기 */
+  top: 7vh; /* navbar 바로 아래 */
+  right: 70px; /* 검색창 위치에 맞게 조정 */
+  width: 20vw; /* 검색창 너비에 맞게 */
+  max-height: 250px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 1000; /* 확실하게 위로 */
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+  color: black;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #ff7b7b;
+}
