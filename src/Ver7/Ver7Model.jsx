@@ -1,13 +1,14 @@
+import { TransformControls } from "@react-three/drei"
 import { useThree } from "@react-three/fiber"
 import { useEffect } from "react"
 import { useRef } from "react"
 import { useState } from "react"
 import * as THREE from "three"
 
-function Ver7Model({ id, position, color, onHover, onClick, clickedModel }) {
+function Ver7Model({ id, position, color, onHover, onClick, clickedModel, setOrbitControlsEnabled }) {
     const [hovered, setHovered] = useState(false)
     const meshRef = useRef(null)
-    const { camera } = useThree()
+    const { camera, gl } = useThree()
 
     const mouseOverHandler = (event) => {
         event.stopPropagation()
@@ -35,8 +36,16 @@ function Ver7Model({ id, position, color, onHover, onClick, clickedModel }) {
 
         if (intersects.length > 0) {
             console.log(id)
-            onClick(id)
+            onClick(id, meshRef.current)
         }
+    }
+
+    const transformControlStart = () => {
+        setOrbitControlsEnabled(false)
+    }
+
+    const transformControlEnd = () => {
+        setOrbitControlsEnabled(true)
     }
 
     return (
@@ -60,6 +69,15 @@ function Ver7Model({ id, position, color, onHover, onClick, clickedModel }) {
                     blending={THREE.NormalBlending}
                 />
             </mesh>
+            {clickedModel.visible && clickedModel.object && (
+                <TransformControls
+                    object={clickedModel.object}
+                    camera={camera}
+                    domElement={gl.domElement}
+                    onMouseDown={transformControlStart}
+                    onMouseUp={transformControlEnd}
+                />
+            )}
         </>
     )
 }

@@ -8,7 +8,7 @@ import { useState } from 'react'
 
 function Ver7Page() {
   const [hoveredData, setHoveredData] = useState({ hovered: false, x: 0, y: 0, id: "" })
-  const [clickedModel, setClickedModel] = useState({ visible: false, id: "" })
+  const [clickedModel, setClickedModel] = useState({ visible: false, id: "", object: null})
   const [selectedButtons, setSelectedButtons] = useState([])
   const [memoText, setMemoText] = useState("")
   const eventBoxButtons = ['충치', '발치', '임플란트', '레진']
@@ -17,15 +17,15 @@ function Ver7Page() {
     setHoveredData({ hovered, x, y, id })
   }
 
-  const clickHandler = (id) => {
+  const clickHandler = (id, object) => {
     const getStoredData = localStorage.getItem(id)
     if (getStoredData) {
       const parsedData = JSON.parse(getStoredData)
-      setClickedModel({ visible: true, id: parsedData.id })
+      setClickedModel({ visible: true, id: parsedData.id, object })
       setSelectedButtons(parsedData.status)
       setMemoText(parsedData.memo)
     } else {
-      setClickedModel({ visible: true, id: id })
+      setClickedModel({ visible: true, id: id, object })
       setSelectedButtons([])
       setMemoText("")
     }
