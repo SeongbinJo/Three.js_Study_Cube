@@ -38,7 +38,6 @@ function Ver7Model({ id, position, color, onHover, onClick, clickedModel, setOrb
 
         event.stopPropagation()
 
-        // 드래그 중일 때는 hovered와 onHover를 false로 설정
         setHovered(false)
         onHover(false, event.clientX, event.clientY, id)
 
