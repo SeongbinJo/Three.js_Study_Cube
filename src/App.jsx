@@ -9,7 +9,7 @@ import Ver6Page from './Ver6/Ver6Page'
 import Ver7Page from './Ver7/Ver7Page'
 import Home from './Home'
 import SidePage from './SidePage/SidePage'
-import SidePage2 from './SidePage2/SidePage'
+import SidePage2 from './SidePage2/SidePage2'
 
 function App() {
 
