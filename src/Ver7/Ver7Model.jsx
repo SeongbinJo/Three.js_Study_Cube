@@ -74,6 +74,7 @@ function Ver7Model({ id, position, color, onHover, onClick, clickedModel, setOrb
                     object={clickedModel.object}
                     camera={camera}
                     domElement={gl.domElement}
+                    mode="translate"
                     onMouseDown={transformControlStart}
                     onMouseUp={transformControlEnd}
                 />

@@ -28,6 +28,9 @@ function Home() {
         <Link to="/sidepage">
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage_투과</button>
         </Link>
+        <Link to="/sidepage2">
+          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage2_가동범위</button>
+        </Link>
       </div>
     </div>
   )
