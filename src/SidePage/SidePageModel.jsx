@@ -1,8 +1,6 @@
 import * as THREE from "three"
 
-
 function SidePageModel() {
-
   return (
     <>
       <mesh>
@@ -11,7 +9,12 @@ function SidePageModel() {
       </mesh>
       <mesh>
         <boxGeometry args={[2, 3, 2, 10, 10, 10]} />
-        <meshStandardMaterial color="blue" />
+        <meshStandardMaterial attach="material-1" color="clear" />  {/* 앞면 */}
+        <meshStandardMaterial attach="material-1" color="red" />   {/* 뒷면 */}
+        <meshStandardMaterial attach="material-2" color="blue" />  {/* 위쪽 */}
+        <meshStandardMaterial attach="material-3" color="blue" />  {/* 아래쪽 */}
+        <meshStandardMaterial attach="material-4" color="blue" />  {/* 왼쪽 */}
+        <meshStandardMaterial attach="material-5" color="yellow" />{/* 오른쪽 */}
       </mesh>
     </>
   )

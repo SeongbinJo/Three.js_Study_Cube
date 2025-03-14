@@ -4,7 +4,7 @@ import { useThree } from "@react-three/fiber"
 
 function SidePageModel2({ orbitRef }) {
   const transformRef = useRef(null)
-  const { scene } = useThree()
+  const shpereRef = useRef(null)
 
   return (
     <>
