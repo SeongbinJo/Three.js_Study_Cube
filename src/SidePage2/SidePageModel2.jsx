@@ -15,7 +15,7 @@ function SidePageModel2({ orbitRef }) {
       <TransformControls
         ref={transformRef}
         mode="rotate"
-        position={[0, -0.75, 0]}  // TransformControls의 위치
+        position={[0, 0, 1]}  // TransformControls의 위치
         onMouseDown={() => (orbitRef.current.enabled = false)}
         onMouseUp={() => (orbitRef.current.enabled = true)}
       >
