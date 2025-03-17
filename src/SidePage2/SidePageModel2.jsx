@@ -7,6 +7,9 @@ function SidePageModel2({ orbitRef }) {
   const boxRef = useRef(null)
   const sphereRef = useRef(null)
   const cylinderRef = useRef(null)
+  const boxHelperRef = useRef(null)
+  const sphereHelperRef = useRef(null)
+  const cylinderHelperRef = useRef(null)
 
   const box = new THREE.Box3()  // 충돌 감지용 box
   const sphereCenter = new THREE.Vector3()  // Sphere의 중심
@@ -42,10 +45,36 @@ function SidePageModel2({ orbitRef }) {
   }
 
   useEffect(() => {
+    // 바운딩 박스 시각화
+    if (boxRef.current) {
+      const boxHelper = new THREE.BoxHelper(boxRef.current, 0xffff00)
+      boxHelperRef.current = boxHelper
+      boxRef.current.add(boxHelper)
+    }
+
+    if (sphereRef.current) {
+      const sphereHelper = new THREE.BoxHelper(sphereRef.current, 0xff0000)
+      sphereHelperRef.current = sphereHelper
+      sphereRef.current.add(sphereHelper)
+    }
+
+    if (cylinderRef.current) {
+      const cylinderHelper = new THREE.BoxHelper(cylinderRef.current, 0x00ff00)
+      cylinderHelperRef.current = cylinderHelper
+      cylinderRef.current.add(cylinderHelper)
+    }
+
     // 매 프레임마다 충돌 체크
     const interval = setInterval(detectCollision, 200)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+
+      // 컴포넌트가 unmount 될 때, 헬퍼 객체를 제거
+      if (boxHelperRef.current) boxRef.current.remove(boxHelperRef.current)
+      if (sphereHelperRef.current) sphereRef.current.remove(sphereHelperRef.current)
+      if (cylinderHelperRef.current) cylinderRef.current.remove(cylinderHelperRef.current)
+    }
   }, [])
 
   return (
@@ -62,6 +91,7 @@ function SidePageModel2({ orbitRef }) {
         onMouseDown={() => (orbitRef.current.enabled = false)}
         onMouseUp={() => (orbitRef.current.enabled = true)}
       >
+        <group>
         <mesh ref={sphereRef} position={[0, 0, 0]}> 
           <sphereGeometry args={[0.5, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshStandardMaterial color="blue" />
@@ -70,6 +100,7 @@ function SidePageModel2({ orbitRef }) {
           <cylinderGeometry args={[0.5, 0.5, 2]} />
           <meshStandardMaterial color="blue" />
         </mesh>
+        </group>
       </TransformControls>
     </>
   )
