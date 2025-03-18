@@ -1,3 +1,41 @@
+// import { useRef, useEffect } from "react"
+// import { TransformControls } from "@react-three/drei"
+// import * as THREE from 'three'
+
+// function SidePageModel2({ orbitRef }) {
+//   const transformRef = useRef(null)
+//   const boxRef = useRef(null)
+//   const capsuleRef = useRef(null) // 캡슐 모델을 위한 ref
+ 
+
+
+//   return (
+//     <>
+//       <mesh ref={boxRef} position={[0, 0, 0]}>
+//         <boxGeometry args={[6, 0.5, 1]} />
+//         <meshStandardMaterial color="white" />
+//       </mesh>
+
+//       <TransformControls
+//         ref={transformRef}
+//         mode="rotate"
+//         position={[0, -1, 0]}  // TransformControls의 위치
+//         onMouseDown={() => (orbitRef.current.enabled = false)}
+//         onMouseUp={() => (orbitRef.current.enabled = true)}
+//       >
+//         <group>
+//           <mesh ref={capsuleRef} position={[0, -1, 0]}>
+//             <capsuleGeometry args={[0.5, 2, 32, 100]} /> {/* 캡슐 모델로 대체 */}
+//             <meshStandardMaterial color="blue" />
+//           </mesh>
+//         </group>
+//       </TransformControls>
+//     </>
+//   )
+// }
+
+// export default SidePageModel2
+
 import { useRef, useEffect } from "react"
 import { TransformControls } from "@react-three/drei"
 import * as THREE from 'three'
@@ -61,7 +99,7 @@ function SidePageModel2({ orbitRef }) {
     }
 
     // 매 프레임마다 충돌 체크
-    const interval = setInterval(detectCollision, 200)
+    const interval = setInterval(detectCollision, 100)
 
     return () => {
       clearInterval(interval)
