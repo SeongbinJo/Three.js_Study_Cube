@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react"
 import { TransformControls } from "@react-three/drei"
 import * as THREE from 'three'
 
-function SidePageModel2({ orbitRef }) {
+function SidePageModel3({ orbitRef }) {
   const transformRef = useRef(null)
   const boxRef = useRef(null)
   const capsuleRef = useRef(null) // 캡슐 모델을 위한 ref
@@ -97,4 +97,4 @@ function SidePageModel2({ orbitRef }) {
   )
 }
 
-export default SidePageModel2
+export default SidePageModel3
