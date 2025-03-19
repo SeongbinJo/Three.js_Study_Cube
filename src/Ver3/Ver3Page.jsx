@@ -73,6 +73,16 @@ function Ver3Page() {
             </div>
           </div>
         )}
+        <div className='ver1-hovered-box' style={{ 
+                position: 'absolute',   // absolute로 지정하여 캔버스 위에 띄움
+                left: 30,               // 원하는 x 위치
+                top: 30,                // 원하는 y 위치
+                zIndex: 10             // 다른 요소들보다 위에 위치하도록 설정
+            }}>
+                [Ver3] - 25.02.19<br />
+                1. 마우스로 box 모델 클릭시 해당 모델의 정보창 팝업<br />
+                2. 팝업창 - 치아 상태 버튼, 메모(기능 비활성화)
+            </div>
       </div>
     </>
   )

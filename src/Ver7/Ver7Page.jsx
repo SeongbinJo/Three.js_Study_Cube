@@ -101,6 +101,15 @@ function Ver7Page() {
           </div>
         )}
       </div>
+      <div className='ver1-hovered-box' style={{ 
+                position: 'absolute',   // absolute로 지정하여 캔버스 위에 띄움
+                left: 30,               // 원하는 x 위치
+                top: 90,                // 원하는 y 위치
+                zIndex: 10             // 다른 요소들보다 위에 위치하도록 설정
+            }}>
+                [Ver7] - 25.03.10<br />
+                1. 클릭한 모델 드래그로 이동 가능<br />
+            </div>
       <Ver7HelpButton />
     </>
   )

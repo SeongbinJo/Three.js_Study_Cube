@@ -78,6 +78,16 @@ function Ver4Page() {
         )}
       </div>
       <Ver4HelpButton/>
+      <div className='ver1-hovered-box' style={{ 
+                position: 'absolute',   // absolute로 지정하여 캔버스 위에 띄움
+                left: 30,               // 원하는 x 위치
+                top: 90,                // 원하는 y 위치
+                zIndex: 10             // 다른 요소들보다 위에 위치하도록 설정
+            }}>
+                [Ver4] - 25.02.19<br />
+                1. 상단바 추가(기능 x)<br />
+                2. 도움말 추가(기능 x)<br />
+            </div>
     </>
   )
 }

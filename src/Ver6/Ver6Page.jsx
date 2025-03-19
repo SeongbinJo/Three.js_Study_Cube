@@ -101,6 +101,17 @@ function Ver6Page() {
           </div>
         )}
       </div>
+      <div className='ver1-hovered-box' style={{ 
+                position: 'absolute',   // absolute로 지정하여 캔버스 위에 띄움
+                left: 30,               // 원하는 x 위치
+                top: 90,                // 원하는 y 위치
+                zIndex: 10             // 다른 요소들보다 위에 위치하도록 설정
+            }}>
+                [Ver6] - 25.03.03<br />
+                1. 검색창 기능 강화(id 일부분 검색, 치아 상태 입력시 리스트 팝업)<br />
+                2. 카메라 에임기능 추가<br />
+                3. localStorage 적용<br />
+            </div>
       <Ver6HelpButton />
     </>
   )

@@ -101,6 +101,18 @@ function Ver5Page() {
           </div>
         )}
       </div>
+      <div className='ver1-hovered-box' style={{ 
+                position: 'absolute',   // absolute로 지정하여 캔버스 위에 띄움
+                left: 30,               // 원하는 x 위치
+                top: 90,                // 원하는 y 위치
+                zIndex: 10             // 다른 요소들보다 위에 위치하도록 설정
+            }}>
+                [Ver5] - 25.02.26<br />
+                1. 클릭된/검색된 모델 색 변경(검은색) - 25.02.24<br />
+                2. 검색창 기능 추가(id 검색시 해당 모델의 정보창 팝업) - 25.02.25<br />
+                3. localStorage 적용 - 25.02.26<br />
+                4. 혓바닥 위치로 기준점 변경<br />
+            </div>
       <Ver5HelpButton />
     </>
   )

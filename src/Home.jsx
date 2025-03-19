@@ -23,16 +23,16 @@ function Home() {
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver6_25.03.03</button>
         </Link>
         <Link to="/ver7">
-          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver7_ing</button>
+          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>Ver7_25.03.10</button>
         </Link>
         <Link to="/sidepage">
-          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage_투과</button>
+          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage_투과_25.03.14</button>
         </Link>
         <Link to="/sidepage2">
-          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage2_가동범위</button>
+          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage2_가동범위_25.03.19</button>
         </Link>
         <Link to="/sidepage3">
-          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage3_Inverse Kinetic</button>
+          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage3_Inverse Kinetic_ing</button>
         </Link>
       </div>
     </div>

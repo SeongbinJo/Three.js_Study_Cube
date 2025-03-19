@@ -12,7 +12,7 @@ function Ver1Page() {
                 top: 30,                // 원하는 y 위치
                 zIndex: 10             // 다른 요소들보다 위에 위치하도록 설정
             }}>
-                [Ver1]<br />
+                [Ver1] - 25.02.06<br />
                 box 모델의 치아 배열과 같이 배치
             </div>
         </div>
