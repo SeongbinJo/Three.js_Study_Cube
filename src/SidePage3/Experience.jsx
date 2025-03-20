@@ -28,7 +28,7 @@ export const Experience = () => {
         console.log("쾅!")
         setRotationDirection((prev) => prev * -1)
         collisionRef.current = true // 충돌 상태로 설정
-    
+
         // 일정 시간이 지난 후 충돌 상태를 초기화
         setTimeout(() => {
             collisionRef.current = false // 충돌 상태를 해제
@@ -49,13 +49,13 @@ export const Experience = () => {
         <>
             <ambientLight intensity={0.5} />
             <directionalLight position={[-10, 10, 0]} intensity={0.4} />
-            <OrbitControls minDistance={20} maxDistance={40}/>
+            <OrbitControls minDistance={20} maxDistance={40} />
 
-            <RigidBody position={[-3, 0, 0]} colliders="ball" gravityScale={5}>
-            <Sphere>
-                <meshStandardMaterial color="hotpink" />
-            </Sphere>
-        </RigidBody>
+            {/* <RigidBody position={[-3, 0, 0]} colliders="ball" gravityScale={5}>
+                <Sphere>
+                    <meshStandardMaterial color="hotpink" />
+                </Sphere>
+            </RigidBody> */}
 
             <RigidBody position={[3, 0, 2]} colliders="cuboid" ref={cubeRef} enabledTranslations={[false, false, false]} enabledRotations={[false, false, false]}>
                 <Box
