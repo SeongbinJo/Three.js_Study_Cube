@@ -10,7 +10,7 @@ function SidePageModel3({ orbitRef }) {
     <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
       {/* <color attach="background" args={["#ececec"]} /> */}
       <Suspense>
-        <Physics debug>
+        <Physics debug gravity={[0, -10, 0]}>
           <Experience />
         </Physics>
       </Suspense>
