@@ -31,9 +31,9 @@ function Home() {
         <Link to="/sidepage2">
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage2_가동범위_25.03.19</button>
         </Link>
-        {/* <Link to="/sidepage3">
-          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage3_Inverse Kinetic_ing</button>
-        </Link> */}
+        <Link to="/sidepage3">
+          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage3_물리법칙</button>
+        </Link>
       </div>
     </div>
   )
