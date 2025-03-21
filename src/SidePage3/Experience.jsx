@@ -51,13 +51,15 @@ export const Experience = () => {
             <directionalLight position={[-10, 10, 0]} intensity={0.4} />
             <OrbitControls minDistance={20} maxDistance={40} />
 
-            {/* <RigidBody position={[-3, 0, 0]} colliders="ball" gravityScale={5}>
+            {/* <RigidBody position={[-3, 5, 0]} colliders="ball" gravityScale={5}>
                 <Sphere>
                     <meshStandardMaterial color="hotpink" />
                 </Sphere>
             </RigidBody> */}
 
-            <RigidBody position={[3, 0, 2]} colliders="cuboid" ref={cubeRef} enabledTranslations={[false, false, false]} enabledRotations={[false, false, false]}>
+            <RigidBody position={[3, 0, 2]} colliders="cuboid" ref={cubeRef} 
+            enabledTranslations={[false, false, false]} enabledRotations={[false, false, false]}
+            >
                 <Box
                     onClick={slide}
                 >

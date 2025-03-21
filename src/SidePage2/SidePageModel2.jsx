@@ -85,6 +85,11 @@ function SidePageModel2({ orbitRef }) {
         position={[0, -1.2, 0]}  // TransformControls의 위치
         onMouseDown={() => (orbitRef.current.enabled = false)}
         onMouseUp={() => (orbitRef.current.enabled = true)}
+        rotateY={false}
+        showX={false}
+        showY={false}
+        showZ={true}
+        rotateZ={1}
       >
         <group>
           <mesh ref={capsuleRef} position={[0, -1, 0]}>
