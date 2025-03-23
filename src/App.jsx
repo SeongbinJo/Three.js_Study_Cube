@@ -12,6 +12,7 @@ import SidePage from './SidePage/SidePage'
 import SidePage2 from './SidePage2/SidePage2'
 import SidePage2_1 from './SidePage2_1/SidePage2_1'
 import SidePage3 from './SidePage3/SidePage3'
+import SidePage4 from './SidePage4/SidePage4'
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
         <Route path="/sidepage2" element={<SidePage2 />} />
         <Route path="/sidepage2_1" element={<SidePage2_1 />} />
         <Route path="/sidepage3" element={<SidePage3 />} />
+        <Route path="/sidepage4" element={<SidePage4 />} />
       </Routes>
     </Router>
   )

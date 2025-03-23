@@ -1,11 +1,10 @@
-import { Box, Capsule, OrbitControls, Sphere, Torus } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
-import { quat, RigidBody } from "@react-three/rapier";
-import { useRef } from "react";
-import { Scene } from "three/src/Three.Core.js";
-import { AxesHelper } from "three/src/Three.Core.js";
+import { Box, Capsule, OrbitControls, Sphere, Torus } from "@react-three/drei"
+import { useFrame, useThree } from "@react-three/fiber"
+import { quat, RigidBody } from "@react-three/rapier"
+import { useRef } from "react"
+import { AxesHelper } from "three/src/Three.Core.js"
 import * as THREE from 'three'
-import { useState } from "react";
+import { useState } from "react"
 
 
 export const Experience = () => {
