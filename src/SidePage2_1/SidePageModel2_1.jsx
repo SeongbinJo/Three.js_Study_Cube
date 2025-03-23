@@ -54,7 +54,7 @@ function SidePageModel2_1({ orbitRef }) {
 
   const handleMouseMove = (event) => {
     if (isDraggingRef.current) {
-      const capsuleCenter = capsulePosition; // 캡슐의 NDC 좌표
+      const capsuleCenter = capsulePosition // 캡슐의 NDC 좌표
   
       // 마우스 좌표 계산 (캔버스 좌표에서 NDC로 변환)
       const mouseX = (event.clientX / window.innerWidth) * 2 - 1
@@ -83,7 +83,11 @@ function SidePageModel2_1({ orbitRef }) {
       cosTheta = Math.min(Math.max(cosTheta, -1), 1)
   
       // cos(θ)를 기준으로 각도 계산
-      const angle = Math.acos(cosTheta)
+      let angle = Math.acos(cosTheta)
+  
+      // 각도를 70도 이하로 제한 (70도를 라디안 값으로 변환)
+      const maxAngle = THREE.MathUtils.degToRad(70) // 70도 -> 라디안
+      angle = Math.min(angle, maxAngle) // 각도가 70도보다 크면 70도로 제한
   
       // 벡터 외적을 이용한 회전 방향 확인
       const crossProduct = vectorA.x * vectorB.y - vectorA.y * vectorB.x
@@ -97,7 +101,7 @@ function SidePageModel2_1({ orbitRef }) {
       // 각도를 도(degree)로 변환
       console.log(`각도: ${THREE.MathUtils.radToDeg(angle)}도`)
     } else {
-      // console.log("드래그 중 아님..");
+      // console.log("드래그 중 아님..")
     }
   }
 
