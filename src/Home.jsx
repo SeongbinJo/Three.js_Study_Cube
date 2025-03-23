@@ -32,7 +32,7 @@ function Home() {
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage2_가동범위_25.03.19</button>
         </Link>
         <Link to="/sidepage2_1">
-          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage2_1_가동범위_ing</button>
+          <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage2_1_가동범위_25.03.23</button>
         </Link>
         <Link to="/sidepage3">
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage3_물리법칙</button>
