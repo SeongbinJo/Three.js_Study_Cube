@@ -86,7 +86,7 @@ function SidePageModel2_1({ orbitRef }) {
       let angle = Math.acos(cosTheta)
   
       // 각도를 70도 이하로 제한 (70도를 라디안 값으로 변환)
-      const maxAngle = THREE.MathUtils.degToRad(70) // 70도 -> 라디안
+      const maxAngle = THREE.MathUtils.degToRad(97) // 70도 -> 라디안
       angle = Math.min(angle, maxAngle) // 각도가 70도보다 크면 70도로 제한
   
       // 벡터 외적을 이용한 회전 방향 확인
