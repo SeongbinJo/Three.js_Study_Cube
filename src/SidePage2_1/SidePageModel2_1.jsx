@@ -11,7 +11,7 @@ function SidePageModel2_1({ orbitRef }) {
   const isDraggingRef = useRef(isDragging) // isDragging 상태를 계속 추적할 수 있는 ref
 
   useEffect(() => {
-    isDraggingRef.current = isDragging; // isDragging 상태를 ref에 동기화
+    isDraggingRef.current = isDragging // isDragging 상태를 ref에 동기화
   }, [isDragging])
 
   useEffect(() => {
@@ -29,7 +29,7 @@ function SidePageModel2_1({ orbitRef }) {
       if (isDraggingRef.current) {
         setIsDragging(false)
         orbitRef.current.enabled = true
-        console.log("드래그 멈춤! (캡슐 외부에서 클릭 해제됨)")
+        console.log("드래그 멈춤! (클릭 해제됨)")
       }
     }
 
@@ -125,58 +125,3 @@ function SidePageModel2_1({ orbitRef }) {
 }
 
 export default SidePageModel2_1
-
-// import { useRef, useEffect, useState } from "react"
-// import * as THREE from "three"
-
-// function SidePageModel2_1() {
-//   const capsuleRef = useRef()
-//   const animationRef = useRef()
-//   const [direction, setDirection] = useState(1)
-
-//   useEffect(() => {
-//     if (!capsuleRef.current) return
-    
-//     const geometry = capsuleRef.current.geometry
-//     geometry.translate(0, -1, 0)
-//   }, [])
-
-//   useEffect(() => {
-//     const rotate = () => {
-//       if (capsuleRef.current) {
-//         // 현재 회전 각도 (라디안 → 도)
-//         let currentAngle = THREE.MathUtils.radToDeg(capsuleRef.current.rotation.z)
-
-//         // 방향 변경 로직
-//         if (currentAngle >= 40) setDirection(-1)
-//         if (currentAngle <= -40) setDirection(1)
-
-//         // 회전 값 증가 또는 감소
-//         capsuleRef.current.rotation.z += THREE.MathUtils.degToRad(1) * direction
-
-//         console.log(`현재 각도: ${currentAngle}°`)
-//       }
-//       animationRef.current = requestAnimationFrame(rotate)
-//     }
-
-//     animationRef.current = requestAnimationFrame(rotate)
-
-//     return () => cancelAnimationFrame(animationRef.current)
-//   }, [direction])
-
-//   return (
-//     <>
-//       <mesh position={[0, 0, 0]}>
-//         <boxGeometry args={[6, 0.5, 1]} />
-//         <meshStandardMaterial color="white" />
-//       </mesh>
-
-//       <mesh ref={capsuleRef} position={[0, -1, 0]}>
-//         <capsuleGeometry args={[0.5, 2, 32, 100]} />
-//         <meshStandardMaterial color="blue" />
-//       </mesh>
-//     </>
-//   )
-// }
-
-// export default SidePageModel2_1

@@ -12,6 +12,7 @@ function SidePage4() {
             }}>
                 [SidePage4_축 제한 이동] - ing<br />
                 1. 모델의 특정한 축으로 특정한 범위 내의 이동 구현<br />
+                2. 구성 - 볼트1, 너트1
             </div>
         </div>
     )
