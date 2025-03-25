@@ -26,7 +26,7 @@ function SidePageModel4() {
       <mesh
         ref={nutRef}
         scale={[0.0015, 0.0015, 0.0015]}
-        rotation={[-0.05, 0, 0.04]}
+        rotation={nutRef.current ? nutRef.current.rotation : [-0.05, 0, 0.04]}
         onPointerDown={handlePointerDown}
         position={nutRef.current ? nutRef.current.position : [0, 0, 0]}
       >
@@ -74,6 +74,9 @@ function SidePageModel4() {
 
       // nutRef의 Y 위치를 제한된 값으로 업데이트
       nutRef.current.position.y = constrainedY
+
+      const rotationSpeed = 60
+      nutRef.current.rotation.y = mouseY * rotationSpeed
   
       console.log("드래그 중! Y 위치:", constrainedY)
     }
