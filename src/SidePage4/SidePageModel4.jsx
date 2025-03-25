@@ -11,7 +11,7 @@ function SidePageModel4() {
   const isDraggingRef = useRef(isDragging)
 
   // 최소, 최대 높이 설정
-  const minY = 0  // 최소 높이
+  const minY = -0.06  // 최소 높이
   const maxY = 0.5   // 최대 높이
 
   const BoltModel = () => {
@@ -65,18 +65,23 @@ function SidePageModel4() {
   
       console.log(`마우스 좌표 : ${mouseX}, ${mouseY}`)
   
-      // 여기에 모델의 위치를 바꾸는 로직 추가
-      // 예시로 Y 위치를 화면의 Y 좌표로 결정한다고 가정
-      const newY = mouseY * 1  // Y축을 5만큼의 범위로 변환 (조정 가능)
+      // 마우스 y축 위치에 얼마나 근접해서 움직일지 결정
+      const newY = mouseY * 1 - 0.05  // Y축을 5만큼의 범위로 변환 (조정 가능)
   
       // 최소값과 최대값을 설정하여 Y 위치를 제한
       const constrainedY = Math.max(minY, Math.min(newY, maxY))
-
+  
       // nutRef의 Y 위치를 제한된 값으로 업데이트
       nutRef.current.position.y = constrainedY
-
+  
       const rotationSpeed = 60
-      nutRef.current.rotation.y = mouseY * rotationSpeed
+  
+      // 높이가 0일 때 또는 0.2 이상일 때 회전을 비활성화
+      if (constrainedY > -0.06 && constrainedY < 0.23) {
+        nutRef.current.rotation.y = mouseY * rotationSpeed
+      } else {
+        nutRef.current.rotation.y = 0 // 회전 비활성화
+      }
   
       console.log("드래그 중! Y 위치:", constrainedY)
     }
