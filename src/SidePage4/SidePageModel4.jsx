@@ -77,7 +77,7 @@ function SidePageModel4() {
       const rotationSpeed = 60
   
       // 높이가 0일 때 또는 0.2 이상일 때 회전을 비활성화
-      if (constrainedY > -0.06 && constrainedY < 0.23) {
+      if (constrainedY > minY && constrainedY < 0.23) {
         nutRef.current.rotation.y = mouseY * rotationSpeed
       } else {
         nutRef.current.rotation.y = 0 // 회전 비활성화

@@ -37,9 +37,9 @@ function Home() {
         <Link to="/sidepage3">
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage3_물리법칙</button>
         </Link>
-        <Link to="/sidepage4">
+        {/* <Link to="/sidepage4">
           <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage4_축 제한 이동</button>
-        </Link>
+        </Link> */}
       </div>
     </div>
   )
