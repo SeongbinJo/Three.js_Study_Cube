@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber"
 import Ver1Model from "./Ver1Model"
 import { OrbitControls } from "@react-three/drei"
 
-function Ver1CanvasBox({ yModelCount, xModelCount, spacing }) {
+function CanvasBox({ yModelCount, xModelCount, spacing }) {
     const [numYModel, setNumYModel] = useState(yModelCount)
     const [numXModel, setNumXModel] = useState(xModelCount)
 
@@ -56,4 +56,4 @@ function Ver1CanvasBox({ yModelCount, xModelCount, spacing }) {
     )
 }
 
-export default Ver1CanvasBox
+export default CanvasBox
