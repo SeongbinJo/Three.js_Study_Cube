@@ -13,7 +13,7 @@ function CameraViewDirection({ view }) {
         console.log("Previous View:", prevView.current)
         console.log("Current View:", view)
 
-        const distance = 30
+        const distance = 40
         let position
 
         switch (view) {
@@ -103,7 +103,7 @@ function CanvasBox({ bottomCount, viewDirection }) {
     }
 
     return (
-        <Canvas camera={{ position: [0, 20, 30], fov: 30 }}>
+        <Canvas camera={{ position: [0, 20, 40], fov: 30 }}>
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
