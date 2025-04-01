@@ -9,7 +9,7 @@ function SidePage5() {
     return (
         <>
             <div className='model-box'>
-                <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} />
+                <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} setCreateBoxBtn={setCreateBoxBtn} />
                 <div className='ver1-hovered-box' style={{ 
                     position: 'absolute',
                     left: 30,

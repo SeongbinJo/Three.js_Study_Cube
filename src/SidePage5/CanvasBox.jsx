@@ -1,19 +1,32 @@
-import { Canvas } from "@react-three/fiber"
-import { useState, useEffect, useRef } from "react"
-import { useThree } from "@react-three/fiber"
+import { Canvas, useThree } from "@react-three/fiber"
+import { useState, useEffect, useRef, Suspense } from "react"
 import * as THREE from "three"
 import gsap from "gsap"
 import SidePage5Model from "./SidePage5Model"
+import { Physics } from "@react-three/rapier"
 
-function CameraViewDirection({ view, createBoxBtn }) {
-    const { camera } = useThree()
-    const prevView = useRef(view)  // 이전 view 값을 저장하는 ref
+function CameraViewDirection({ view }) {
+    const { camera, size } = useThree() // size: 캔버스 크기 가져오기
+    const prevView = useRef(view)
+    const [distance, setDistance] = useState(40) // 기본 거리
 
     useEffect(() => {
-        console.log("Previous View:", prevView.current)
-        console.log("Current View:", view)
+        // 화면 크기에 따른 distance 계산
+        const updateDistance = () => {
+            const aspectRatio = size.width / size.height
+            const newDistance = aspectRatio > 1 ? 40 : 40 / aspectRatio;
+            setDistance(newDistance)
+        };
 
-        const distance = 40
+        updateDistance(); // 초기 설정
+        window.addEventListener("resize", updateDistance)
+
+        return () => {
+            window.removeEventListener("resize", updateDistance)
+        }
+    }, [size.width, size.height])
+
+    useEffect(() => {
         let position
 
         switch (view) {
@@ -34,57 +47,28 @@ function CameraViewDirection({ view, createBoxBtn }) {
                 break
         }
 
-        const 돌아감 = (prevView.current === "front" && view === "back") || (prevView.current === "back" && view === "front")
-        const 돌아감Pos = [distance, 20, 0]
-        const 돌아감2 = (prevView.current === "left" && view === "right") || (prevView.current === "right" && view === "left")
-        const 돌아감2Pos = [0, 20, distance]
-
-        if (돌아감 || 돌아감2) {
-            // 첫 번째 애니메이션
-            gsap.to(camera.position, {
-                x: 돌아감 ? 돌아감Pos[0] : 돌아감2Pos[0],
-                y: 돌아감 ? 돌아감Pos[1] : 돌아감2Pos[1],
-                z: 돌아감 ? 돌아감Pos[2] : 돌아감2Pos[2],
-                duration: 0.5,
-                ease: "power2.out",
-                onUpdate: () => {
-                    camera.lookAt(new THREE.Vector3(0, 0, 0))
-                },
-                onComplete: () => {
-                    gsap.to(camera.position, {
-                        x: position[0],
-                        y: position[1],
-                        z: position[2],
-                        duration: 0.5,
-                        ease: "power2.out",
-                        onUpdate: () => {
-                            camera.lookAt(new THREE.Vector3(0, 0, 0)) // 항상 중앙을 바라보게
-                        }
-                    })
-                }
-            })
-        } else {
-            gsap.to(camera.position, {
-                x: position[0],
-                y: position[1],
-                z: position[2],
-                duration: 0.7,
-                ease: "power2.out",
-                onUpdate: () => {
-                    camera.lookAt(new THREE.Vector3(0, 0, 0))
-                }
-            })
-        }
+        gsap.to(camera.position, {
+            x: position[0],
+            y: position[1],
+            z: position[2],
+            duration: 0.7,
+            ease: "power2.out",
+            onUpdate: () => {
+                camera.lookAt(new THREE.Vector3(0, 0, 0))
+            },
+        })
 
         prevView.current = view
-    }, [view, camera]) 
+    }, [view, distance, camera])
 
     return null
 }
 
-function CanvasBox({ bottomCount, viewDirection }) {
+function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn }) {
     const [bottomBoxCount, setbottomBoxCount] = useState(bottomCount)
+    const [createdBoxes, setCreatedBoxes] = useState([])
 
+    // 바닥 세팅
     const setBottom = () => {
         const boxModels = []
         const centerOffset = (bottomBoxCount - 1) / 2  // 중심 좌표
@@ -94,7 +78,7 @@ function CanvasBox({ bottomCount, viewDirection }) {
                 const x = i - centerOffset
                 const z = j - centerOffset
                 boxModels.push(
-                    <SidePage5Model key={`${i}-${j}`} position={[x, 0, z]} color="white" />
+                    <SidePage5Model key={`${i}-${j}`} position={[x, 0, z]} color="white" type="fixed"/>
                 )
             }
         }
@@ -102,15 +86,29 @@ function CanvasBox({ bottomCount, viewDirection }) {
         return boxModels
     }
 
+    useEffect(() => {
+        if (createBoxBtn) {
+            // 생성할 박스 id 와 생성할 위치 넣어서 배열에 추가
+            setCreatedBoxes(prev => [...prev, { id: prev.length, position: [0, 5, 0]}])
+            setCreateBoxBtn(false)
+        }
+    }, [createBoxBtn, setCreateBoxBtn])
+
     return (
-        <Canvas camera={{ position: [0, 20, 40], fov: 30 }}>
+        <Canvas camera={{fov: 30 }}>
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
             <directionalLight position={[20, -20, 30]} />
             <directionalLight position={[-10, 0, 0]} />
-            {/* <OrbitControls /> */}
-            {setBottom()}
+            <Suspense>
+                <Physics>
+                    {setBottom()}
+                    {createdBoxes.map(box => (
+                        <SidePage5Model key={box.id} position={box.position} color="blue" type="dynamic" />
+                    ))}
+                </Physics>
+            </Suspense>
             <axesHelper args={[25]}></axesHelper>
         </Canvas>
     )
