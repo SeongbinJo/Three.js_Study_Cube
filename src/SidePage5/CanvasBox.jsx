@@ -5,7 +5,7 @@ import * as THREE from "three"
 import gsap from "gsap"
 import SidePage5Model from "./SidePage5Model"
 
-function CameraViewDirection({ view }) {
+function CameraViewDirection({ view, createBoxBtn }) {
     const { camera } = useThree()
     const prevView = useRef(view)  // 이전 view 값을 저장하는 ref
 
@@ -111,7 +111,7 @@ function CanvasBox({ bottomCount, viewDirection }) {
             <directionalLight position={[-10, 0, 0]} />
             {/* <OrbitControls /> */}
             {setBottom()}
-            <axesHelper args={[10]}></axesHelper>
+            <axesHelper args={[25]}></axesHelper>
         </Canvas>
     )
 }
