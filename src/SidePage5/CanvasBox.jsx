@@ -16,9 +16,9 @@ function CameraViewDirection({ view }) {
             const aspectRatio = size.width / size.height
             const newDistance = aspectRatio > 1 ? 40 : 40 / aspectRatio;
             setDistance(newDistance)
-        };
+        }
 
-        updateDistance(); // 초기 설정
+        updateDistance() // 초기 설정
         window.addEventListener("resize", updateDistance)
 
         return () => {
@@ -47,16 +47,48 @@ function CameraViewDirection({ view }) {
                 break
         }
 
-        gsap.to(camera.position, {
-            x: position[0],
-            y: position[1],
-            z: position[2],
-            duration: 0.7,
-            ease: "power2.out",
-            onUpdate: () => {
-                camera.lookAt(new THREE.Vector3(0, 0, 0))
-            },
-        })
+        const 돌아감 = (prevView.current === "front" && view === "back") || (prevView.current === "back" && view === "front")
+        const 돌아감Pos = [distance, 20, 0]
+        const 돌아감2 = (prevView.current === "left" && view === "right") || (prevView.current === "right" && view === "left")
+        const 돌아감2Pos = [0, 20, distance]
+
+        if (돌아감 || 돌아감2) {
+            // 첫 번째 애니메이션
+            gsap.to(camera.position, {
+                x: 돌아감 ? 돌아감Pos[0] : 돌아감2Pos[0],
+                y: 돌아감 ? 돌아감Pos[1] : 돌아감2Pos[1],
+                z: 돌아감 ? 돌아감Pos[2] : 돌아감2Pos[2],
+                duration: 0.5,
+                ease: "power2.out",
+                onUpdate: () => {
+                    camera.lookAt(new THREE.Vector3(0, 0, 0))
+                },
+                onComplete: () => {
+                    gsap.to(camera.position, {
+                        x: position[0],
+                        y: position[1],
+                        z: position[2],
+                        duration: 0.5,
+                        ease: "power2.out",
+                        onUpdate: () => {
+                            camera.lookAt(new THREE.Vector3(0, 0, 0)) // 항상 중앙을 바라보게
+                        }
+                    })
+                }
+            })
+        } else {
+            gsap.to(camera.position, {
+                x: position[0],
+                y: position[1],
+                z: position[2],
+                duration: 0.7,
+                ease: "power2.out",
+                onUpdate: () => {
+                    camera.lookAt(new THREE.Vector3(0, 0, 0))
+                }
+            })
+        }
+
 
         prevView.current = view
     }, [view, distance, camera])
