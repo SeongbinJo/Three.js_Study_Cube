@@ -120,7 +120,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn }
     useEffect(() => {
         if (createBoxBtn) {
             // 생성할 박스 id 와 생성할 위치 넣어서 배열에 추가
-            setCreatedBoxes(prev => [...prev, { id: prev.length, position: [0, 5, 0]}])
+            setCreatedBoxes(prev => [...prev, { id: prev.length, position: [0, 10, 0]}])
             setCreateBoxBtn(false)
         }
     }, [createBoxBtn, setCreateBoxBtn])

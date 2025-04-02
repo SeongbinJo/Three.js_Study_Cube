@@ -1,16 +1,18 @@
 import { useState } from "react"
 import '../App.css'
 import CanvasBox from './CanvasBox'
+import { SketchPicker } from "react-color"
 
 function SidePage5() {
     const [viewDirection, setViewDirection] = useState("front")
     const [createBoxBtn, setCreateBoxBtn] = useState(false)
+    const [color, setColor] = useState("#ffffff")
 
     return (
         <>
             <div className='model-box'>
                 <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} setCreateBoxBtn={setCreateBoxBtn} />
-                <div className='ver1-hovered-box' style={{ 
+                <div className='ver1-hovered-box' style={{
                     position: 'absolute',
                     left: 30,
                     top: 30,
@@ -27,16 +29,28 @@ function SidePage5() {
                         <button onClick={() => setViewDirection("right")}>오른쪽</button>
                     </div>
                 </div>
-                <div style={{
-                    position: 'absolute',
-                    top: 50,
-                    right: 50,
-                    zIndex: 10
-                }}>
-                    <button onClick={() => {
-                        console.log('생성 버튼 클릭.')
-                        setCreateBoxBtn(true)
-                        }}>생성</button>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 50,
+                        right: 50,
+                        zIndex: 10,
+                        backgroundColor: "white",
+                        padding: "10px",
+                        borderRadius: "5px",
+                    }}
+                >
+                    <button
+                        onClick={() => {
+                            console.log("생성 버튼 클릭.")
+                            setCreateBoxBtn(true)
+                        }}
+                    >
+                        생성
+                    </button>
+                    <div style={{ marginTop: "30px" }}>
+                        <SketchPicker color={color} onChange={(color) => setColor(color.hex)} />
+                    </div>
                 </div>
             </div>
         </>
