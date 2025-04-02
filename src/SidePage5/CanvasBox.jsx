@@ -47,17 +47,16 @@ function CameraViewDirection({ view }) {
                 break
         }
 
-        const 돌아감 = (prevView.current === "front" && view === "back") || (prevView.current === "back" && view === "front")
-        const 돌아감Pos = [distance, 20, 0]
-        const 돌아감2 = (prevView.current === "left" && view === "right") || (prevView.current === "right" && view === "left")
-        const 돌아감2Pos = [0, 20, distance]
+        const isFrontBack = (prevView.current === "front" && view === "back") || (prevView.current === "back" && view === "front")
+        const frontBackPosition = [distance, 20, 0]
+        const isLeftRight = (prevView.current === "left" && view === "right") || (prevView.current === "right" && view === "left")
+        const leftRightPosition = [0, 20, distance]
 
-        if (돌아감 || 돌아감2) {
-            // 첫 번째 애니메이션
+        if (isFrontBack || isLeftRight) {
             gsap.to(camera.position, {
-                x: 돌아감 ? 돌아감Pos[0] : 돌아감2Pos[0],
-                y: 돌아감 ? 돌아감Pos[1] : 돌아감2Pos[1],
-                z: 돌아감 ? 돌아감Pos[2] : 돌아감2Pos[2],
+                x: isFrontBack ? frontBackPosition[0] : leftRightPosition[0],
+                y: isFrontBack ? frontBackPosition[1] : leftRightPosition[1],
+                z: isFrontBack ? frontBackPosition[2] : leftRightPosition[2],
                 duration: 0.5,
                 ease: "power2.out",
                 onUpdate: () => {
