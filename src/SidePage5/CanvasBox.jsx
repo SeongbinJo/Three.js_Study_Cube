@@ -8,13 +8,13 @@ import { Physics } from "@react-three/rapier"
 function CameraViewDirection({ view }) {
     const { camera, size } = useThree() // size: 캔버스 크기 가져오기
     const prevView = useRef(view)
-    const [distance, setDistance] = useState(40) // 기본 거리
+    const [distance, setDistance] = useState(50) // 기본 거리
 
     useEffect(() => {
         // 화면 크기에 따른 distance 계산
         const updateDistance = () => {
             const aspectRatio = size.width / size.height
-            const newDistance = aspectRatio > 1 ? 40 : 40 / aspectRatio;
+            const newDistance = aspectRatio > 1 ? 50 : 50 / aspectRatio;
             setDistance(newDistance)
         }
 
@@ -95,7 +95,7 @@ function CameraViewDirection({ view }) {
     return null
 }
 
-function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn }) {
+function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor }) {
     const [bottomBoxCount, setbottomBoxCount] = useState(bottomCount)
     const [createdBoxes, setCreatedBoxes] = useState([])
 
@@ -120,7 +120,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn }
     useEffect(() => {
         if (createBoxBtn) {
             // 생성할 박스 id 와 생성할 위치 넣어서 배열에 추가
-            setCreatedBoxes(prev => [...prev, { id: prev.length, position: [0, 10, 0]}])
+            setCreatedBoxes(prev => [...prev, { id: prev.length, position: [0, 10, 0], color: boxColor}])
             setCreateBoxBtn(false)
         }
     }, [createBoxBtn, setCreateBoxBtn])
@@ -136,7 +136,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn }
                 <Physics>
                     {setBottom()}
                     {createdBoxes.map(box => (
-                        <SidePage5Model key={box.id} position={box.position} color="blue" type="dynamic" />
+                        <SidePage5Model key={box.id} position={box.position} color={box.color} type="dynamic" />
                     ))}
                 </Physics>
             </Suspense>

@@ -1,7 +1,11 @@
-import { useState } from "react"
+import { useState, useEffect, useRef, Suspense } from "react"
 import '../App.css'
 import CanvasBox from './CanvasBox'
 import { SketchPicker } from "react-color"
+import { Canvas, useThree } from "@react-three/fiber"
+import * as THREE from "three"
+import SidePage5Model from "./SidePage5Model"
+import { Physics } from "@react-three/rapier"
 
 function SidePage5() {
     const [viewDirection, setViewDirection] = useState("front")
@@ -11,7 +15,7 @@ function SidePage5() {
     return (
         <>
             <div className='model-box'>
-                <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} setCreateBoxBtn={setCreateBoxBtn} />
+                <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} setCreateBoxBtn={setCreateBoxBtn} boxColor={color} />
                 <div className='ver1-hovered-box' style={{
                     position: 'absolute',
                     left: 30,
@@ -38,6 +42,7 @@ function SidePage5() {
                         backgroundColor: "white",
                         padding: "10px",
                         borderRadius: "5px",
+                        width: "20%"
                     }}
                 >
                     <button
@@ -48,8 +53,25 @@ function SidePage5() {
                     >
                         생성
                     </button>
-                    <div style={{ marginTop: "30px" }}>
-                        <SketchPicker color={color} onChange={(color) => setColor(color.hex)} />
+                    <div style={{
+                        marginTop: "20px",
+                        backgroundColor: "lightgray",
+                        borderRadius: "5px",
+                        }}>
+                        <Canvas camera={{position: [1, 1, 5], fov: 30}}>
+                            <directionalLight position={[10, 15, -30]} />
+                            <directionalLight position={[10, 30, -30]} />
+                            <directionalLight position={[20, -20, 30]} />
+                            <directionalLight position={[-10, 0, 0]} />
+                            <Suspense>
+                                <Physics>
+                                    <SidePage5Model color={color} type="fixed" />
+                                </Physics>
+                            </Suspense>
+                        </Canvas>
+                    </div>
+                    <div style={{ marginTop: "20px" }}>
+                        <SketchPicker color={color} disableAlpha={true} onChange={(color) => setColor(color.hex)} />
                     </div>
                 </div>
             </div>
