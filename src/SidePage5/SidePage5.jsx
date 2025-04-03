@@ -42,7 +42,7 @@ function SidePage5() {
                         backgroundColor: "white",
                         padding: "10px",
                         borderRadius: "5px",
-                        width: "20%"
+                        maxWidth: "15%"
                     }}
                 >
                     <button
@@ -57,6 +57,7 @@ function SidePage5() {
                         marginTop: "20px",
                         backgroundColor: "lightgray",
                         borderRadius: "5px",
+                        width: "100%"
                         }}>
                         <Canvas camera={{position: [1, 1, 5], fov: 30}}>
                             <directionalLight position={[10, 15, -30]} />
@@ -70,7 +71,7 @@ function SidePage5() {
                             </Suspense>
                         </Canvas>
                     </div>
-                    <div style={{ marginTop: "20px" }}>
+                    <div style={{ marginTop: "20px"}}>
                         <SketchPicker color={color} disableAlpha={true} onChange={(color) => setColor(color.hex)} />
                     </div>
                 </div>
