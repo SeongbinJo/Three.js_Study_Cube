@@ -6,6 +6,7 @@ import { Canvas, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import SidePage5Model from "./SidePage5Model"
 import { Physics } from "@react-three/rapier"
+import { OrbitControls } from "@react-three/drei"
 
 function SidePage5() {
     const [viewDirection, setViewDirection] = useState("front")
@@ -60,6 +61,7 @@ function SidePage5() {
                         width: "100%"
                         }}>
                         <Canvas camera={{position: [1, 1, 5], fov: 30}}>
+                            <OrbitControls autoRotate={true}/>
                             <directionalLight position={[10, 15, -30]} />
                             <directionalLight position={[10, 30, -30]} />
                             <directionalLight position={[20, -20, 30]} />
