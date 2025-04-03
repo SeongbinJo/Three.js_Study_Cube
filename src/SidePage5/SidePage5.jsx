@@ -15,7 +15,7 @@ function SidePage5() {
 
     return (
         <>
-            <div className='model-box'>
+            <div className='sidePage5-box'>
                 <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} setCreateBoxBtn={setCreateBoxBtn} boxColor={color} />
                 <div className='ver1-hovered-box' style={{
                     position: 'absolute',
@@ -31,7 +31,9 @@ function SidePage5() {
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("front")}>앞</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("back")}>뒤</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("left")}>왼쪽</button>
-                        <button onClick={() => setViewDirection("right")}>오른쪽</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("right")}>오른쪽</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("top")}>위</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("bottom")}>아래</button>
                     </div>
                 </div>
                 <div

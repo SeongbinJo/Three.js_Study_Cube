@@ -8,54 +8,66 @@ import { Physics } from "@react-three/rapier"
 function CameraViewDirection({ view }) {
     const { camera, size } = useThree() // size: 캔버스 크기 가져오기
     const prevView = useRef(view)
-    const [distance, setDistance] = useState(50) // 기본 거리
+    const [distance, setDistance] = useState(50)
+    const [cameraYPos, setCameraYPos] = useState(30)
 
     useEffect(() => {
-        // 화면 크기에 따른 distance 계산
-        const updateDistance = () => {
-            const aspectRatio = size.width / size.height
-            const newDistance = aspectRatio > 1 ? 50 : 50 / aspectRatio;
-            setDistance(newDistance)
+        let newCameraYPos = cameraYPos // 기존 값 유지
+        let newX = camera.position.x
+        let newZ = camera.position.z
+    
+        if (view === "top") {
+            newCameraYPos = 30
+            if (prevView.current !== "top" && prevView.current !== "bottom") {
+                newX = camera.position.x
+                newZ = camera.position.z
+            }
+        } else if (view === "bottom") {
+            newCameraYPos = -30
+            if (prevView.current !== "top" && prevView.current !== "bottom") {
+                newX = camera.position.x
+                newZ = camera.position.z
+            }
         }
-
-        updateDistance() // 초기 설정
-        window.addEventListener("resize", updateDistance)
-
-        return () => {
-            window.removeEventListener("resize", updateDistance)
+    
+        if (view === "top" || view === "bottom") {
+            setCameraYPos(newCameraYPos)
         }
-    }, [size.width, size.height])
-
-    useEffect(() => {
-        let position
-
+    
+        let position = [newX, newCameraYPos, newZ]
+    
         switch (view) {
             case "front":
-                position = [0, 20, distance]
+                position = [0, newCameraYPos, distance]
                 break
             case "back":
-                position = [0, 20, -distance]
+                position = [0, newCameraYPos, -distance]
                 break
             case "left":
-                position = [-distance, 20, 0]
+                position = [-distance, newCameraYPos, 0]
                 break
             case "right":
-                position = [distance, 20, 0]
-                break
-            default:
-                position = [0, 20, distance]
+                position = [distance, newCameraYPos, 0]
                 break
         }
-
-        const isFrontBack = (prevView.current === "front" && view === "back") || (prevView.current === "back" && view === "front")
-        const frontBackPosition = [distance, 20, 0]
-        const isLeftRight = (prevView.current === "left" && view === "right") || (prevView.current === "right" && view === "left")
-        const leftRightPosition = [0, 20, distance]
-
-        if (isFrontBack || isLeftRight) {
+    
+        const isFrontBack = (prevView.current === "front" && view === "back") || 
+                            (prevView.current === "back" && view === "front")
+    
+        const isLeftRight = (prevView.current === "left" && view === "right") || 
+                            (prevView.current === "right" && view === "left")
+    
+        const isBottomToSide = prevView.current === "bottom" && (view === "left" || view === "right")
+        const isTopToSide = prevView.current === "top" && (view === "left" || view === "right")
+    
+        const frontBackPosition = [distance, cameraYPos, 0]
+        const leftRightPosition = [0, cameraYPos, distance]
+    
+        // bottom → left/right도 top → left/right와 동일한 방식으로 처리
+        if (isFrontBack || isLeftRight || isBottomToSide || isTopToSide) {
             gsap.to(camera.position, {
                 x: isFrontBack ? frontBackPosition[0] : leftRightPosition[0],
-                y: isFrontBack ? frontBackPosition[1] : leftRightPosition[1],
+                y: newCameraYPos,
                 z: isFrontBack ? frontBackPosition[2] : leftRightPosition[2],
                 duration: 0.5,
                 ease: "power2.out",
@@ -87,10 +99,9 @@ function CameraViewDirection({ view }) {
                 }
             })
         }
-
-
+    
         prevView.current = view
-    }, [view, distance, camera])
+    }, [view, distance, camera, cameraYPos])
 
     return null
 }
@@ -109,7 +120,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
                 const x = i - centerOffset
                 const z = j - centerOffset
                 boxModels.push(
-                    <SidePage5Model key={`${i}-${j}`} position={[x, 0, z]} color="white" type="fixed"/>
+                    <SidePage5Model key={`${i}-${j}`} position={[x, 0, z]} color="white" type="fixed" />
                 )
             }
         }
@@ -120,13 +131,13 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
     useEffect(() => {
         if (createBoxBtn) {
             // 생성할 박스 id 와 생성할 위치 넣어서 배열에 추가
-            setCreatedBoxes(prev => [...prev, { id: prev.length, position: [0, 10, 0], color: boxColor}])
+            setCreatedBoxes(prev => [...prev, { id: prev.length, position: [0, 10, 0], color: boxColor }])
             setCreateBoxBtn(false)
         }
     }, [createBoxBtn, setCreateBoxBtn])
 
     return (
-        <Canvas camera={{fov: 30 }}>
+        <Canvas camera={{ fov: 30 }}>
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
