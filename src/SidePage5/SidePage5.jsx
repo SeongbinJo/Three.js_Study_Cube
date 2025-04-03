@@ -28,9 +28,9 @@ function SidePage5() {
                     2. 카메라 고정 및 동서남북 시점 변환_ing<br />
 
                     <div style={{ marginTop: '10px' }}>
-                        <button onClick={() => setViewDirection("front")}>앞</button>
-                        <button onClick={() => setViewDirection("back")}>뒤</button>
-                        <button onClick={() => setViewDirection("left")}>왼쪽</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("front")}>앞</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("back")}>뒤</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("left")}>왼쪽</button>
                         <button onClick={() => setViewDirection("right")}>오른쪽</button>
                     </div>
                 </div>
@@ -61,7 +61,7 @@ function SidePage5() {
                         width: "100%"
                         }}>
                         <Canvas camera={{position: [1, 1, 5], fov: 30}}>
-                            <OrbitControls autoRotate={true}/>
+                            <OrbitControls autoRotate={true} enablePan={false} enableZoom={false}/>
                             <directionalLight position={[10, 15, -30]} />
                             <directionalLight position={[10, 30, -30]} />
                             <directionalLight position={[20, -20, 30]} />
