@@ -7,7 +7,7 @@ import { Canvas, useThree } from "@react-three/fiber"
 function SidePage5Model({ id, position, color, type, onClick }) {
     return (
         <RigidBody type={type} restitution={0.1}>
-            <mesh userData={{ id }} position={position} onClick={onClick}>
+            <mesh userData={{ id, position }} position={position} onClick={onClick}>
     <boxGeometry args={[1,1,1]} />
     <meshStandardMaterial color={color} />
 </mesh>

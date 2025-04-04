@@ -5,7 +5,7 @@ import * as THREE from "three"
 import SidePage5Model from "./SidePage5Model"
 import CameraViewDirection from "./CameraViewDirection"
 
-function ClickHandler({ setClickedId }) {
+function ClickHandler({ setClickedInfo }) {
     const { scene, camera } = useThree()
 
     const handleClick = (event) => {
@@ -26,10 +26,12 @@ function ClickHandler({ setClickedId }) {
 
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object
-            console.log(`Clicked Box ID: ${clickedObject.userData.id}`)
+            const { id, position } = clickedObject.userData
+            
+            console.log(`Clicked Box ID: ${id}, Position: ${JSON.stringify(position)}`)
 
             // 클릭한 객체의 ID 저장
-            setClickedId(clickedObject.userData.id)
+            setClickedInfo({ id, position })
         }
     }
 
@@ -44,7 +46,7 @@ function ClickHandler({ setClickedId }) {
 function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor }) {
     const [bottomBoxCount, setBottomBoxCount] = useState(bottomCount)
     const [createdBoxes, setCreatedBoxes] = useState([])
-    const [clickedId, setClickedId] = useState(null)
+    const [clickedInfo, setClickedInfo] = useState(null)
 
     const setBottom = () => {
         const boxModels = []
@@ -96,7 +98,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
                     />
                 ))}
             </Physics>
-            <ClickHandler setClickedId={setClickedId} />
+            <ClickHandler setClickedInfo={setClickedInfo} />
         </Canvas>
     )
 }
