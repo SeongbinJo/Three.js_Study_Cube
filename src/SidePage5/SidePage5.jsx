@@ -61,21 +61,20 @@ function SidePage5() {
                         backgroundColor: "lightgray",
                         borderRadius: "5px",
                         width: "100%"
-                        }}>
-                        <Canvas camera={{position: [1, 1, 5], fov: 30}}>
-                            <OrbitControls autoRotate={true} enablePan={false} enableZoom={false}/>
+                    }}>
+                        <Canvas camera={{ position: [1, 1, 5], fov: 30 }}>
+                            <OrbitControls autoRotate={true} enablePan={false} enableZoom={false} />
                             <directionalLight position={[10, 15, -30]} />
                             <directionalLight position={[10, 30, -30]} />
                             <directionalLight position={[20, -20, 30]} />
                             <directionalLight position={[-10, 0, 0]} />
-                            <Suspense>
-                                <Physics>
-                                    <SidePage5Model color={color} type="fixed" />
-                                </Physics>
-                            </Suspense>
+                            <mesh>
+                                <boxGeometry args={[1, 1, 1]} />
+                                <meshStandardMaterial color={color} />
+                            </mesh>
                         </Canvas>
                     </div>
-                    <div style={{ marginTop: "20px"}}>
+                    <div style={{ marginTop: "20px" }}>
                         <SketchPicker color={color} disableAlpha={true} onChange={(color) => setColor(color.hex)} />
                     </div>
                 </div>

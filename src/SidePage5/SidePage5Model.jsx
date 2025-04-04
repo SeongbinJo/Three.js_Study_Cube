@@ -1,17 +1,17 @@
+import { DragControls } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
+import * as THREE from "three"
+import { Canvas, useThree } from "@react-three/fiber"
 
-function SidePage5Model({ position, color, type }) {
 
+function SidePage5Model({ id, position, color, type, onClick }) {
     return (
-        <>
-            <RigidBody type={type} restitution={0.1}> // restitution : 반탄력
-                <mesh position={position}>
-                    <boxGeometry args={[1, 1, 1]} />
-                    <meshStandardMaterial color={color} />
-                </mesh>
-            </RigidBody>
-
-        </>
+        <RigidBody type={type} restitution={0.1}>
+            <mesh userData={{ id }} position={position} onClick={onClick}>
+    <boxGeometry args={[1,1,1]} />
+    <meshStandardMaterial color={color} />
+</mesh>
+        </RigidBody>
     )
 }
 
