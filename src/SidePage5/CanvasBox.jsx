@@ -5,7 +5,6 @@ import * as THREE from "three"
 import SidePage5Model from "./SidePage5Model"
 import CameraViewDirection from "./CameraViewDirection"
 
-// 📌 Raycaster를 활용한 클릭 핸들러 (Canvas 내부에서 실행)
 function ClickHandler({ setClickedId }) {
     const { scene, camera } = useThree()
 
@@ -47,7 +46,6 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
     const [createdBoxes, setCreatedBoxes] = useState([])
     const [clickedId, setClickedId] = useState(null)
 
-    // 🏗 바닥 박스 생성
     const setBottom = () => {
         const boxModels = []
         const centerOffset = (bottomBoxCount - 1) / 2;
