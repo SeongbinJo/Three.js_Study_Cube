@@ -69,7 +69,7 @@ function PlayControl() {
                 break
         }
     }
-
+    
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown)
         window.addEventListener("keyup", handleKeyUp)

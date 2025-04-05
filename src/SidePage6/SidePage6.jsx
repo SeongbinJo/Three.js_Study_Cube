@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, Suspense } from "react"
 import '../App.css'
 import CanvasBox from './CanvasBox'
+import './Crosshair.css'
 import { SketchPicker } from "react-color"
 import { Canvas, useThree } from "@react-three/fiber"
 import * as THREE from "three"
@@ -17,6 +18,7 @@ function SidePage6() {
         <>
             <div className='sidePage5-box'>
                 <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} setCreateBoxBtn={setCreateBoxBtn} boxColor={color} />
+                <div className="dot"></div>
                 <div className='ver1-hovered-box' style={{
                     position: 'absolute',
                     left: 30,

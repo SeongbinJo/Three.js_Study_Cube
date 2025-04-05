@@ -4,7 +4,7 @@ import { Physics } from "@react-three/rapier"
 import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
 import CameraViewDirection from "./CameraViewDirection"
-import { FirstPersonControls, PointerLockControls } from "@react-three/drei"
+import { PointerLockControls } from "@react-three/drei"
 import PlayControl from "./PlayControl"
 
 function ClickHandler({ setClickedInfo }) {
