@@ -2,8 +2,10 @@ import { Canvas, useThree } from "@react-three/fiber"
 import { useState, useEffect } from "react"
 import { Physics } from "@react-three/rapier"
 import * as THREE from "three"
-import SidePage5Model from "./SidePage5Model"
+import SidePage6Model from "./SidePage6Model"
 import CameraViewDirection from "./CameraViewDirection"
+import { FirstPersonControls, PointerLockControls } from "@react-three/drei"
+import PlayControl from "./PlayControl"
 
 function ClickHandler({ setClickedInfo }) {
     const { scene, camera } = useThree()
@@ -59,7 +61,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
                 const x = i - centerOffset;
                 const z = j - centerOffset;
                 boxModels.push(
-                    <SidePage5Model 
+                    <SidePage6Model 
                         key={`${i}-${j}`} 
                         id={`${i}-${j}`} 
                         position={[x, 0, z]} 
@@ -84,14 +86,16 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
     }, [createBoxBtn, setCreateBoxBtn])
 
     return (
-        <Canvas camera={{ fov: 30 }}>
+        <Canvas camera={{ position: [0, 20, 40], fov: 30 }}>
+            <PointerLockControls />
+            <PlayControl />
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
             <Physics>
                 {setBottom()}
                 {createdBoxes.map((box) => (
-                    <SidePage5Model 
+                    <SidePage6Model 
                         key={box.id} 
                         id={box.id}
                         position={box.position} 
