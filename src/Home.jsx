@@ -52,9 +52,9 @@ function Home() {
           <Link to="/sidepage5">
             <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage5_Minecraft</button>
           </Link>
-          {/* <Link to="/sidepage6">
+          <Link to="/sidepage6">
             <button style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>SidePage6_Minecraft2</button>
-          </Link> */}
+          </Link>
         </div>
 
       </div>
