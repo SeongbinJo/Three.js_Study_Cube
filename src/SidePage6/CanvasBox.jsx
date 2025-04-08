@@ -16,9 +16,9 @@ function ClickHandler({ setClickedInfo }) {
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2()
 
-        // 마우스 좌표 정규화 (-1 ~ 1 범위)
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+        // PointerLockControls를 사용하기 때문에 항상 0,0 으로 기준을 잡아줘야함
+        mouse.x = 0
+        mouse.y = 0
 
         // Raycaster 설정
         raycaster.setFromCamera(mouse, camera)
@@ -29,10 +29,10 @@ function ClickHandler({ setClickedInfo }) {
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object
             const { id, position } = clickedObject.userData
-            
+
             console.log(`Clicked Box ID: ${id}, Position: ${JSON.stringify(position)}`)
 
-            
+
 
             // 클릭한 객체의 ID 저장
             setClickedInfo({ id, position })
@@ -61,12 +61,12 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
                 const x = i - centerOffset;
                 const z = j - centerOffset;
                 boxModels.push(
-                    <SidePage6Model 
-                        key={`${i}-${j}`} 
-                        id={`${i}-${j}`} 
-                        position={[x, 0, z]} 
-                        color="white" 
-                        type="fixed" 
+                    <SidePage6Model
+                        key={`${i}-${j}`}
+                        id={`${i}-${j}`}
+                        position={[x, 0, z]}
+                        color="white"
+                        type="fixed"
                     />
                 )
             }
@@ -78,7 +78,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
     useEffect(() => {
         if (createBoxBtn) {
             setCreatedBoxes((prev) => [
-                ...prev, 
+                ...prev,
                 { id: `created-${prev.length}`, position: [0, 10, 0], color: boxColor }
             ]);
             setCreateBoxBtn(false)
@@ -95,11 +95,11 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
             <Physics>
                 {setBottom()}
                 {createdBoxes.map((box) => (
-                    <SidePage6Model 
-                        key={box.id} 
+                    <SidePage6Model
+                        key={box.id}
                         id={box.id}
-                        position={box.position} 
-                        color={box.color} 
+                        position={box.position}
+                        color={box.color}
                         type="dynamic"
                     />
                 ))}
