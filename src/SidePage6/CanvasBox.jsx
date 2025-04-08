@@ -1,5 +1,5 @@
-import { Canvas, useThree } from "@react-three/fiber"
-import { useState, useEffect } from "react"
+import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { useState, useEffect, useRef } from "react"
 import { Physics } from "@react-three/rapier"
 import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
@@ -7,7 +7,7 @@ import CameraViewDirection from "./CameraViewDirection"
 import { PointerLockControls } from "@react-three/drei"
 import PlayControl from "./PlayControl"
 
-function ClickHandler({ setClickedInfo }) {
+function ClickHandler({ setClickedInfo, setBoxes, setHeldBox }) {
     const { scene, camera } = useThree()
 
     const handleClick = (event) => {
@@ -16,27 +16,35 @@ function ClickHandler({ setClickedInfo }) {
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2()
 
-        // PointerLockControls를 사용하기 때문에 항상 0,0 으로 기준을 잡아줘야함
         mouse.x = 0
         mouse.y = 0
 
-        // Raycaster 설정
         raycaster.setFromCamera(mouse, camera)
-
-        // 장면에서 객체 교차 감지
         const intersects = raycaster.intersectObjects(scene.children, true)
 
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object
-            const { id, position } = clickedObject.userData
+            const { id, position, type } = clickedObject.userData
+            console.log('sibal?')
 
-            // 클릭한 객체의 ID 저장
-            setClickedInfo({ id, position })
+            if (type === "fixed") {
+                setClickedInfo({ id, position })
 
-            console.log(`Clicked Box ID: ${id}, Position: ${JSON.stringify(position)}`)
+                // 박스 제거
+                setBoxes((prev) => prev.filter((box) => box.id !== id))
+
+                // 손에 들기
+                setHeldBox({
+                    id,
+                    color: clickedObject.material.color.getStyle(),
+                })
+
+                console.log(`Picked up box: ${id}`)
+            }
+        }else {
+            console.log('sibal')
         }
     }
-
 
     useEffect(() => {
         window.addEventListener("click", handleClick)
@@ -44,51 +52,86 @@ function ClickHandler({ setClickedInfo }) {
             window.removeEventListener("click", handleClick)
         }
     })
-
+    
     return null
 }
 
+function HeldBox({ box }) {
+    const { camera } = useThree()
+    const ref = useRef()
+
+    useFrame(() => {
+        if (ref.current) {
+            const direction = new THREE.Vector3()
+            const right = new THREE.Vector3()
+            const up = new THREE.Vector3()
+            
+            camera.getWorldDirection(direction)
+            direction.normalize()
+
+            // 오른쪽 방향 벡터 구하기
+            right.crossVectors(direction, camera.up).normalize()
+
+            // 위쪽 방향 벡터
+            up.copy(camera.up).normalize()
+
+            // 블럭 위치 = 카메라 앞 + 오른쪽으로 약간 + 아래로 약간
+            const newPosition = camera.position.clone()
+                .add(direction.multiplyScalar(2))     // 카메라 앞쪽으로
+                .add(right.multiplyScalar(0.9))       // 오른쪽으로
+                .add(up.multiplyScalar(-0.5))         // 아래로
+
+            ref.current.position.copy(newPosition)
+        }
+    })
+
+    return (
+        <mesh ref={ref}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial color={box.color} />
+        </mesh>
+    )
+}
+
 function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor }) {
-    const [bottomBoxCount, setBottomBoxCount] = useState(bottomCount)
-    const [createdBoxes, setCreatedBoxes] = useState([])
+    const [boxes, setBoxes] = useState([])
     const [clickedInfo, setClickedInfo] = useState(null)
+    const [heldBox, setHeldBox] = useState(null)
 
-    const setBottom = () => {
+    useEffect(() => {
         const boxModels = []
-        const centerOffset = (bottomBoxCount - 1) / 2;
+        const centerOffset = (bottomCount - 1) / 2
 
-        for (let i = 0; i < bottomBoxCount; i++) {
-            for (let j = 0; j < bottomBoxCount; j++) {
-                const x = i - centerOffset;
-                const z = j - centerOffset;
-                boxModels.push(
-                    <SidePage6Model
-                        key={`${i}-${j}`}
-                        id={`${i}-${j}`}
-                        position={[x, 0, z]}
-                        color="white"
-                        type="fixed"
-                    />
-                )
+        for (let i = 0; i < bottomCount; i++) {
+            for (let j = 0; j < bottomCount; j++) {
+                const x = i - centerOffset
+                const z = j - centerOffset
+                boxModels.push({
+                    id: `fixed-${i}-${j}`,
+                    position: [x, 0, z],
+                    color: "white",
+                    type: "fixed"
+                })
             }
         }
 
-        return boxModels
-    }
-
-    const removeBoxById = (id) => {
-        setCreatedBoxes((prev) => prev.filter((box) => box.id !== id))
-    }
+        setBoxes(boxModels)
+    }, [bottomCount])
 
     useEffect(() => {
         if (createBoxBtn) {
-            setCreatedBoxes((prev) => [
+            setBoxes((prev) => [
                 ...prev,
-                { id: `created-${prev.length}`, position: [0, 10, 0], color: boxColor }
-            ]);
+                {
+                    id: `created-${prev.length}`,
+                    position: [0, 10, 0],
+                    color: boxColor,
+                    type: "dynamic"
+                }
+            ])
             setCreateBoxBtn(false)
         }
-    }, [createBoxBtn, setCreateBoxBtn])
+    }, [createBoxBtn, boxColor, setCreateBoxBtn])
 
     return (
         <Canvas camera={{ position: [0, 20, 40], fov: 30 }}>
@@ -98,20 +141,18 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
             <Physics>
-                {setBottom()}
-                {createdBoxes.map((box) => (
+                {boxes.map((box) => (
                     <SidePage6Model
                         key={box.id}
                         id={box.id}
                         position={box.position}
                         color={box.color}
-                        type="dynamic"
+                        type={box.type}
                     />
                 ))}
             </Physics>
-            <ClickHandler 
-                setClickedInfo={setClickedInfo}
-            />
+            {heldBox && <HeldBox box={heldBox} />}
+            <ClickHandler setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} />
         </Canvas>
     )
 }
