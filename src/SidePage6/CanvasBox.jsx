@@ -7,7 +7,7 @@ import CameraViewDirection from "./CameraViewDirection"
 import { PointerLockControls } from "@react-three/drei"
 import PlayControl from "./PlayControl"
 
-function ClickHandler({ setClickedInfo, setBoxes, setHeldBox, heldBox }) {
+function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox }) {
     const { scene, camera } = useThree()
 
     const handleClick = (event) => {
@@ -50,18 +50,30 @@ function ClickHandler({ setClickedInfo, setBoxes, setHeldBox, heldBox }) {
         }
     }
 
-    const handleRightClick = (event) => {
-        event.preventDefault() // 브라우저 기본 우클릭 메뉴 방지
-        if (heldBox) {
-            console.log("블럭을 가져온 상태에서 마우스 우클릭을 함.")
-        }
-    }
-
     useEffect(() => {
         const handleMouseDown = (event) => {
-            if (event.button === 2 && heldBox) {
-                console.log("블럭을 가져온 상태에서 마우스 우클릭을 함.")
-                // 예: setHeldBox(null) 등 추가 행동 가능
+            if (event.button === 2) { // 우클릭
+                event.preventDefault() 
+        
+                if (heldBox && clickedInfo) {
+                    console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
+        
+                    // 블럭 다시 boxes에 추가
+                    setBoxes(prev => [
+                        ...prev,
+                        {
+                            id: heldBox.id,
+                            position: clickedInfo.position,
+                            color: heldBox.color,
+                            type: "fixed"
+                        }
+                    ])
+        
+                    // 들고 있는 블럭 내려놓기
+                    setHeldBox(null)
+                }
+        
+                return
             }
         }
 
@@ -173,7 +185,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
                 ))}
             </Physics>
             {heldBox && <HeldBox box={heldBox} />}
-            <ClickHandler setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} />
+            <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} />
         </Canvas>
     )
 }
