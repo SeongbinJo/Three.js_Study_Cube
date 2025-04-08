@@ -30,19 +30,20 @@ function ClickHandler({ setClickedInfo }) {
             const clickedObject = intersects[0].object
             const { id, position } = clickedObject.userData
 
-            console.log(`Clicked Box ID: ${id}, Position: ${JSON.stringify(position)}`)
-
-
-
             // 클릭한 객체의 ID 저장
             setClickedInfo({ id, position })
+
+            console.log(`Clicked Box ID: ${id}, Position: ${JSON.stringify(position)}`)
         }
     }
 
+
     useEffect(() => {
         window.addEventListener("click", handleClick)
-        return () => window.removeEventListener("click", handleClick)
-    }, [])
+        return () => {
+            window.removeEventListener("click", handleClick)
+        }
+    })
 
     return null
 }
@@ -75,6 +76,10 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
         return boxModels
     }
 
+    const removeBoxById = (id) => {
+        setCreatedBoxes((prev) => prev.filter((box) => box.id !== id))
+    }
+
     useEffect(() => {
         if (createBoxBtn) {
             setCreatedBoxes((prev) => [
@@ -104,7 +109,9 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
                     />
                 ))}
             </Physics>
-            <ClickHandler setClickedInfo={setClickedInfo} />
+            <ClickHandler 
+                setClickedInfo={setClickedInfo}
+            />
         </Canvas>
     )
 }
