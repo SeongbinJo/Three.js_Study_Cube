@@ -7,51 +7,72 @@ import CameraViewDirection from "./CameraViewDirection"
 import { PointerLockControls } from "@react-three/drei"
 import PlayControl from "./PlayControl"
 
-function ClickHandler({ setClickedInfo, setBoxes, setHeldBox }) {
+function ClickHandler({ setClickedInfo, setBoxes, setHeldBox, heldBox }) {
     const { scene, camera } = useThree()
 
     const handleClick = (event) => {
+        if (event.button !== 0) return // 0: left, 2: right
+    
         event.stopPropagation()
-
+    
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2()
-
+    
         mouse.x = 0
         mouse.y = 0
-
+    
         raycaster.setFromCamera(mouse, camera)
         const intersects = raycaster.intersectObjects(scene.children, true)
-
+    
+        if (heldBox) {
+            console.log(`이미 블럭을 들고있음.`)
+            return
+        }
+    
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object
             const { id, position, type } = clickedObject.userData
-            console.log('sibal?')
-
+    
             if (type === "fixed") {
                 setClickedInfo({ id, position })
-
+    
                 // 박스 제거
                 setBoxes((prev) => prev.filter((box) => box.id !== id))
-
+    
                 // 손에 들기
                 setHeldBox({
                     id,
                     color: clickedObject.material.color.getStyle(),
                 })
-
-                console.log(`Picked up box: ${id}`)
+    
+                console.log(`들고있는 박스: ${id}`)
             }
-        }else {
-            console.log('sibal')
+        }
+    }
+
+    const handleRightClick = (event) => {
+        event.preventDefault() // 브라우저 기본 우클릭 메뉴 방지
+        if (heldBox) {
+            console.log("블럭을 가져온 상태에서 마우스 우클릭을 함.")
         }
     }
 
     useEffect(() => {
+        const handleMouseDown = (event) => {
+            if (event.button === 2 && heldBox) {
+                console.log("블럭을 가져온 상태에서 마우스 우클릭을 함.")
+                // 예: setHeldBox(null) 등 추가 행동 가능
+            }
+        }
+
         window.addEventListener("click", handleClick)
+        window.addEventListener("mousedown", handleMouseDown)
+
         return () => {
             window.removeEventListener("click", handleClick)
+            window.removeEventListener("mousedown", handleMouseDown)
         }
-    })
+    }, [heldBox])
     
     return null
 }
@@ -152,7 +173,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
                 ))}
             </Physics>
             {heldBox && <HeldBox box={heldBox} />}
-            <ClickHandler setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} />
+            <ClickHandler setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} />
         </Canvas>
     )
 }
