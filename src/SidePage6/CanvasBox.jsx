@@ -11,29 +11,41 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
     const { scene, camera } = useThree()
 
     const handleClick = (event) => {
-        if (event.button !== 0) return // 0: left, 2: right
+        if (event.button !== 0) return
     
         event.stopPropagation()
     
         const raycaster = new THREE.Raycaster()
-        const mouse = new THREE.Vector2()
-    
-        mouse.x = 0
-        mouse.y = 0
+        const mouse = new THREE.Vector2(0, 0) // 항상 화면 중심
     
         raycaster.setFromCamera(mouse, camera)
         const intersects = raycaster.intersectObjects(scene.children, true)
     
-        if (heldBox) {
-            console.log(`이미 블럭을 들고있음.`)
-            return
-        }
-    
         if (intersects.length > 0) {
-            const clickedObject = intersects[0].object
+            const intersection = intersects[0]
+            const clickedObject = intersection.object
             const { id, position, type } = clickedObject.userData
     
-            if (type === "fixed") {
+            // 클릭한 면 방향 구하기
+            const faceNormal = intersection.face?.normal.clone()
+            faceNormal?.applyMatrix3(new THREE.Matrix3().getNormalMatrix(clickedObject.matrixWorld)).normalize()
+    
+            let faceName = "unknown"
+            if (faceNormal) {
+                const [x, y, z] = [faceNormal.x, faceNormal.y, faceNormal.z].map((v) => Math.round(v))
+                if (x === 1) faceName = "right"
+                else if (x === -1) faceName = "left"
+                else if (y === 1) faceName = "top"
+                else if (y === -1) faceName = "bottom"
+                else if (z === 1) faceName = "front"
+                else if (z === -1) faceName = "back"
+            }
+    
+            console.log(`클릭한 블럭 ID: ${id}`)
+            console.log(`블럭 위치: [${position[0]}, ${position[1]}, ${position[2]}, ${faceName}]`)
+    
+            // 만약 블럭을 들고 있지 않다면 들기 처리
+            if (!heldBox && type === "fixed") {
                 setClickedInfo({ id, position })
     
                 // 박스 제거
@@ -46,6 +58,8 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 })
     
                 console.log(`들고있는 박스: ${id}`)
+            } else {
+                console.log("블럭을 들고 있는 상태라서 클릭만 처리함.")
             }
         }
     }
@@ -126,10 +140,48 @@ function HeldBox({ box }) {
     )
 }
 
+
+// 호버링 된 블럭 근처 grid 표현
+
+// function HighlightHandler({ boxes, setHighlightMap }) {
+//     const { camera, scene } = useThree()
+//     const raycaster = useRef(new THREE.Raycaster())
+  
+//     useFrame(() => {
+//       const mouse = new THREE.Vector2(0, 0) // 중앙 고정
+//       raycaster.current.setFromCamera(mouse, camera)
+  
+//       const intersects = raycaster.current.intersectObjects(scene.children, true)
+  
+//       let highlightCenter = null
+//       if (intersects.length > 0) {
+//         const intersected = intersects.find((obj) => obj.object.userData?.type === "fixed")
+//         if (intersected) {
+//           highlightCenter = intersected.object.position
+//         }
+//       }
+  
+//       const newMap = {}
+//       if (highlightCenter) {
+//         for (const box of boxes) {
+//           const dist = new THREE.Vector3(...box.position).distanceTo(highlightCenter)
+//           newMap[box.id] = dist <= 2 // 반경 1만 highlight
+//         }
+//       }
+  
+//       setHighlightMap(newMap)
+//     })
+  
+//     return null
+//   }
+
+
 function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor }) {
     const [boxes, setBoxes] = useState([])
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
+    const [highlightMap, setHighlightMap] = useState({})
+
 
     useEffect(() => {
         const boxModels = []
@@ -174,18 +226,20 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
             <Physics>
-                {boxes.map((box) => (
-                    <SidePage6Model
-                        key={box.id}
-                        id={box.id}
-                        position={box.position}
-                        color={box.color}
-                        type={box.type}
-                    />
-                ))}
+            {boxes.map((box) => (
+          <SidePage6Model
+            key={box.id}
+            id={box.id}
+            position={box.position}
+            color={box.color}
+            type={box.type}
+            // highlight={highlightMap[box.id]}
+          />
+        ))}
             </Physics>
             {heldBox && <HeldBox box={heldBox} />}
             <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} />
+            {/* <HighlightHandler boxes={boxes} setHighlightMap={setHighlightMap} /> */}
         </Canvas>
     )
 }
