@@ -11,53 +11,69 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
     const { scene, camera } = useThree()
 
     const handleClick = (event) => {
-        if (event.button !== 0) return
-    
+        if (event.button !== 0) return // 왼쪽 클릭만 처리
+
         event.stopPropagation()
-    
+
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2(0, 0) // 항상 화면 중심
-    
+
         raycaster.setFromCamera(mouse, camera)
         const intersects = raycaster.intersectObjects(scene.children, true)
-    
+
         if (intersects.length > 0) {
             const intersection = intersects[0]
             const clickedObject = intersection.object
             const { id, position, type } = clickedObject.userData
-    
+
             // 클릭한 면 방향 구하기
             const faceNormal = intersection.face?.normal.clone()
             faceNormal?.applyMatrix3(new THREE.Matrix3().getNormalMatrix(clickedObject.matrixWorld)).normalize()
-    
-            let faceName = "unknown"
-            if (faceNormal) {
+
+            // 만약 블럭을 들고 있는 상태라면 놓기 처리
+            if (heldBox && faceNormal && position) {
+                const offset = new THREE.Vector3(0, 0, 0)
                 const [x, y, z] = [faceNormal.x, faceNormal.y, faceNormal.z].map((v) => Math.round(v))
-                if (x === 1) faceName = "right"
-                else if (x === -1) faceName = "left"
-                else if (y === 1) faceName = "top"
-                else if (y === -1) faceName = "bottom"
-                else if (z === 1) faceName = "front"
-                else if (z === -1) faceName = "back"
+                if (x === 1) offset.set(1, 0, 0)
+                else if (x === -1) offset.set(-1, 0, 0)
+                else if (y === 1) offset.set(0, 1, 0)
+                else if (y === -1) offset.set(0, -1, 0)
+                else if (z === 1) offset.set(0, 0, 1)
+                else if (z === -1) offset.set(0, 0, -1)
+
+                const targetPos = new THREE.Vector3(...position).add(offset)
+
+                setBoxes(prev => [
+                    ...prev,
+                    {
+                        id: `placed-${Date.now()}`,
+                        position: [targetPos.x, targetPos.y, targetPos.z],
+                        color: heldBox.color,
+                        type: "fixed"
+                    }
+                ])
+
+                setHeldBox(null)
+                setClickedInfo(null)
+
+                console.log(`블럭을 ${[x, y, z]} 방향으로 놓았음. 위치:`, targetPos.toArray())
+                return
             }
-    
-            console.log(`클릭한 블럭 ID: ${id}`)
-            console.log(`블럭 위치: [${position[0]}, ${position[1]}, ${position[2]}, ${faceName}]`)
-    
-            // 만약 블럭을 들고 있지 않다면 들기 처리
+
+            // 들고 있는 블럭이 없고, 클릭한 것이 fixed 블럭이면 들기 처리
             if (!heldBox && type === "fixed") {
                 setClickedInfo({ id, position })
-    
+
                 // 박스 제거
                 setBoxes((prev) => prev.filter((box) => box.id !== id))
-    
+
                 // 손에 들기
                 setHeldBox({
                     id,
                     color: clickedObject.material.color.getStyle(),
                 })
-    
-                console.log(`들고있는 박스: ${id}`)
+
+                console.log(`블럭 ${id}을 들었음`)
             } else {
                 console.log("블럭을 들고 있는 상태라서 클릭만 처리함.")
             }
@@ -67,11 +83,11 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
     useEffect(() => {
         const handleMouseDown = (event) => {
             if (event.button === 2) { // 우클릭
-                event.preventDefault() 
-        
+                event.preventDefault()
+
                 if (heldBox && clickedInfo) {
                     console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
-        
+
                     // 블럭 다시 boxes에 추가
                     setBoxes(prev => [
                         ...prev,
@@ -82,11 +98,12 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                             type: "fixed"
                         }
                     ])
-        
+
                     // 들고 있는 블럭 내려놓기
                     setHeldBox(null)
+                    setClickedInfo(null)
                 }
-        
+
                 return
             }
         }
@@ -98,8 +115,8 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
             window.removeEventListener("click", handleClick)
             window.removeEventListener("mousedown", handleMouseDown)
         }
-    }, [heldBox])
-    
+    }, [heldBox, clickedInfo])
+
     return null
 }
 
