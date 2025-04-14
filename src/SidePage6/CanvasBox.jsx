@@ -53,8 +53,11 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                     }
                 ])
 
-                setHeldBox(null)
-                setClickedInfo(null)
+                // 창작 모드일 경우 계속 생성하게끔
+                if (!heldBox.persistent) {
+                    setHeldBox(null)
+                    setClickedInfo(null)
+                }
 
                 console.log(`블럭을 ${[x, y, z]} 방향으로 놓았음. 위치:`, targetPos.toArray())
                 return
@@ -84,26 +87,29 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
         const handleMouseDown = (event) => {
             if (event.button === 2) { // 우클릭
                 event.preventDefault()
-
-                if (heldBox && clickedInfo) {
-                    console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
-
-                    // 블럭 다시 boxes에 추가
-                    setBoxes(prev => [
-                        ...prev,
-                        {
-                            id: heldBox.id,
-                            position: clickedInfo.position,
-                            color: heldBox.color,
-                            type: "fixed"
-                        }
-                    ])
-
-                    // 들고 있는 블럭 내려놓기
-                    setHeldBox(null)
-                    setClickedInfo(null)
+        
+                if (heldBox) {
+                    if (heldBox.persistent) {
+                        console.log("persistent 블럭 내려놓기")
+                        setHeldBox(null)
+                    } else if (clickedInfo) {
+                        console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
+        
+                        // 블럭 다시 boxes에 추가
+                        setBoxes(prev => [
+                            ...prev,
+                            {
+                                id: heldBox.id,
+                                position: clickedInfo.position,
+                                color: heldBox.color,
+                                type: "fixed"
+                            }
+                        ])
+                        setHeldBox(null)
+                        setClickedInfo(null)
+                    }
                 }
-
+        
                 return
             }
         }
@@ -193,11 +199,11 @@ function HeldBox({ box }) {
 //   }
 
 
-function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor }) {
+function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor, showInventory }) {
     const [boxes, setBoxes] = useState([])
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
-    const [highlightMap, setHighlightMap] = useState({})
+    // const [highlightMap, setHighlightMap] = useState({})
 
 
     useEffect(() => {
@@ -222,22 +228,26 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
 
     useEffect(() => {
         if (createBoxBtn) {
-            setBoxes((prev) => [
-                ...prev,
-                {
-                    id: `created-${prev.length}`,
-                    position: [0, 10, 0],
-                    color: boxColor,
-                    type: "dynamic"
-                }
-            ])
-            setCreateBoxBtn(false)
+            // 새 블럭을 손에 쥐도록 heldBox 상태를 설정
+            setHeldBox({
+                id: `hand-${Date.now()}`,
+                color: boxColor,
+                persistent: true,
+            })
+            setCreateBoxBtn(false) // 한 번만 생성되도록 false로 리셋
+            console.log('사용하기 눌렸고 useEffect 작동함')
         }
-    }, [createBoxBtn, boxColor, setCreateBoxBtn])
+    }, [createBoxBtn])
+
+    useEffect(() => {
+        if (showInventory) {
+            document.exitPointerLock?.()
+        }
+    }, [showInventory])
 
     return (
         <Canvas camera={{ position: [0, 20, 40], fov: 30 }}>
-            <PointerLockControls />
+            {!showInventory && <PointerLockControls />}
             <PlayControl />
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
@@ -250,12 +260,12 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
             position={box.position}
             color={box.color}
             type={box.type}
-            highlight={highlightMap[box.id]}
+            // highlight={highlightMap[box.id]}
           />
         ))}
             </Physics>
             {heldBox && <HeldBox box={heldBox} />}
-           <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} />
+           {!showInventory && <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} showInventory={showInventory} />}
             {/* <HighlightHandler boxes={boxes} setHighlightMap={setHighlightMap} /> */}
         </Canvas>
     )

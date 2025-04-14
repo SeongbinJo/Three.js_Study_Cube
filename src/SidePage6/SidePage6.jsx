@@ -29,7 +29,7 @@ function SidePage6() {
     return (
         <>
             <div className='sidePage5-box'>
-                <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} setCreateBoxBtn={setCreateBoxBtn} boxColor={color} />
+                <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} setCreateBoxBtn={setCreateBoxBtn} boxColor={color} showInventory={showInventory} />
                 <div className="dot"></div>
                 <div className='ver1-hovered-box' style={{
                     position: 'absolute',
@@ -54,22 +54,23 @@ function SidePage6() {
                 { showInventory && <div
                     style={{
                         position: "absolute",
-                        top: 50,
-                        right: 50,
+                        top: "50%",
+                        right: "50%",
+                        transform: "translate(-50%, -50%)",
                         zIndex: 10,
                         backgroundColor: "green",
                         padding: "10px",
                         borderRadius: "5px",
-                        maxWidth: "15%"
+                        maxWidth: "40%"
                     }}
                 >
                     <button
                         onClick={() => {
-                            console.log("생성 버튼 클릭.")
                             setCreateBoxBtn(true)
+                            setShowInventory(prev => !prev)
                         }}
                     >
-                        생성
+                        사용하기
                     </button>
                     <div style={{
                         marginTop: "20px",
