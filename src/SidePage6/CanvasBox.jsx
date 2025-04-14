@@ -158,7 +158,7 @@ function HeldBox({ box }) {
 }
 
 
-// 호버링 된 블럭 근처 grid 표현
+// // 호버링 된 블럭 근처 grid 표현
 
 // function HighlightHandler({ boxes, setHighlightMap }) {
 //     const { camera, scene } = useThree()
@@ -250,12 +250,12 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
             position={box.position}
             color={box.color}
             type={box.type}
-            // highlight={highlightMap[box.id]}
+            highlight={highlightMap[box.id]}
           />
         ))}
             </Physics>
             {heldBox && <HeldBox box={heldBox} />}
-            <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} />
+           <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} />
             {/* <HighlightHandler boxes={boxes} setHighlightMap={setHighlightMap} /> */}
         </Canvas>
     )

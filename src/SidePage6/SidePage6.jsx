@@ -13,6 +13,18 @@ function SidePage6() {
     const [viewDirection, setViewDirection] = useState("front")
     const [createBoxBtn, setCreateBoxBtn] = useState(false)
     const [color, setColor] = useState("#ffffff")
+    const [showInventory, setShowInventory] = useState(false)
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "e" || e.key === "E") {
+                setShowInventory(prev => !prev)
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
 
     return (
         <>
@@ -39,7 +51,7 @@ function SidePage6() {
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("bottom")}>아래</button>
                     </div>
                 </div>
-                {/* <div
+                { showInventory && <div
                     style={{
                         position: "absolute",
                         top: 50,
@@ -80,7 +92,7 @@ function SidePage6() {
                     <div style={{ marginTop: "20px" }}>
                         <SketchPicker color={color} disableAlpha={true} onChange={(color) => setColor(color.hex)} />
                     </div>
-                </div> */}
+                </div>}
             </div>
         </>
     )
