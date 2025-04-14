@@ -51,6 +51,26 @@ function SidePage6() {
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("bottom")}>아래</button>
                     </div>
                 </div>
+                <div className='ver1-hovered-box' style={{
+                    position: 'absolute',
+                    left: 30,
+                    top: 30,
+                    zIndex: 10
+                }}>
+                    [SidePage6_Minecraft2] - ing<br />
+                    1. 기본 바탕이 되는 바닥 생성<br />
+                    2. 카메라 고정 및 동서남북 시점 변환<br />
+                    3. w(전진), s(후진), a(왼쪽), d(오른쪽), LCtrl(하강), Space-bar(상승) :: 키보드 및 마우스로 카메라 조작
+
+                    <div style={{ marginTop: '10px' }}>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("front")}>앞</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("back")}>뒤</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("left")}>왼쪽</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("right")}>오른쪽</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("top")}>위</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("bottom")}>아래</button>
+                    </div>
+                </div>
                 { showInventory && <div
                     style={{
                         position: "absolute",
