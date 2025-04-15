@@ -88,29 +88,45 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
             if (event.button === 2) { // 우클릭
                 event.preventDefault()
         
-                if (heldBox) {
-                    if (heldBox.persistent) {
-                        console.log("persistent 블럭 내려놓기")
-                        setHeldBox(null)
-                    } else if (clickedInfo) {
-                        console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
+                const raycaster = new THREE.Raycaster()
+                const mouse = new THREE.Vector2(0, 0) // 중앙 고정
+                raycaster.setFromCamera(mouse, camera)
+                const intersects = raycaster.intersectObjects(scene.children, true)
         
-                        // 블럭 다시 boxes에 추가
-                        setBoxes(prev => [
-                            ...prev,
-                            {
-                                id: heldBox.id,
-                                position: clickedInfo.position,
-                                color: heldBox.color,
-                                type: "fixed"
-                            }
-                        ])
-                        setHeldBox(null)
-                        setClickedInfo(null)
+                if (intersects.length > 0) {
+                    const intersection = intersects[0]
+                    const clickedObject = intersection.object
+                    const userData = clickedObject.userData || {}
+                    const id = userData.id
+                    const type = userData.type
+        
+                    // 블럭을 들고 있을 경우
+                    if (heldBox) {
+                        if (heldBox.persistent) {
+                            console.log("persistent 블럭 내려놓기")
+                            setHeldBox(null)
+                        } else if (clickedInfo) {
+                            console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
+        
+                            setBoxes(prev => [
+                                ...prev,
+                                {
+                                    id: heldBox.id,
+                                    position: clickedInfo.position,
+                                    color: heldBox.color,
+                                    type: "fixed"
+                                }
+                            ])
+                            setHeldBox(null)
+                            setClickedInfo(null)
+                        }
+                    }
+                    // 아무것도 안 들고 있고, 클릭한 것이 fixed 블럭이면 삭제
+                    else if (type === "fixed" && id) {
+                        setBoxes((prev) => prev.filter((box) => box.id !== id))
+                        console.log(`손에 아무것도 없을 때 fixed 블럭 ${id} 우클릭 → 삭제함`)
                     }
                 }
-        
-                return
             }
         }
 
