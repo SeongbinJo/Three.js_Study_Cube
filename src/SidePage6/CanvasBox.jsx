@@ -24,7 +24,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
         if (intersects.length > 0) {
             const intersection = intersects[0]
             const clickedObject = intersection.object
-            const { id, position, type } = clickedObject.userData
+            const { id, position } = clickedObject.userData
 
             // 클릭한 면 방향 구하기
             const faceNormal = intersection.face?.normal.clone()
@@ -49,7 +49,6 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                         id: `placed-${Date.now()}`,
                         position: [targetPos.x, targetPos.y, targetPos.z],
                         color: heldBox.color,
-                        type: "fixed"
                     }
                 ])
 
@@ -64,7 +63,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
             }
 
             // 들고 있는 블럭이 없고, 클릭한 것이 fixed 블럭이면 들기 처리
-            if (!heldBox && type === "fixed") {
+            if (!heldBox) {
                 setClickedInfo({ id, position })
 
                 // 박스 제거
@@ -85,50 +84,48 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
     useEffect(() => {
         const handleMouseDown = (event) => {
-            if (event.button === 2) { // 우클릭
-                event.preventDefault()
-        
-                const raycaster = new THREE.Raycaster()
-                const mouse = new THREE.Vector2(0, 0) // 중앙 고정
-                raycaster.setFromCamera(mouse, camera)
-                const intersects = raycaster.intersectObjects(scene.children, true)
-        
-                if (intersects.length > 0) {
-                    const intersection = intersects[0]
-                    const clickedObject = intersection.object
-                    const userData = clickedObject.userData || {}
-                    const id = userData.id
-                    const type = userData.type
-        
-                    // 블럭을 들고 있을 경우
-                    if (heldBox) {
-                        if (heldBox.persistent) {
-                            console.log("persistent 블럭 내려놓기")
-                            setHeldBox(null)
-                        } else if (clickedInfo) {
-                            console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
-        
-                            setBoxes(prev => [
-                                ...prev,
-                                {
-                                    id: heldBox.id,
-                                    position: clickedInfo.position,
-                                    color: heldBox.color,
-                                    type: "fixed"
-                                }
-                            ])
-                            setHeldBox(null)
-                            setClickedInfo(null)
+    if (event.button === 2) { // 우클릭
+        event.preventDefault()
+
+        const raycaster = new THREE.Raycaster()
+        const mouse = new THREE.Vector2(0, 0) // 중앙 고정
+        raycaster.setFromCamera(mouse, camera)
+        const intersects = raycaster.intersectObjects(scene.children, true)
+
+        if (intersects.length > 0) {
+            const intersection = intersects[0]
+            const clickedObject = intersection.object
+            const userData = clickedObject.userData || {}
+            const id = userData.id
+
+            // 블럭을 들고 있을 경우
+            if (heldBox) {
+                if (heldBox.persistent) {
+                    console.log("persistent 블럭 내려놓기")
+                    setHeldBox(null)
+                } else if (clickedInfo) {
+                    console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
+
+                    setBoxes(prev => [
+                        ...prev,
+                        {
+                            id: heldBox.id,
+                            position: clickedInfo.position,
+                            color: heldBox.color,
                         }
-                    }
-                    // 아무것도 안 들고 있고, 클릭한 것이 fixed 블럭이면 삭제
-                    else if (type === "fixed" && id) {
-                        setBoxes((prev) => prev.filter((box) => box.id !== id))
-                        console.log(`손에 아무것도 없을 때 fixed 블럭 ${id} 우클릭 → 삭제함`)
-                    }
+                    ])
+                    setHeldBox(null)
+                    setClickedInfo(null)
                 }
             }
+            // 아무것도 안 들고 있고, 클릭한 것이 fixed 블럭이면 삭제
+            else if (id) {
+                setBoxes((prev) => prev.filter((box) => box.id !== id))
+                console.log(`손에 아무것도 없을 때 fixed 블럭 ${id} 우클릭 → 삭제함`)
+            }
         }
+    }
+}
 
         window.addEventListener("click", handleClick)
         window.addEventListener("mousedown", handleMouseDown)
@@ -180,46 +177,10 @@ function HeldBox({ box }) {
 }
 
 
-// // 호버링 된 블럭 근처 grid 표현
-
-// function HighlightHandler({ boxes, setHighlightMap }) {
-//     const { camera, scene } = useThree()
-//     const raycaster = useRef(new THREE.Raycaster())
-  
-//     useFrame(() => {
-//       const mouse = new THREE.Vector2(0, 0) // 중앙 고정
-//       raycaster.current.setFromCamera(mouse, camera)
-  
-//       const intersects = raycaster.current.intersectObjects(scene.children, true)
-  
-//       let highlightCenter = null
-//       if (intersects.length > 0) {
-//         const intersected = intersects.find((obj) => obj.object.userData?.type === "fixed")
-//         if (intersected) {
-//           highlightCenter = intersected.object.position
-//         }
-//       }
-  
-//       const newMap = {}
-//       if (highlightCenter) {
-//         for (const box of boxes) {
-//           const dist = new THREE.Vector3(...box.position).distanceTo(highlightCenter)
-//           newMap[box.id] = dist <= 2 // 반경 1만 highlight
-//         }
-//       }
-  
-//       setHighlightMap(newMap)
-//     })
-  
-//     return null
-//   }
-
-
 function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor, showInventory }) {
     const [boxes, setBoxes] = useState([])
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
-    // const [highlightMap, setHighlightMap] = useState({})
 
 
     useEffect(() => {
@@ -234,7 +195,6 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
                     id: `fixed-${i}-${j}`,
                     position: [x, 0, z],
                     color: "white",
-                    type: "fixed"
                 })
             }
         }
@@ -268,21 +228,16 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
-            <Physics>
             {boxes.map((box) => (
           <SidePage6Model
             key={box.id}
             id={box.id}
             position={box.position}
             color={box.color}
-            type={box.type}
-            // highlight={highlightMap[box.id]}
           />
         ))}
-            </Physics>
             {heldBox && <HeldBox box={heldBox} />}
            {!showInventory && <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} showInventory={showInventory} />}
-            {/* <HighlightHandler boxes={boxes} setHighlightMap={setHighlightMap} /> */}
         </Canvas>
     )
 }
