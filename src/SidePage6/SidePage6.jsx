@@ -104,6 +104,7 @@ function SidePage6() {
                     <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: '6px', marginLeft: '20px' }}>
                         <input
                             type="checkbox"
+                            checked={isGrid}
                             onChange={(e) => {
                                 setIsGrid(prev => !prev)
                             }}

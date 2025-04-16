@@ -39,7 +39,7 @@ function PlayControl() {
             case "Space":
                 keys.current.up = true
                 break
-            case "ControlLeft":
+            case "KeyC":
                 keys.current.down = true
                 break
         }
@@ -64,7 +64,7 @@ function PlayControl() {
             case "Space":
                 keys.current.up = false
                 break
-            case "ControlLeft":
+            case "KeyC":
                 keys.current.down = false
                 break
         }
