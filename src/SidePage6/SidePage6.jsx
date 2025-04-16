@@ -14,6 +14,7 @@ function SidePage6() {
     const [createBoxBtn, setCreateBoxBtn] = useState(false)
     const [color, setColor] = useState("#ffffff")
     const [showInventory, setShowInventory] = useState(false)
+    const [isGrid, setIsGrid] = useState(false)
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -29,7 +30,15 @@ function SidePage6() {
     return (
         <>
             <div className='sidePage5-box'>
-                <CanvasBox bottomCount={20} viewDirection={viewDirection} createBoxBtn={createBoxBtn} setCreateBoxBtn={setCreateBoxBtn} boxColor={color} showInventory={showInventory} />
+                <CanvasBox
+                    bottomCount={20}
+                    viewDirection={viewDirection}
+                    createBoxBtn={createBoxBtn}
+                    setCreateBoxBtn={setCreateBoxBtn}
+                    boxColor={color}
+                    showInventory={showInventory}
+                    isGrid={isGrid}
+                />
                 <div className="dot"></div>
                 <div className='ver1-hovered-box' style={{
                     position: 'absolute',
@@ -71,7 +80,7 @@ function SidePage6() {
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("bottom")}>아래</button>
                     </div>
                 </div>
-                { showInventory && <div
+                {showInventory && <div
                     style={{
                         position: "absolute",
                         top: "50%",
@@ -92,6 +101,15 @@ function SidePage6() {
                     >
                         사용하기
                     </button>
+                    <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: '6px', marginLeft: '20px' }}>
+                        <input
+                            type="checkbox"
+                            onChange={(e) => {
+                                setIsGrid(prev => !prev)
+                            }}
+                        />
+                        <span>Grid 적용</span>
+                    </label>
                     <div style={{
                         marginTop: "20px",
                         backgroundColor: "lightgray",

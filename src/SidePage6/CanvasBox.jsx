@@ -19,7 +19,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
         const mouse = new THREE.Vector2(0, 0) // 항상 화면 중심
 
         raycaster.setFromCamera(mouse, camera)
-        const intersects = raycaster.intersectObjects(scene.children, true)
+        const intersects = raycaster.intersectObjects(scene.children, true).filter(i => !i.object.userData.ignoreRaycast)
 
         if (intersects.length > 0) {
             const intersection = intersects[0]
@@ -90,7 +90,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2(0, 0) // 중앙 고정
         raycaster.setFromCamera(mouse, camera)
-        const intersects = raycaster.intersectObjects(scene.children, true)
+        const intersects = raycaster.intersectObjects(scene.children, true).filter(i => !i.object.userData.ignoreRaycast)
 
         if (intersects.length > 0) {
             const intersection = intersects[0]
@@ -177,7 +177,7 @@ function HeldBox({ box }) {
 }
 
 
-function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor, showInventory }) {
+function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, isGrid }) {
     const [boxes, setBoxes] = useState([])
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
@@ -227,13 +227,16 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
             <PlayControl />
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
-            <directionalLight position={[10, 30, -30]} />
+                            <directionalLight position={[10, 30, -30]} />
+                            <directionalLight position={[20, -20, 30]} />
+                            <directionalLight position={[-10, 0, 0]} />
             {boxes.map((box) => (
           <SidePage6Model
             key={box.id}
             id={box.id}
             position={box.position}
             color={box.color}
+            isGrid={isGrid}
           />
         ))}
             {heldBox && <HeldBox box={heldBox} />}
