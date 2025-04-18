@@ -84,48 +84,48 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
     useEffect(() => {
         const handleMouseDown = (event) => {
-    if (event.button === 2) { // 우클릭
-        event.preventDefault()
+            if (event.button === 2) { // 우클릭
+                event.preventDefault()
 
-        const raycaster = new THREE.Raycaster()
-        const mouse = new THREE.Vector2(0, 0) // 중앙 고정
-        raycaster.setFromCamera(mouse, camera)
-        const intersects = raycaster.intersectObjects(scene.children, true).filter(i => !i.object.userData.ignoreRaycast)
+                const raycaster = new THREE.Raycaster()
+                const mouse = new THREE.Vector2(0, 0) // 중앙 고정
+                raycaster.setFromCamera(mouse, camera)
+                const intersects = raycaster.intersectObjects(scene.children, true).filter(i => !i.object.userData.ignoreRaycast)
 
-        if (intersects.length > 0) {
-            const intersection = intersects[0]
-            const clickedObject = intersection.object
-            const userData = clickedObject.userData || {}
-            const id = userData.id
+                if (intersects.length > 0) {
+                    const intersection = intersects[0]
+                    const clickedObject = intersection.object
+                    const userData = clickedObject.userData || {}
+                    const id = userData.id
 
-            // 블럭을 들고 있을 경우
-            if (heldBox) {
-                if (heldBox.persistent) {
-                    console.log("persistent 블럭 내려놓기")
-                    setHeldBox(null)
-                } else if (clickedInfo) {
-                    console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
+                    // 블럭을 들고 있을 경우
+                    if (heldBox) {
+                        if (heldBox.persistent) {
+                            console.log("persistent 블럭 내려놓기")
+                            setHeldBox(null)
+                        } else if (clickedInfo) {
+                            console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
 
-                    setBoxes(prev => [
-                        ...prev,
-                        {
-                            id: heldBox.id,
-                            position: clickedInfo.position,
-                            color: heldBox.color,
+                            setBoxes(prev => [
+                                ...prev,
+                                {
+                                    id: heldBox.id,
+                                    position: clickedInfo.position,
+                                    color: heldBox.color,
+                                }
+                            ])
+                            setHeldBox(null)
+                            setClickedInfo(null)
                         }
-                    ])
-                    setHeldBox(null)
-                    setClickedInfo(null)
+                    }
+                    // 아무것도 안 들고 있고, 클릭한 것이 fixed 블럭이면 삭제
+                    else if (id) {
+                        setBoxes((prev) => prev.filter((box) => box.id !== id))
+                        console.log(`손에 아무것도 없을 때 fixed 블럭 ${id} 우클릭 → 삭제함`)
+                    }
                 }
             }
-            // 아무것도 안 들고 있고, 클릭한 것이 fixed 블럭이면 삭제
-            else if (id) {
-                setBoxes((prev) => prev.filter((box) => box.id !== id))
-                console.log(`손에 아무것도 없을 때 fixed 블럭 ${id} 우클릭 → 삭제함`)
-            }
         }
-    }
-}
 
         window.addEventListener("click", handleClick)
         window.addEventListener("mousedown", handleMouseDown)
@@ -148,7 +148,7 @@ function HeldBox({ box }) {
             const direction = new THREE.Vector3()
             const right = new THREE.Vector3()
             const up = new THREE.Vector3()
-            
+
             camera.getWorldDirection(direction)
             direction.normalize()
 
@@ -227,20 +227,20 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
             <PlayControl />
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
-                            <directionalLight position={[10, 30, -30]} />
-                            <directionalLight position={[20, -20, 30]} />
-                            <directionalLight position={[-10, 0, 0]} />
+            <directionalLight position={[10, 30, -30]} />
+            <directionalLight position={[20, -20, 30]} />
+            <directionalLight position={[-10, 0, 0]} />
             {boxes.map((box) => (
-          <SidePage6Model
-            key={box.id}
-            id={box.id}
-            position={box.position}
-            color={box.color}
-            isGrid={isGrid}
-          />
-        ))}
+                <SidePage6Model
+                    key={box.id}
+                    id={box.id}
+                    position={box.position}
+                    color={box.color}
+                    isGrid={isGrid}
+                />
+            ))}
             {heldBox && <HeldBox box={heldBox} />}
-           {!showInventory && <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} showInventory={showInventory} />}
+            {!showInventory && <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} showInventory={showInventory} />}
         </Canvas>
     )
 }
