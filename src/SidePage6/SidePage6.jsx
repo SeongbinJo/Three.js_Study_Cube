@@ -23,6 +23,8 @@ function SidePage6() {
     const [swatches, setSwatches] = useState(Array(5).fill("#ffffff"))
     const [selectedSwatchIndex, setSelectedSwatchIndex] = useState(null)
 
+    const [backgroundColor, setBackgroundColor] = useState("#ffffff")
+
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === "e" || e.key === "E") {
@@ -54,6 +56,7 @@ function SidePage6() {
                     boxColor={color}
                     showInventory={showInventory}
                     isGrid={isGrid}
+                    backgroundColor={backgroundColor}
                 />
                 <div className="dot"></div>
                 <div className='ver1-hovered-box' style={{
@@ -95,9 +98,9 @@ function SidePage6() {
                             setShowInventory(prev => !prev)
                         }}
                     >
-                        사용하기
+                        블럭 사용하기
                     </button>
-                    <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: '6px', marginLeft: '20px' }}>
+                    <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: '6px', marginLeft: '10px', marginRight: '10px' }}>
                         <input
                             type="checkbox"
                             checked={isGrid}
@@ -107,6 +110,13 @@ function SidePage6() {
                         />
                         <span>Grid 적용</span>
                     </label>
+                    <button
+                        onClick={() => {
+                            setBackgroundColor(color)
+                        }}
+                    >
+                        배경색 적용하기
+                    </button>
                     <div style={{
                         marginTop: "20px",
                         backgroundColor: "lightgray",

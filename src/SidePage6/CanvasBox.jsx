@@ -177,7 +177,7 @@ function HeldBox({ box }) {
 }
 
 
-function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, isGrid }) {
+function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, isGrid, backgroundColor }) {
     const [boxes, setBoxes] = useState([])
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
@@ -222,7 +222,10 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
     }, [showInventory])
 
     return (
-        <Canvas camera={{ position: [0, 20, 40], fov: 30 }}>
+        <Canvas
+            camera={{ position: [0, 20, 40], fov: 30 }}
+            // style={{ background: backgroundColor }}
+        >
             {!showInventory && <PointerLockControls />}
             <PlayControl />
             <CameraViewDirection view={viewDirection} />
