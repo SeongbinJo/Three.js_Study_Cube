@@ -224,7 +224,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
     return (
         <Canvas
             camera={{ position: [0, 20, 40], fov: 30 }}
-            // style={{ background: backgroundColor }}
+            style={{ background: backgroundColor }}
         >
             {!showInventory && <PointerLockControls />}
             <PlayControl />
