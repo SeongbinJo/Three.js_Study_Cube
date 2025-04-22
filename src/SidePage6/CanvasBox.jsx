@@ -7,11 +7,48 @@ import CameraViewDirection from "./CameraViewDirection"
 import { PointerLockControls } from "@react-three/drei"
 import PlayControl from "./PlayControl"
 
-function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox }) {
+function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory }) {
     const { scene, camera } = useThree()
 
+    // 1. 히스토리 배열 생성
+    //     a. 10개 까지만 들어가야함
+    //     b. 10개 이후로는 처음에 들어왔던 것 부터 삭제 후 마지막에 추가
+    //     c. 추가/삭제/위치변경 인지 구분해서 추가
+    // 2. < 키 이벤트 생성
+    //     a. 히스토리 배열의 마지막 요소가
+    //         1. 추가일 경우
+    //             a. 해당 요소의 박스 정보에 맞게 '삭제' 해줌
+    //         2. 삭제일 경우
+    //             a. 해당 요소의 박스 정보에 맞게 '추가' 해줌
+    //         3. 위치변경일 경우
+    //             a. 해당 요소의 박스 정보에 맞게 '삭제' 후 원래 위치에 '추가' 해줌\
+    //     b. < 키를 눌러 이전으로 수정해도 배열의 요소는 삭제되면 안되고, 참조하는 배열 요소의 위치만 앞으로 당겨져야함
+    //     c. 참조하는 배열 요소가 첫번째이고, < 키를 한 번 더 누르게되면 이벤트는 더이상 작동하지 않음
+    // 3. > 키 이벤트 생성
+    //     a. 참조하는 배열 요소가 마지막이면 더이상 이벤트 작동하지 않음
+
+    const [history, setHistory] = useState([])
+
+    function pushHistory(boxInfo) {
+        setHistory(prev => {
+            const newHistory = [...prev]
+
+            if (newHistory.length >= 10) {
+                newHistory.shift()
+            }
+
+            newHistory.push(boxInfo)
+            console.log(`현재 History[] =`, newHistory)
+
+            return newHistory
+        })
+    }
+
+
+
+
     const handleClick = (event) => {
-        if (event.button !== 0) return // 왼쪽 클릭만 처리
+        if (event.button !== 0 || showInventory) return // 왼쪽 클릭만 처리
 
         event.stopPropagation()
 
@@ -30,6 +67,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
             const faceNormal = intersection.face?.normal.clone()
             faceNormal?.applyMatrix3(new THREE.Matrix3().getNormalMatrix(clickedObject.matrixWorld)).normalize()
 
+
             // 만약 블럭을 들고 있는 상태라면 놓기 처리
             if (heldBox && faceNormal && position) {
                 const offset = new THREE.Vector3(0, 0, 0)
@@ -43,22 +81,46 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
                 const targetPos = new THREE.Vector3(...position).add(offset)
 
+                const movedBox = {
+                    id: `placed-${Date.now()}`,
+                    position: [targetPos.x, targetPos.y, targetPos.z],
+                    color: heldBox.color,
+                }
+
                 setBoxes(prev => [
                     ...prev,
-                    {
-                        id: `placed-${Date.now()}`,
-                        position: [targetPos.x, targetPos.y, targetPos.z],
-                        color: heldBox.color,
-                    }
+                    movedBox
                 ])
 
-                // 창작 모드일 경우 계속 생성하게끔
+                // 창작 모드가 아닌 존재하는 블럭을 집어 좌클릭 한 경우
                 if (!heldBox.persistent) {
                     setHeldBox(null)
                     setClickedInfo(null)
+
+                    pushHistory({
+                        type: "move",
+                        prevBox: {
+                            id: heldBox.id,
+                            position: heldBox.prevPos,
+                            color: heldBox.color
+                        },
+                        nextBox: {
+                            id: heldBox.id,
+                            position: targetPos.toArray(),
+                            color: heldBox.color
+                        }
+                    })
+
+                } else { // 창작 모드로 생성
+                    pushHistory({
+                        type: "create",
+                        box: movedBox
+                    })
+
+                    console.log('창작 모드, 생성 함')
                 }
 
-                console.log(`블럭을 ${[x, y, z]} 방향으로 놓았음. 위치:`, targetPos.toArray())
+                console.log(`블럭을 ${[x, y, z]} 방향으로 놓았음. 옮긴 위치:`, targetPos.toArray())
                 return
             }
 
@@ -73,6 +135,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 setHeldBox({
                     id,
                     color: clickedObject.material.color.getStyle(),
+                    prevPos: [...position], // 손에 집기 전 블럭 위치
                 })
 
                 console.log(`블럭 ${id}을 들었음`)
@@ -84,7 +147,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
     useEffect(() => {
         const handleMouseDown = (event) => {
-            if (event.button === 2) { // 우클릭
+            if (event.button === 2 && !showInventory) { // 우클릭
                 event.preventDefault()
 
                 const raycaster = new THREE.Raycaster()
@@ -118,9 +181,20 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                             setClickedInfo(null)
                         }
                     }
-                    // 아무것도 안 들고 있고, 클릭한 것이 fixed 블럭이면 삭제
+                    // 아무것도 안 들고 있으면 삭제
                     else if (id) {
                         setBoxes((prev) => prev.filter((box) => box.id !== id))
+
+                        const deletedBox = {
+                            id: id,
+                            position: clickedObject.position.clone(),
+                            color: clickedObject.material.color.getStyle()
+                        }
+                        pushHistory({
+                            type: "delete",
+                            box: deletedBox
+                        })
+
                         console.log(`손에 아무것도 없을 때 fixed 블럭 ${id} 우클릭 → 삭제함`)
                     }
                 }
@@ -134,7 +208,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
             window.removeEventListener("click", handleClick)
             window.removeEventListener("mousedown", handleMouseDown)
         }
-    }, [heldBox, clickedInfo])
+    }, [heldBox, clickedInfo, showInventory])
 
     return null
 }
@@ -208,7 +282,7 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
             setHeldBox({
                 id: `hand-${Date.now()}`,
                 color: boxColor,
-                persistent: true,
+                persistent: true, // 창작 모드 블럭인지?
             })
             setCreateBoxBtn(false) // 한 번만 생성되도록 false로 리셋
             console.log('사용하기 눌렸고 useEffect 작동함')
@@ -243,7 +317,14 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
                 />
             ))}
             {heldBox && <HeldBox box={heldBox} />}
-            {!showInventory && <ClickHandler clickedInfo={clickedInfo} setClickedInfo={setClickedInfo} setBoxes={setBoxes} setHeldBox={setHeldBox} heldBox={heldBox} showInventory={showInventory} />}
+            <ClickHandler
+                clickedInfo={clickedInfo}
+                setClickedInfo={setClickedInfo}
+                setBoxes={setBoxes}
+                setHeldBox={setHeldBox}
+                heldBox={heldBox}
+                showInventory={showInventory}
+            />
         </Canvas>
     )
 }
