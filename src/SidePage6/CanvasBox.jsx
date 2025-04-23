@@ -27,23 +27,68 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
     // 3. > 키 이벤트 생성
     //     a. 참조하는 배열 요소가 마지막이면 더이상 이벤트 작동하지 않음
 
+
     const [history, setHistory] = useState([])
+    const [historyIndex, setHistoryIndex] = useState(-1)
 
     function pushHistory(boxInfo) {
         setHistory(prev => {
             const newHistory = [...prev]
 
-            if (newHistory.length >= 10) {
-                newHistory.shift()
-            }
+            // 현재 최신 흔적일 경우
+            // 길이가 10이 아니면 10이 될떄까지 추가할 수 있고, 10 이상이면 shift 해줘야 함
+            if (historyIndex == -1) {
+                if (newHistory.length >= 10) {
+                    newHistory.shift()
+                }
 
-            newHistory.push(boxInfo)
-            console.log(`현재 History[] =`, newHistory)
+                newHistory.push(boxInfo)
+            } else {
+                // <, > 를 사용해서 최신 흔적이 아닐 경우
+                // 이때 추가되는 흔적은 현재 Index 뒤에 다 지우고 추가가 되어야 함
+                newHistory.splice(newHistory.length + historyIndex + 1)
+                newHistory.push(boxInfo)
+            }
 
             return newHistory
         })
     }
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "<" || e.key === ",") {
+                // 현재 상황이 히스토리의 제일 과거가 아닐 경우
+                // 인덱스를 감소시키고 히스토리의 요소를 출력해야함
+                if (history.length + historyIndex > 0) {
+                    setHistoryIndex(prev => {
+                        const newIndex = prev - 1
+                        console.log(`< 키 누름, ${JSON.stringify(history[history.length + newIndex], null, 2)}`)
+                        return newIndex
+                    })
+                } else {
+                    // 현재 상황이 히스토리의 제일 과거일 경우
+                    console.log("더 이상 < 키 액션을 수행할 수 없음")
+                }
+            }
+            if (e.key === ">" || e.key === ".") {
+                // 현재 상황이 히스토리의 제일 최신이 아닐 경우
+                // 인덱스를 증가시키고 히스토리의 요소 출력
+                if (history.length + historyIndex < history.length - 1) {
+                    setHistoryIndex(prev => {
+                        const newIndex = prev + 1
+                        console.log(`> 키 누름, ${JSON.stringify(history[history.length + newIndex], null, 2)}`)
+                        return newIndex
+                    })
+                } else {
+                    // 현재 상황이 히스토리의 제일 최신일 경우
+                    console.log("더 이상 > 키 액션을 수행할 수 없음")
+                }
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [history, historyIndex])
 
 
 
