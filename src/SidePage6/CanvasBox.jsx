@@ -47,6 +47,9 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 // <, > 를 사용해서 최신 흔적이 아닐 경우
                 // 이때 추가되는 흔적은 현재 Index 뒤에 다 지우고 추가가 되어야 함
                 newHistory.splice(newHistory.length + historyIndex + 1)
+
+                setHistoryIndex(-1)
+
                 newHistory.push(boxInfo)
             }
 
