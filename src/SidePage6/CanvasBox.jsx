@@ -29,7 +29,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
 
     const [history, setHistory] = useState([])
-    const [historyIndex, setHistoryIndex] = useState(-1)
+    const [historyIndex, setHistoryIndex] = useState(0)
 
     function pushHistory(boxInfo) {
         setHistory(prev => {
@@ -37,7 +37,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
             // 현재 최신 흔적일 경우
             // 길이가 10이 아니면 10이 될떄까지 추가할 수 있고, 10 이상이면 shift 해줘야 함
-            if (historyIndex == -1) {
+            if (historyIndex == 0) {
                 if (newHistory.length >= 10) {
                     newHistory.shift()
                 }
@@ -46,9 +46,9 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
             } else {
                 // <, > 를 사용해서 최신 흔적이 아닐 경우
                 // 이때 추가되는 흔적은 현재 Index 뒤에 다 지우고 추가가 되어야 함
-                newHistory.splice(newHistory.length + historyIndex + 1)
+                newHistory.splice(newHistory.length + historyIndex)
 
-                setHistoryIndex(-1)
+                setHistoryIndex(0)
 
                 newHistory.push(boxInfo)
             }
@@ -57,34 +57,61 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
         })
     }
 
+    function undoAction(target) {
+        setBoxes(prev => {
+            let newBoxes = [...prev]
+            switch (target.type) {
+                case "create":
+                    // create를 undo -> 해당 박스 삭제
+                    return newBoxes.filter(box => box.id !== target.box.id)
+                case "delete":
+                    // delete를 undo -> 해당 박스 추가
+                    newBoxes = newBoxes.filter(box => box.id !== target.box.id)
+                    return [...newBoxes, target.box]
+                case "move":
+                    newBoxes = newBoxes.filter(box => box.id !== target.nextBox.id)
+                    return [...newBoxes, target.prevBox]
+                default:
+                    return newBoxes
+            }
+        })
+    }
+
+    function redoAction(target) {
+        setBoxes(prev => {
+            let newBoxes = [...prev]
+            switch (target.type) {
+                case "create":
+                    // create를 redo -> 해당 박스 다시 추가
+                    return [...newBoxes, target.box]
+                case "delete":
+                    // delete를 redo -> 해당 박스 다시 삭제
+                    return newBoxes.filter(box => box.id !== target.box.id)
+                case "move":
+                    newBoxes = newBoxes.filter(box => box.id !== target.prevBox.id)
+                    return [...newBoxes, target.nextBox]
+                default:
+                    return newBoxes
+            }
+        })
+    }
+
     useEffect(() => {
+        // 키 이벤트 안에서 index 변경 전에 바로 실행
         const handleKeyDown = (e) => {
             if (e.key === "<" || e.key === ",") {
-                // 현재 상황이 히스토리의 제일 과거가 아닐 경우
-                // 인덱스를 감소시키고 히스토리의 요소를 출력해야함
-                if (history.length + historyIndex > 0) {
-                    setHistoryIndex(prev => {
-                        const newIndex = prev - 1
-                        console.log(`< 키 누름, ${JSON.stringify(history[history.length + newIndex], null, 2)}`)
-                        return newIndex
-                    })
-                } else {
-                    // 현재 상황이 히스토리의 제일 과거일 경우
-                    console.log("더 이상 < 키 액션을 수행할 수 없음")
+                const nextIndex = historyIndex - 1
+                const target = history[history.length + nextIndex]
+                if (target) {
+                    undoAction(target)
+                    setHistoryIndex(nextIndex)
                 }
             }
             if (e.key === ">" || e.key === ".") {
-                // 현재 상황이 히스토리의 제일 최신이 아닐 경우
-                // 인덱스를 증가시키고 히스토리의 요소 출력
-                if (history.length + historyIndex < history.length - 1) {
-                    setHistoryIndex(prev => {
-                        const newIndex = prev + 1
-                        console.log(`> 키 누름, ${JSON.stringify(history[history.length + newIndex], null, 2)}`)
-                        return newIndex
-                    })
-                } else {
-                    // 현재 상황이 히스토리의 제일 최신일 경우
-                    console.log("더 이상 > 키 액션을 수행할 수 없음")
+                const target = history[history.length + historyIndex]
+                if (target) {
+                    redoAction(target)
+                    setHistoryIndex(historyIndex + 1)
                 }
             }
         }
