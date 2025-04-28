@@ -7,6 +7,8 @@ import CameraViewDirection from "./CameraViewDirection"
 import { PointerLockControls } from "@react-three/drei"
 import PlayControl from "./PlayControl"
 
+
+
 function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory }) {
     const { scene, camera } = useThree()
 
@@ -40,10 +42,10 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 newHistory.splice(cutIndex)
             }
     
-            newHistory.push(boxInfo);
+            newHistory.push(boxInfo)
     
-            return newHistory;
-        });
+            return newHistory
+        })
     
         setHistoryIndex(0)
     }
@@ -317,7 +319,7 @@ function HeldBox({ box }) {
 }
 
 
-function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, isGrid, backgroundColor }) {
+function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, showMenu, isGrid, backgroundColor }) {
     const [boxes, setBoxes] = useState([])
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
@@ -356,17 +358,17 @@ function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, 
     }, [createBoxBtn])
 
     useEffect(() => {
-        if (showInventory) {
+        if (showInventory || showMenu) {
             document.exitPointerLock?.()
         }
-    }, [showInventory])
+    }, [showInventory, showMenu])
 
     return (
         <Canvas
             camera={{ position: [0, 20, 40], fov: 30 }}
             style={{ background: backgroundColor }}
         >
-            {!showInventory && <PointerLockControls />}
+            {!(showInventory || showMenu) && <PointerLockControls />}
             <PlayControl />
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />

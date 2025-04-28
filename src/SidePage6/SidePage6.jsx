@@ -18,6 +18,11 @@ function SidePage6() {
 
     const [showInventory, setShowInventory] = useState(false)
 
+    const [showMenu, setShowMenu] = useState(false)
+
+    const [savedSlots, setSavedSlots] = useState([null, null, null])
+    const [currentSlot, setCurrentSlot] = useState(0)
+
     const [isGrid, setIsGrid] = useState(false)
 
     const [swatches, setSwatches] = useState(Array(5).fill("#ffffff"))
@@ -29,6 +34,10 @@ function SidePage6() {
         const handleKeyDown = (e) => {
             if (e.key === "e" || e.key === "E") {
                 setShowInventory(prev => !prev)
+            }
+
+            if (e.key === "q" || e.key === "Q") {
+                setShowMenu(prev => !prev)
             }
         }
 
@@ -51,10 +60,11 @@ function SidePage6() {
                 <CanvasBox
                     bottomCount={20}
                     viewDirection={viewDirection}
-                    createBoxBtn={createBoxBtn}
+                    createBoxBtn={createBoxBtn}d
                     setCreateBoxBtn={setCreateBoxBtn}
                     boxColor={color}
                     showInventory={showInventory}
+                    showMenu={showMenu}
                     isGrid={isGrid}
                     backgroundColor={backgroundColor}
                 />
@@ -163,6 +173,49 @@ function SidePage6() {
                         </div>
                     </div>
                 </div>}
+                {showMenu && <div>
+                     {/* 오른쪽에 슬롯과 버튼 UI */}
+        <div style={{
+                        position: "absolute",
+                        top: "50%",
+                        right: "50%",
+                        transform: "translate(-50%, -50%)",
+                        zIndex: 10,
+                        padding: "10px",
+                        borderRadius: "5px",
+                        maxWidth: "40%",
+                     backgroundColor: "#eee" }}>
+                        <h3>저장 슬롯</h3>
+                {savedSlots.map((slot, index) => (
+                    <div
+                        key={index}
+                        onClick={() => handleLoad(index)}
+                        style={{
+                            padding: "10px",
+                            marginBottom: "10px",
+                            border: currentSlot === index ? "2px solid blue" : "1px solid gray",
+                            cursor: "pointer",
+                            backgroundColor: slot ? "#cce5ff" : "#f8f9fa",
+                        }}
+                    >
+                        {slot ? `저장된 슬롯 ${index + 1}` : `빈 저장 슬롯 ${index + 1}`}
+                    </div>
+                ))}
+                <button
+                    style={{
+                        marginTop: "20px",
+                        padding: "10px",
+                        width: "100%",
+                        backgroundColor: "#007bff",
+                        color: "white",
+                        border: "none",
+                        cursor: "pointer",
+                    }}
+                >
+                    현재 상태 저장
+                </button>
+            </div>
+        </div>}
             </div>
         </>
     )
