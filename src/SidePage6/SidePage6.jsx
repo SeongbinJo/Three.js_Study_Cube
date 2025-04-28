@@ -12,6 +12,26 @@ import { OrbitControls } from "@react-three/drei"
 function SidePage6() {
     const [viewDirection, setViewDirection] = useState("front")
 
+    const bottomCount = 20
+    const [boxes, setBoxes] = useState(() => {
+        const boxModels = []
+        const centerOffset = (bottomCount - 1) / 2
+
+        for (let i = 0; i< bottomCount; i++) {
+            for (let j = 0; j < bottomCount; j++) {
+                const x = i - centerOffset
+                const z = j - centerOffset
+                boxModels.push({
+                    id: `${i}-${j}`,
+                    position: [x, 0, z],
+                    color: "white"
+                })
+            }
+        }
+
+        return boxModels
+    })
+
     const [createBoxBtn, setCreateBoxBtn] = useState(false)
 
     const [color, setColor] = useState("#ffffff")
@@ -20,7 +40,7 @@ function SidePage6() {
 
     const [showMenu, setShowMenu] = useState(false)
 
-    const [savedSlots, setSavedSlots] = useState([null, null, null])
+    const [savedSlots, setSavedSlots] = useState([boxes, boxes, boxes])
     const [currentSlot, setCurrentSlot] = useState(0)
 
     const [isGrid, setIsGrid] = useState(false)
@@ -53,14 +73,28 @@ function SidePage6() {
             setSwatches(newSwatches)
         }
     }
+    
+
+    const saveSlot = (slotIndex) => {
+        const newSavedSlots = [...savedSlots]
+        newSavedSlots[slotIndex] = boxes
+        setSavedSlots(newSavedSlots)
+    }
+
+    useEffect(() => {
+        const newSlot = savedSlots[currentSlot]
+        setBoxes(newSlot)
+    }, [currentSlot])
 
     return (
         <>
             <div className='sidePage5-box'>
                 <CanvasBox
-                    bottomCount={20}
+                    bottomCount={bottomCount}
                     viewDirection={viewDirection}
-                    createBoxBtn={createBoxBtn}d
+                    boxes={boxes}
+                    setBoxes={setBoxes}
+                    createBoxBtn={createBoxBtn}
                     setCreateBoxBtn={setCreateBoxBtn}
                     boxColor={color}
                     showInventory={showInventory}
@@ -174,8 +208,7 @@ function SidePage6() {
                     </div>
                 </div>}
                 {showMenu && <div>
-                     {/* 오른쪽에 슬롯과 버튼 UI */}
-        <div style={{
+                    <div style={{
                         position: "absolute",
                         top: "50%",
                         right: "50%",
@@ -184,38 +217,40 @@ function SidePage6() {
                         padding: "10px",
                         borderRadius: "5px",
                         maxWidth: "40%",
-                     backgroundColor: "#eee" }}>
+                        backgroundColor: "#eee"
+                    }}>
                         <h3>저장 슬롯</h3>
-                {savedSlots.map((slot, index) => (
-                    <div
-                        key={index}
-                        onClick={() => handleLoad(index)}
-                        style={{
-                            padding: "10px",
-                            marginBottom: "10px",
-                            border: currentSlot === index ? "2px solid blue" : "1px solid gray",
-                            cursor: "pointer",
-                            backgroundColor: slot ? "#cce5ff" : "#f8f9fa",
-                        }}
-                    >
-                        {slot ? `저장된 슬롯 ${index + 1}` : `빈 저장 슬롯 ${index + 1}`}
+                        {savedSlots.map((slot, index) => (
+                            <div
+                                key={index}
+                                onClick={() => setCurrentSlot(index)}
+                                style={{
+                                    padding: "10px",
+                                    marginBottom: "10px",
+                                    border: currentSlot === index ? "2px solid blue" : "1px solid gray",
+                                    cursor: "pointer",
+                                    backgroundColor: slot ? "#cce5ff" : "#f8f9fa",
+                                }}
+                            >
+                                {slot ? `저장된 슬롯 ${index + 1}` : `빈 저장 슬롯 ${index + 1}`}
+                            </div>
+                        ))}
+                        <button
+                            style={{
+                                marginTop: "20px",
+                                padding: "10px",
+                                width: "100%",
+                                backgroundColor: "#007bff",
+                                color: "white",
+                                border: "none",
+                                cursor: "pointer",
+                            }}
+                            onClick={() => saveSlot(currentSlot)}
+                        >
+                            현재 상태 저장
+                        </button>
                     </div>
-                ))}
-                <button
-                    style={{
-                        marginTop: "20px",
-                        padding: "10px",
-                        width: "100%",
-                        backgroundColor: "#007bff",
-                        color: "white",
-                        border: "none",
-                        cursor: "pointer",
-                    }}
-                >
-                    현재 상태 저장
-                </button>
-            </div>
-        </div>}
+                </div>}
             </div>
         </>
     )

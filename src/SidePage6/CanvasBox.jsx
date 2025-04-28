@@ -319,30 +319,10 @@ function HeldBox({ box }) {
 }
 
 
-function CanvasBox({ bottomCount, viewDirection, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, showMenu, isGrid, backgroundColor }) {
-    const [boxes, setBoxes] = useState([])
+function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, showMenu, isGrid, backgroundColor }) {
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
 
-
-    useEffect(() => {
-        const boxModels = []
-        const centerOffset = (bottomCount - 1) / 2
-
-        for (let i = 0; i < bottomCount; i++) {
-            for (let j = 0; j < bottomCount; j++) {
-                const x = i - centerOffset
-                const z = j - centerOffset
-                boxModels.push({
-                    id: `fixed-${i}-${j}`,
-                    position: [x, 0, z],
-                    color: "white",
-                })
-            }
-        }
-
-        setBoxes(boxModels)
-    }, [bottomCount])
 
     useEffect(() => {
         if (createBoxBtn) {
