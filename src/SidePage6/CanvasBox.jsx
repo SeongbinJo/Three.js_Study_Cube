@@ -30,31 +30,22 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
     const [history, setHistory] = useState([])
     const [historyIndex, setHistoryIndex] = useState(0)
-
+    
     function pushHistory(boxInfo) {
         setHistory(prev => {
             const newHistory = [...prev]
-
-            // 현재 최신 흔적일 경우
-            // 길이가 10이 아니면 10이 될떄까지 추가할 수 있고, 10 이상이면 shift 해줘야 함
-            if (historyIndex == 0) {
-                if (newHistory.length >= 10) {
-                    newHistory.shift()
-                }
-
-                newHistory.push(boxInfo)
-            } else {
-                // <, > 를 사용해서 최신 흔적이 아닐 경우
-                // 이때 추가되는 흔적은 현재 Index 뒤에 다 지우고 추가가 되어야 함
-                newHistory.splice(newHistory.length + historyIndex)
-
-                setHistoryIndex(0)
-
-                newHistory.push(boxInfo)
+    
+            if (historyIndex !== 0) {
+                const cutIndex = newHistory.length + historyIndex
+                newHistory.splice(cutIndex)
             }
-
-            return newHistory
-        })
+    
+            newHistory.push(boxInfo);
+    
+            return newHistory;
+        });
+    
+        setHistoryIndex(0)
     }
 
     function undoAction(target) {
@@ -199,24 +190,24 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 return
             }
 
-            // 들고 있는 블럭이 없고, 클릭한 것이 fixed 블럭이면 들기 처리
-            if (!heldBox) {
-                setClickedInfo({ id, position })
+            // // 들고 있는 블럭이 없고, 클릭한 것이 fixed 블럭이면 들기 처리
+            // if (!heldBox) {
+            //     setClickedInfo({ id, position })
 
-                // 박스 제거
-                setBoxes((prev) => prev.filter((box) => box.id !== id))
+            //     // 박스 제거
+            //     setBoxes((prev) => prev.filter((box) => box.id !== id))
 
-                // 손에 들기
-                setHeldBox({
-                    id,
-                    color: clickedObject.material.color.getStyle(),
-                    prevPos: [...position], // 손에 집기 전 블럭 위치
-                })
+            //     // 손에 들기
+            //     setHeldBox({
+            //         id,
+            //         color: clickedObject.material.color.getStyle(),
+            //         prevPos: [...position], // 손에 집기 전 블럭 위치
+            //     })
 
-                console.log(`블럭 ${id}을 들었음`)
-            } else {
-                console.log("블럭을 들고 있는 상태라서 클릭만 처리함.")
-            }
+            //     console.log(`블럭 ${id}을 들었음`)
+            // } else {
+            //     console.log("블럭을 들고 있는 상태라서 클릭만 처리함.")
+            // }
         }
     }
 
