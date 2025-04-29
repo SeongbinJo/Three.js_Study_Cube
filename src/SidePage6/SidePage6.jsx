@@ -14,10 +14,17 @@ function SidePage6() {
 
     const bottomCount = 20
     const [boxes, setBoxes] = useState(() => {
+
+        const savedBoxes = localStorage.getItem("boxes")
+        if (savedBoxes) {
+            console.log('저장된 boxes가 있음!')
+            return JSON.parse(savedBoxes)
+        }
+
         const boxModels = []
         const centerOffset = (bottomCount - 1) / 2
 
-        for (let i = 0; i< bottomCount; i++) {
+        for (let i = 0; i < bottomCount; i++) {
             for (let j = 0; j < bottomCount; j++) {
                 const x = i - centerOffset
                 const z = j - centerOffset
@@ -32,6 +39,18 @@ function SidePage6() {
         return boxModels
     })
 
+    useEffect(() => {
+        if (
+            localStorage.getItem('boxes0') === null &&
+            localStorage.getItem('boxes1') === null &&
+            localStorage.getItem('boxes2') === null
+        ) {
+            localStorage.setItem('boxes0', JSON.stringify(boxes))
+            localStorage.setItem('boxes1', JSON.stringify(boxes))
+            localStorage.setItem('boxes2', JSON.stringify(boxes))
+        }
+    }, [])
+
     const [createBoxBtn, setCreateBoxBtn] = useState(false)
 
     const [color, setColor] = useState("#ffffff")
@@ -40,7 +59,13 @@ function SidePage6() {
 
     const [showMenu, setShowMenu] = useState(false)
 
-    const [savedSlots, setSavedSlots] = useState([boxes, boxes, boxes])
+    const [savedSlots, setSavedSlots] = useState(() => {
+        const savedBox0 = localStorage.getItem(`boxes0`)
+        const savedBox1 = localStorage.getItem(`boxes1`)
+        const savedBox2 = localStorage.getItem(`boxes2`)
+
+        return [JSON.parse(savedBox0), JSON.parse(savedBox1), JSON.parse(savedBox2)]
+    })
     const [currentSlot, setCurrentSlot] = useState(0)
 
     const [isGrid, setIsGrid] = useState(false)
@@ -73,18 +98,25 @@ function SidePage6() {
             setSwatches(newSwatches)
         }
     }
-    
+
 
     const saveSlot = (slotIndex) => {
+        // 해당 슬롯의 boxes 상태를 로컬스토리지에 저장
+        localStorage.setItem(`boxes${slotIndex}`, JSON.stringify(boxes))
+
+        // savedSlots 배열도 업데이트
         const newSavedSlots = [...savedSlots]
         newSavedSlots[slotIndex] = boxes
         setSavedSlots(newSavedSlots)
     }
 
     useEffect(() => {
-        const newSlot = savedSlots[currentSlot]
-        setBoxes(newSlot)
-    }, [currentSlot])
+        // 현재 슬롯에 해당하는 boxes 데이터를 로컬스토리지에서 불러오기
+        const savedBoxes = localStorage.getItem(`boxes${currentSlot}`)
+        if (savedBoxes) {
+            setBoxes(JSON.parse(savedBoxes))
+        }
+    }, [currentSlot])  // currentSlot이 변경될 때마다 실행
 
     return (
         <>
@@ -232,7 +264,7 @@ function SidePage6() {
                                     backgroundColor: slot ? "#cce5ff" : "#f8f9fa",
                                 }}
                             >
-                                {slot ? `저장된 슬롯 ${index + 1}` : `빈 저장 슬롯 ${index + 1}`}
+                                {slot ? `저장 슬롯 ${index + 1}` : `저장 슬롯 ${index + 1}`}
                             </div>
                         ))}
                         <button
