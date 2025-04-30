@@ -9,7 +9,7 @@ import PlayControl from "./PlayControl"
 
 
 
-function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory }) {
+function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory, showMenu }) {
     const { scene, camera } = useThree()
     // 1. 히스토리 배열 생성
     //     a. 10개 까지만 들어가야함
@@ -115,7 +115,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
 
     const handleClick = (event) => {
-        if (event.button !== 0 || showInventory) return // 왼쪽 클릭만 처리
+        if (event.button !== 0 || showInventory || showMenu) return // 왼쪽 클릭만 처리
 
         event.stopPropagation()
 
@@ -196,7 +196,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
     useEffect(() => {
         const handleMouseDown = (event) => {
-            if (event.button === 2 && !showInventory) { // 우클릭
+            if ((event.button === 2 && showInventory === false && showMenu === false)) { // 우클릭
                 event.preventDefault()
 
                 const raycaster = new THREE.Raycaster()
@@ -257,7 +257,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
             window.removeEventListener("click", handleClick)
             window.removeEventListener("mousedown", handleMouseDown)
         }
-    }, [heldBox, clickedInfo, showInventory])
+    }, [heldBox, clickedInfo, showInventory, showMenu])
 
     return null
 }
@@ -353,6 +353,7 @@ function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, 
                 setHeldBox={setHeldBox}
                 heldBox={heldBox}
                 showInventory={showInventory}
+                showMenu={showMenu}
             />
         </Canvas>
     )
