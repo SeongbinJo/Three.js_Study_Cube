@@ -11,7 +11,6 @@ import PlayControl from "./PlayControl"
 
 function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory }) {
     const { scene, camera } = useThree()
-
     // 1. 히스토리 배열 생성
     //     a. 10개 까지만 들어가야함
     //     b. 10개 이후로는 처음에 들어왔던 것 부터 삭제 후 마지막에 추가
@@ -26,7 +25,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
     //             a. 해당 요소의 박스 정보에 맞게 '삭제' 후 원래 위치에 '추가' 해줌\
     //     b. < 키를 눌러 이전으로 수정해도 배열의 요소는 삭제되면 안되고, 참조하는 배열 요소의 위치만 앞으로 당겨져야함
     //     c. 참조하는 배열 요소가 첫번째이고, < 키를 한 번 더 누르게되면 이벤트는 더이상 작동하지 않음
-    // 3. > 키 이벤트 생성
+    //  3. > 키 이벤트 생성
     //     a. 참조하는 배열 요소가 마지막이면 더이상 이벤트 작동하지 않음
 
 
@@ -192,24 +191,6 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 return
             }
 
-            // // 들고 있는 블럭이 없고, 클릭한 것이 fixed 블럭이면 들기 처리
-            // if (!heldBox) {
-            //     setClickedInfo({ id, position })
-
-            //     // 박스 제거
-            //     setBoxes((prev) => prev.filter((box) => box.id !== id))
-
-            //     // 손에 들기
-            //     setHeldBox({
-            //         id,
-            //         color: clickedObject.material.color.getStyle(),
-            //         prevPos: [...position], // 손에 집기 전 블럭 위치
-            //     })
-
-            //     console.log(`블럭 ${id}을 들었음`)
-            // } else {
-            //     console.log("블럭을 들고 있는 상태라서 클릭만 처리함.")
-            // }
         }
     }
 
