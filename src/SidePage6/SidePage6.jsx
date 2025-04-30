@@ -142,9 +142,11 @@ function SidePage6() {
                     zIndex: 10
                 }}>
                     [SidePage6_Minecraft2] - ing<br />
-                    1. 기본 바탕이 되는 바닥 생성<br />
-                    2. 카메라 고정 및 동서남북 시점 변환<br />
-                    3. w(전진), s(후진), a(왼쪽), d(오른쪽), LCtrl(하강), Space-bar(상승) :: 키보드 및 마우스로 카메라 조작
+                    [조작법]<br />
+                    1. 움직임 - W, A, S, D<br />
+                    2. C(하강), Spacebar(상승)<br />
+                    3. E - 블럭 및 배경 색상 설정<br />
+                    4. Q - 로컬 저장 및 저장 슬롯 변경경
 
                     <div style={{ marginTop: '10px' }}>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("front")}>앞</button>
