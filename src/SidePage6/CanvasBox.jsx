@@ -60,9 +60,9 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                     // delete를 undo -> 해당 박스 추가
                     newBoxes = newBoxes.filter(box => box.id !== target.box.id)
                     return [...newBoxes, target.box]
-                case "move":
-                    newBoxes = newBoxes.filter(box => box.id !== target.nextBox.id)
-                    return [...newBoxes, target.prevBox]
+                // case "move":
+                //     newBoxes = newBoxes.filter(box => box.id !== target.nextBox.id)
+                //     return [...newBoxes, target.prevBox]
                 default:
                     return newBoxes
             }
@@ -79,9 +79,9 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 case "delete":
                     // delete를 redo -> 해당 박스 다시 삭제
                     return newBoxes.filter(box => box.id !== target.box.id)
-                case "move":
-                    newBoxes = newBoxes.filter(box => box.id !== target.prevBox.id)
-                    return [...newBoxes, target.nextBox]
+                // case "move":
+                //     newBoxes = newBoxes.filter(box => box.id !== target.prevBox.id)
+                //     return [...newBoxes, target.nextBox]
                 default:
                     return newBoxes
             }
