@@ -8,6 +8,7 @@ import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
 import { Physics } from "@react-three/rapier"
 import { OrbitControls } from "@react-three/drei"
+import { getAllDocuments } from "./firebase"
 
 function SidePage6() {
     const [viewDirection, setViewDirection] = useState("front")
@@ -117,6 +118,10 @@ function SidePage6() {
             setBoxes(JSON.parse(savedBoxes))
         }
     }, [currentSlot])  // currentSlot이 변경될 때마다 실행
+
+    useEffect(() => {
+        getAllDocuments()
+    }, [])
 
     return (
         <>
