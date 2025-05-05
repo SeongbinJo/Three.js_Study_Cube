@@ -3,7 +3,7 @@ import { db } from '../../firebase'
 
 export async function getAllDocuments() {
     try {
-      const colRef = collection(db, 'item') // 'item' 컬렉션
+      const colRef = collection(db, 'BlockStatus') // 'BlockStatus' 컬렉션
       const snapshot = await getDocs(colRef)
   
       const documents = snapshot.docs.map(doc => ({
@@ -18,3 +18,9 @@ export async function getAllDocuments() {
       return []
     }
   }
+
+  export async function addBlockStatus() {
+
+  }
+
+//   export async function 

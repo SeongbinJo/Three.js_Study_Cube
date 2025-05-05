@@ -123,6 +123,34 @@ function SidePage6() {
         getAllDocuments()
     }, [])
 
+    // 창 나올 조건:
+    // 가입 안 하거나(isAuthenticated), 처음 들어온 사람(isAnonymity)이거나.
+
+    // 1. 가입 안 하고 '로그인 없이 플레이' 누르면 다시 false로 바꿀 수 없게 만들면(로컬 스토리지에 저장)
+    // 새로고침하거나 다시 들어와도 로컬로 플레이 가능                                                  :: 완
+    // 2. 이 사람들은 설정이나 저장 창에 추가할 로그인하기를 눌렀을때 회원가입 가능
+
+    // 3. 가입하면 firestore 계정 저장, 로그인하면 isLogin = true로 firestore 저장
+    // 4. 새로고침하거나 다시 들어올 경우 isLogin 필드 참조해서 자동 로그인
+
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [isAnonymity, setIsAnonymity] = useState(() => {
+        const getIsAnonymity = localStorage.getItem(`isAnonymity`)
+
+        if (getIsAnonymity) {
+            return JSON.parse(getIsAnonymity)
+        }
+
+        return false
+    })
+    const [isClickedSignUp, setIsClickedSignUp] = useState(false)
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+
+    const saveIsAnonymityStatus = (isAnonymity) => {
+        const savedStatus = localStorage.setItem(`isAnonymity`, JSON.stringify(isAnonymity))
+    }
+
     return (
         <>
             <div className='sidePage5-box'>
@@ -288,6 +316,61 @@ function SidePage6() {
                         >
                             현재 상태 저장
                         </button>
+                    </div>
+                </div>}
+                {!isAuthenticated && !isAnonymity && <div>
+                    <div style={{
+                        position: "absolute",
+                        top: "50%",
+                        right: "50%",
+                        transform: "translate(-50%, -50%)",
+                        zIndex: 10,
+                        padding: "10px",
+                        borderRadius: "5px",
+                        maxWidth: "40%",
+                        backgroundColor: "#eee"
+                    }}>
+                        <h1>{isClickedSignUp ? "회원가입" : "로그인"}</h1>
+                        <input
+                            type="email"
+                            placeholder="이메일"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            style={{ marginBottom: '10px', padding: '8px' }}
+                        /><br />
+                        <input
+                            type="password"
+                            placeholder="비밀번호"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            style={{ marginBottom: '10px', padding: '8px' }}
+                        /><br />
+                        {isClickedSignUp ? (
+                            <>
+                                <button onClick={() => {
+                                    setIsClickedSignUpA(false)
+                                    setIsAuthenticated(true)
+                                }}>
+                                    회원가입 하기
+                                </button><br />
+                                <button onClick={() => setIsClickedSignUp(false)}>로그인 화면으로</button>
+                            </>
+                        ) : (
+                            <>
+                                <button onClick={() => {
+                                    setIsClickedSignUp(false)
+                                    setIsAuthenticated(true)
+                                }}>
+                                    로그인
+                                </button><br />
+                                <button onClick={() => setIsClickedSignUp(true)}>회원가입</button>
+                            </>
+                        )}
+                        <br /><br />
+                        <button onClick={() => {
+                            setIsAnonymity(true)
+                            saveIsAnonymityStatus(true)
+                        }}>로그인 없이 플레이하기</button>
                     </div>
                 </div>}
             </div>
