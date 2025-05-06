@@ -8,36 +8,96 @@ import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
 import { Physics } from "@react-three/rapier"
 import { OrbitControls } from "@react-three/drei"
-import { getAllDocuments } from "./firebase"
+import { getAllDocuments, setBlockStatus } from "./firebase"
 
 function SidePage6() {
     const [viewDirection, setViewDirection] = useState("front")
 
+    // 로그인 관련 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 창 나올 조건:
+    // 가입 안 하거나(isAuthenticated), 처음 들어온 사람(isAnonymity)이거나.
+
+    // 1. 가입 안 하고 '로그인 없이 플레이' 누르면 다시 false로 바꿀 수 없게 만들면(로컬 스토리지에 저장)
+    // 새로고침하거나 다시 들어와도 로컬로 플레이 가능                                                  :: 완
+    // 2. 이 사람들은 설정이나 저장 창에 추가할 로그인하기를 눌렀을때 회원가입 가능
+
+    // 3. 가입하면 firestore 계정 저장, 로그인하면 isLogin = true로 firestore 저장
+    // 4. 새로고침하거나 다시 들어올 경우 isLogin 필드 참조해서 자동 로그인
+
+    const [isAnonymity, setIsAnonymity] = useState(() => {
+        const getIsAnonymity = localStorage.getItem(`isAnonymity`)
+
+        if (getIsAnonymity) {
+            return JSON.parse(getIsAnonymity)
+        }
+
+        return false
+    })
+    const [isLogin, setIsLogin] = useState(() => {
+        // firestore에서 isLogin 가져와서 초기 값 저장
+    })
+    const [isClickedSignUp, setIsClickedSignUp] = useState(false)
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+
+    const saveIsAnonymityStatus = (isAnonymity) => {
+        const savedStatus = localStorage.setItem(`isAnonymity`, JSON.stringify(isAnonymity))
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     const bottomCount = 20
     const [boxes, setBoxes] = useState(() => {
 
-        const savedBoxes = localStorage.getItem("boxes")
-        if (savedBoxes) {
-            console.log('저장된 boxes가 있음!')
-            return JSON.parse(savedBoxes)
-        }
-
-        const boxModels = []
-        const centerOffset = (bottomCount - 1) / 2
-
-        for (let i = 0; i < bottomCount; i++) {
-            for (let j = 0; j < bottomCount; j++) {
-                const x = i - centerOffset
-                const z = j - centerOffset
-                boxModels.push({
-                    id: `${i}-${j}`,
-                    position: [x, 0, z],
-                    color: "white"
-                })
+        // `로그인 없이 플레이` 인 경우
+        if (isAnonymity) {
+            const savedBoxes = localStorage.getItem("boxes")
+            if (savedBoxes) {
+                console.log('저장된 boxes가 있음!')
+                return JSON.parse(savedBoxes)
             }
+
+            // 기본 바닥
+            const boxModels = []
+            const centerOffset = (bottomCount - 1) / 2
+
+            for (let i = 0; i < bottomCount; i++) {
+                for (let j = 0; j < bottomCount; j++) {
+                    const x = i - centerOffset
+                    const z = j - centerOffset
+                    boxModels.push({
+                        id: `${i}-${j}`,
+                        position: [x, 0, z],
+                        color: "white"
+                    })
+                }
+            }
+
+            return boxModels
+        } else {
+            // 기본 바닥
+            const boxModels = []
+            const centerOffset = (bottomCount - 1) / 2
+
+            for (let i = 0; i < bottomCount; i++) {
+                for (let j = 0; j < bottomCount; j++) {
+                    const x = i - centerOffset
+                    const z = j - centerOffset
+                    boxModels.push({
+                        id: `${i}-${j}`,
+                        position: [x, 0, z],
+                        color: "white"
+                    })
+                }
+            }
+
+            return boxModels
         }
 
-        return boxModels
+        // 로그인인 경우
+        if (isLogin) {
+            // firestore에 저장된 해당 계정의 문서를 가져와 리턴 해야함.
+
+        }
     })
 
     useEffect(() => {
@@ -46,9 +106,13 @@ function SidePage6() {
             localStorage.getItem('boxes1') === null &&
             localStorage.getItem('boxes2') === null
         ) {
-            localStorage.setItem('boxes0', JSON.stringify(boxes))
-            localStorage.setItem('boxes1', JSON.stringify(boxes))
-            localStorage.setItem('boxes2', JSON.stringify(boxes))
+            for (let i = 0; i < 3; i++) {
+                // localStorage 저장
+                localStorage.setItem(`boxes${i}`, JSON.stringify(boxes))
+
+                // firestore 저장
+                setBlockStatus(boxes, i)
+            }
         }
     }, [])
 
@@ -61,6 +125,15 @@ function SidePage6() {
     const [showMenu, setShowMenu] = useState(false)
 
     const [savedSlots, setSavedSlots] = useState(() => {
+
+        if (isLogin) {
+            const savedBox0 = getAllDocuments(0)
+            const savedBox1 = getAllDocuments(1)
+            const savedBox2 = getAllDocuments(2)
+
+            return [savedBox0, savedBox1, savedBox2]
+        }
+
         const savedBox0 = localStorage.getItem(`boxes0`)
         const savedBox1 = localStorage.getItem(`boxes1`)
         const savedBox2 = localStorage.getItem(`boxes2`)
@@ -102,13 +175,20 @@ function SidePage6() {
 
 
     const saveSlot = (slotIndex) => {
-        // 해당 슬롯의 boxes 상태를 로컬스토리지에 저장
-        localStorage.setItem(`boxes${slotIndex}`, JSON.stringify(boxes))
+        if (isAnonymity) { // '로그인 없이 플레이' 인 경우
+            // 해당 슬롯의 boxes 상태를 로컬스토리지에 저장
+            localStorage.setItem(`boxes${slotIndex}`, JSON.stringify(boxes))
 
-        // savedSlots 배열도 업데이트
-        const newSavedSlots = [...savedSlots]
-        newSavedSlots[slotIndex] = boxes
-        setSavedSlots(newSavedSlots)
+            // savedSlots 배열도 업데이트
+            const newSavedSlots = [...savedSlots]
+            newSavedSlots[slotIndex] = boxes
+            setSavedSlots(newSavedSlots)
+
+
+
+            // firestore 테스트
+            setBlockStatus(boxes, currentSlot)
+        }
     }
 
     useEffect(() => {
@@ -120,36 +200,10 @@ function SidePage6() {
     }, [currentSlot])  // currentSlot이 변경될 때마다 실행
 
     useEffect(() => {
-        getAllDocuments()
+        getAllDocuments(0)
     }, [])
 
-    // 창 나올 조건:
-    // 가입 안 하거나(isAuthenticated), 처음 들어온 사람(isAnonymity)이거나.
 
-    // 1. 가입 안 하고 '로그인 없이 플레이' 누르면 다시 false로 바꿀 수 없게 만들면(로컬 스토리지에 저장)
-    // 새로고침하거나 다시 들어와도 로컬로 플레이 가능                                                  :: 완
-    // 2. 이 사람들은 설정이나 저장 창에 추가할 로그인하기를 눌렀을때 회원가입 가능
-
-    // 3. 가입하면 firestore 계정 저장, 로그인하면 isLogin = true로 firestore 저장
-    // 4. 새로고침하거나 다시 들어올 경우 isLogin 필드 참조해서 자동 로그인
-
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const [isAnonymity, setIsAnonymity] = useState(() => {
-        const getIsAnonymity = localStorage.getItem(`isAnonymity`)
-
-        if (getIsAnonymity) {
-            return JSON.parse(getIsAnonymity)
-        }
-
-        return false
-    })
-    const [isClickedSignUp, setIsClickedSignUp] = useState(false)
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-
-    const saveIsAnonymityStatus = (isAnonymity) => {
-        const savedStatus = localStorage.setItem(`isAnonymity`, JSON.stringify(isAnonymity))
-    }
 
     return (
         <>
@@ -318,7 +372,7 @@ function SidePage6() {
                         </button>
                     </div>
                 </div>}
-                {!isAuthenticated && !isAnonymity && <div>
+                {!isAnonymity && <div>
                     <div style={{
                         position: "absolute",
                         top: "50%",
@@ -348,12 +402,11 @@ function SidePage6() {
                         {isClickedSignUp ? (
                             <>
                                 <button onClick={() => {
-                                    setIsClickedSignUpA(false)
-                                    setIsAuthenticated(true)
+                                    setIsClickedSignUp(false)
                                 }}>
                                     회원가입 하기
                                 </button><br />
-                                <button onClick={() => setIsClickedSignUp(false)}>로그인 화면으로</button>
+                                <button onClick={() => setIsClickedSignUp(false)}>뒤로가기</button>
                             </>
                         ) : (
                             <>
