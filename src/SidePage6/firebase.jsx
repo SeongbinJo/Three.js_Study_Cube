@@ -16,8 +16,8 @@ export async function getAllDocuments(index) {
       ...doc.data()
     }))
 
-    console.log('모든 Users 문서:', users[0].boxes)
-    return users
+    // console.log('모든 Users 문서:', users[0].boxes)
+    return users[0].boxes
   } catch (error) {
     console.error('Users 문서 가져오기 실패:', error)
     return []

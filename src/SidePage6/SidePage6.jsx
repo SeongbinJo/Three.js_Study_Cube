@@ -45,60 +45,45 @@ function SidePage6() {
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    const [isBoxesLoaded, setIsBoxesLoaded] = useState(false)
     const bottomCount = 20
-    const [boxes, setBoxes] = useState(() => {
+    const [boxes, setBoxes] = useState()
 
-        // `로그인 없이 플레이` 인 경우
-        if (isAnonymity) {
-            const savedBoxes = localStorage.getItem("boxes")
+    useEffect(() => {
+        async function loadBoxes() {
+            const savedBoxes = await getAllDocuments(0)
             if (savedBoxes) {
-                console.log('저장된 boxes가 있음!')
-                return JSON.parse(savedBoxes)
-            }
+                // console.log('저장된 boxes가 firestore에 있음 :', savedBoxes)
+                setBoxes(savedBoxes)
+                setIsBoxesLoaded(true)
+            } else {
+                const localSavedBoxes = localStorage.getItem("boxes0")
+                if (localSavedBoxes) {
+                    console.log('firestore에 저장파일이 없고(로그인 문제), 로컬 스토리지에 존재함. 가져옴')
+                    setBoxes(JSON.parse(localSavedBoxes))
+                } else {
+                    const boxModels = []
+                    const centerOffset = (bottomCount - 1) / 2
 
-            // 기본 바닥
-            const boxModels = []
-            const centerOffset = (bottomCount - 1) / 2
+                    for (let i = 0; i < bottomCount; i++) {
+                        for (let j = 0; j < bottomCount; j++) {
+                            const x = i - centerOffset
+                            const z = j - centerOffset
+                            boxModels.push({
+                                id: `${i}-${j}`,
+                                position: [x, 0, z],
+                                color: "white"
+                            })
+                        }
+                    }
 
-            for (let i = 0; i < bottomCount; i++) {
-                for (let j = 0; j < bottomCount; j++) {
-                    const x = i - centerOffset
-                    const z = j - centerOffset
-                    boxModels.push({
-                        id: `${i}-${j}`,
-                        position: [x, 0, z],
-                        color: "white"
-                    })
+                    setBoxes(boxModels)
                 }
             }
-
-            return boxModels
-        } else {
-            // 기본 바닥
-            const boxModels = []
-            const centerOffset = (bottomCount - 1) / 2
-
-            for (let i = 0; i < bottomCount; i++) {
-                for (let j = 0; j < bottomCount; j++) {
-                    const x = i - centerOffset
-                    const z = j - centerOffset
-                    boxModels.push({
-                        id: `${i}-${j}`,
-                        position: [x, 0, z],
-                        color: "white"
-                    })
-                }
-            }
-
-            return boxModels
         }
 
-        // 로그인인 경우
-        if (isLogin) {
-            // firestore에 저장된 해당 계정의 문서를 가져와 리턴 해야함.
-
-        }
-    })
+        loadBoxes()
+    }, [])
 
     useEffect(() => {
         if (
@@ -179,6 +164,11 @@ function SidePage6() {
             // 해당 슬롯의 boxes 상태를 로컬스토리지에 저장
             localStorage.setItem(`boxes${slotIndex}`, JSON.stringify(boxes))
 
+            // firestore에도 저장
+            // if (isLogin) {
+                setBlockStatus(boxes, slotIndex)
+            // }
+
             // savedSlots 배열도 업데이트
             const newSavedSlots = [...savedSlots]
             newSavedSlots[slotIndex] = boxes
@@ -192,35 +182,67 @@ function SidePage6() {
     }
 
     useEffect(() => {
-        // 현재 슬롯에 해당하는 boxes 데이터를 로컬스토리지에서 불러오기
-        const savedBoxes = localStorage.getItem(`boxes${currentSlot}`)
-        if (savedBoxes) {
-            setBoxes(JSON.parse(savedBoxes))
+        // 현재 슬롯에 해당하는 boxes 데이터를 로컬스토리지에서 불러오기, firestore에 있다면 그것 우선으로
+        async function loadBoxes() {
+            const savedBoxes = await getAllDocuments(currentSlot)
+            if (savedBoxes) {
+                // console.log('저장된 boxes가 firestore에 있음 :', savedBoxes)
+                setBoxes(savedBoxes)
+                setIsBoxesLoaded(true)
+            } else {
+                const localSavedBoxes = localStorage.getItem(`boxes${currentSlot}`)
+                if (localSavedBoxes) {
+                    console.log('firestore에 저장파일이 없고(로그인 문제), 로컬 스토리지에 존재함. 가져옴')
+                    setBoxes(JSON.parse(localSavedBoxes))
+                } else {
+                    const boxModels = []
+                    const centerOffset = (bottomCount - 1) / 2
+
+                    for (let i = 0; i < bottomCount; i++) {
+                        for (let j = 0; j < bottomCount; j++) {
+                            const x = i - centerOffset
+                            const z = j - centerOffset
+                            boxModels.push({
+                                id: `${i}-${j}`,
+                                position: [x, 0, z],
+                                color: "white"
+                            })
+                        }
+                    }
+
+                    setBoxes(boxModels)
+                }
+            }
         }
+
+        loadBoxes()
     }, [currentSlot])  // currentSlot이 변경될 때마다 실행
 
-    useEffect(() => {
-        getAllDocuments(0)
-    }, [])
 
 
 
     return (
         <>
             <div className='sidePage5-box'>
-                <CanvasBox
-                    bottomCount={bottomCount}
-                    viewDirection={viewDirection}
-                    boxes={boxes}
-                    setBoxes={setBoxes}
-                    createBoxBtn={createBoxBtn}
-                    setCreateBoxBtn={setCreateBoxBtn}
-                    boxColor={color}
-                    showInventory={showInventory}
-                    showMenu={showMenu}
-                    isGrid={isGrid}
-                    backgroundColor={backgroundColor}
-                />
+                {!isBoxesLoaded ? (
+                    <div style={{ color: 'white', padding: '20px', zIndex: 10 }}>
+                        🔄 박스를 불러오는 중 🔄
+                    </div>
+                ) : (
+                    <CanvasBox
+                        bottomCount={bottomCount}
+                        viewDirection={viewDirection}
+                        boxes={boxes}
+                        setBoxes={setBoxes}
+                        createBoxBtn={createBoxBtn}
+                        setCreateBoxBtn={setCreateBoxBtn}
+                        boxColor={color}
+                        showInventory={showInventory}
+                        showMenu={showMenu}
+                        isGrid={isGrid}
+                        backgroundColor={backgroundColor}
+                    />
+                )}
                 <div className="dot"></div>
                 <div className='ver1-hovered-box' style={{
                     position: 'absolute',
