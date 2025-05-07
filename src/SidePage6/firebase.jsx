@@ -1,9 +1,10 @@
 import { getDocs, doc, collection, setDoc, getDoc} from 'firebase/firestore/lite'
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import { db } from '../../firebase'
 
-export async function getAllDocuments(index) {
+export async function getAllDocuments(uid, index) {
   try {
-    const colRef = collection(db, 'Users', 'UserID', 'Test-User-ID', 'BlockStatus', `boxes${index}`)
+    const colRef = collection(db, 'Users', 'UserID', `${uid}`, 'BlockStatus', `boxes${index}`)
     const snapshot = await getDocs(colRef)
 
     if (snapshot.empty) {
@@ -25,9 +26,9 @@ export async function getAllDocuments(index) {
 }
 
 
-  export async function setBlockStatus(boxes, index) {
+  export async function setBlockStatus(boxes, index, uid) {
     try {
-        await setDoc(doc(db, `Users`, `UserID`, `Test-User-ID` ,`BlockStatus` ,`boxes${index}`, `boxes${index}-0`), {
+        await setDoc(doc(db, `Users`, `UserID`, `${uid}` ,`BlockStatus` ,`boxes${index}`, `boxes${index}-0`), {
             boxes: boxes,
             updatedAt: new Date().toISOString(),
         })
@@ -37,5 +38,54 @@ export async function getAllDocuments(index) {
     }
   }
 
-  // TODO:
-  // 회원가입 시 Users/UserID/유저의 ID/BlockStatus/boxes0 ~ 2 를 생성하는 함수 만들어야 함.(파이어스토어 불러와 렌더링 테스트 완료 후)
+  // boxes는 기본 바닥을 넣어야함함
+  export async function signUp(email, password, boxes) {
+    const auth = getAuth() // Firebase의 인증 객체를 가져옴옴
+    
+    try {
+      // email, password 로 계정을 생성
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user // 생성된 유저 정보 가져옴
+      console.log(`회원가입 성공`, user.uid)
+
+      // Firestore에 유저 데이터 넣기
+      for (let i = 0; i < 3; i++) {
+        setBlockStatus(boxes, i, user.uid)
+      }
+
+      logOut()
+
+      return { success: true, uid: user.uid }
+    } catch (error) {
+      console.error(`회원가입 실패: `, error.message)
+      return { success: false, error: error.message}
+    }
+  }
+
+  export async function signIn(email, password) {
+    const auth = getAuth()
+
+    try {
+      // email, password로 로그인
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+      console.log(`로그인 성공: `, user.uid)
+
+      return { success: true, uid: user.uid}
+    } catch (error) {
+      console.error(`로그인 실패: `, error.message)
+
+      return { success: false, error: error.message }
+    }
+  }
+
+  export async function logOut() {
+    const auth = getAuth()
+
+    try {
+      await signOut(auth)
+      console.log(`로그아웃 성공`)
+    } catch (error) {
+      console.error(`로그아웃 실패: `, error.message)
+    }
+  }

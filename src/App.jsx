@@ -1,5 +1,6 @@
 import './App.css'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
+
 import Ver1Page from './Ver1/Ver1Page'
 import Ver2Page from './Ver2/Ver2Page'
 import Ver3Page from './Ver3/Ver3Page'
@@ -17,6 +18,8 @@ import SidePage5 from './SidePage5/SidePage5'
 import SidePage6 from './SidePage6/SidePage6'
 
 function App() {
+
+  
 
   return (
     <Router>

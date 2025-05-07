@@ -8,9 +8,12 @@ import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
 import { Physics } from "@react-three/rapier"
 import { OrbitControls } from "@react-three/drei"
-import { getAllDocuments, setBlockStatus } from "./firebase"
+import { getAllDocuments, signUp, signIn, logOut } from "./firebase"
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
 function SidePage6() {
+
+
     const [viewDirection, setViewDirection] = useState("front")
 
     // 로그인 관련 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,6 +26,11 @@ function SidePage6() {
 
     // 3. 가입하면 firestore 계정 저장, 로그인하면 isLogin = true로 firestore 저장
     // 4. 새로고침하거나 다시 들어올 경우 isLogin 필드 참조해서 자동 로그인
+
+    const auth = getAuth()
+    let userUID = `null`
+
+    
 
     const [isAnonymity, setIsAnonymity] = useState(() => {
         const getIsAnonymity = localStorage.getItem(`isAnonymity`)
@@ -43,63 +51,82 @@ function SidePage6() {
     const saveIsAnonymityStatus = (isAnonymity) => {
         const savedStatus = localStorage.setItem(`isAnonymity`, JSON.stringify(isAnonymity))
     }
+
+    onAuthStateChanged(auth, (user) => {
+        // 로그인 상태가 바뀔 때 마다 콜백
+        if (user) {
+            
+            userUID = `${user.uid}`
+            setIsLogin(true)
+            console.log(`현재 로그인 된 유저: `, userUID)
+        } else {
+            setIsLogin(false)
+            console.log(`로그인 안되어 있음`)
+        }
+    })
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const [isBoxesLoaded, setIsBoxesLoaded] = useState(false)
     const bottomCount = 20
     const [boxes, setBoxes] = useState()
 
+    async function loadFirestoreBoxes(uid) {
+        const savedBoxes = await getAllDocuments(uid, 0)
+        if (savedBoxes) {
+            setBoxes(savedBoxes)
+            setIsBoxesLoaded(true)
+        }
+    }
+
+    // isLogin, isAnonymity에 따라 나중에 조건을 달아줘야함함
     useEffect(() => {
-        async function loadBoxes() {
-            const savedBoxes = await getAllDocuments(0)
-            if (savedBoxes) {
-                // console.log('저장된 boxes가 firestore에 있음 :', savedBoxes)
-                setBoxes(savedBoxes)
+
+        if (isLogin) {
+            console.log(`islogin 내부`)
+            loadFirestoreBoxes(userUID)
+        } else if (isAnonymity) {
+            console.log(`isAnonymity 내부`)
+            const localSavedBoxes = localStorage.getItem("boxes0")
+            if (localSavedBoxes) {
+                console.log('firestore에 로그인 되어있지 않고, 로컬 스토리지에 존재함. 가져옴')
+                setBoxes(JSON.parse(localSavedBoxes))
                 setIsBoxesLoaded(true)
-            } else {
-                const localSavedBoxes = localStorage.getItem("boxes0")
-                if (localSavedBoxes) {
-                    console.log('firestore에 저장파일이 없고(로그인 문제), 로컬 스토리지에 존재함. 가져옴')
-                    setBoxes(JSON.parse(localSavedBoxes))
-                } else {
-                    const boxModels = []
-                    const centerOffset = (bottomCount - 1) / 2
+            }
+        } else {
+            console.log(`나머지 내부`)
+            const boxModels = []
+            const centerOffset = (bottomCount - 1) / 2
 
-                    for (let i = 0; i < bottomCount; i++) {
-                        for (let j = 0; j < bottomCount; j++) {
-                            const x = i - centerOffset
-                            const z = j - centerOffset
-                            boxModels.push({
-                                id: `${i}-${j}`,
-                                position: [x, 0, z],
-                                color: "white"
-                            })
-                        }
-                    }
-
-                    setBoxes(boxModels)
+            for (let i = 0; i < bottomCount; i++) {
+                for (let j = 0; j < bottomCount; j++) {
+                    const x = i - centerOffset
+                    const z = j - centerOffset
+                    boxModels.push({
+                        id: `${i}-${j}`,
+                        position: [x, 0, z],
+                        color: "white"
+                    })
                 }
             }
-        }
 
-        loadBoxes()
-    }, [])
-
-    useEffect(() => {
-        if (
-            localStorage.getItem('boxes0') === null &&
-            localStorage.getItem('boxes1') === null &&
-            localStorage.getItem('boxes2') === null
-        ) {
-            for (let i = 0; i < 3; i++) {
-                // localStorage 저장
-                localStorage.setItem(`boxes${i}`, JSON.stringify(boxes))
-
-                // firestore 저장
-                setBlockStatus(boxes, i)
+            if (
+                localStorage.getItem('boxes0') === null &&
+                localStorage.getItem('boxes1') === null &&
+                localStorage.getItem('boxes2') === null
+            ) {
+                for (let i = 0; i < 3; i++) {
+                    // localStorage 저장
+                    localStorage.setItem(`boxes${i}`, JSON.stringify(boxModels))
+                }
             }
+
+            setBoxes(boxModels)
+            setIsBoxesLoaded(true)
         }
+
+
     }, [])
+
 
     const [createBoxBtn, setCreateBoxBtn] = useState(false)
 
@@ -166,7 +193,7 @@ function SidePage6() {
 
             // firestore에도 저장
             // if (isLogin) {
-                setBlockStatus(boxes, slotIndex)
+            // setBlockStatus(boxes, slotIndex)
             // }
 
             // savedSlots 배열도 업데이트
@@ -177,45 +204,19 @@ function SidePage6() {
 
 
             // firestore 테스트
-            setBlockStatus(boxes, currentSlot)
+            // setBlockStatus(boxes, currentSlot)
         }
     }
 
     useEffect(() => {
         // 현재 슬롯에 해당하는 boxes 데이터를 로컬스토리지에서 불러오기, firestore에 있다면 그것 우선으로
-        async function loadBoxes() {
-            const savedBoxes = await getAllDocuments(currentSlot)
-            if (savedBoxes) {
-                // console.log('저장된 boxes가 firestore에 있음 :', savedBoxes)
-                setBoxes(savedBoxes)
-                setIsBoxesLoaded(true)
-            } else {
-                const localSavedBoxes = localStorage.getItem(`boxes${currentSlot}`)
-                if (localSavedBoxes) {
-                    console.log('firestore에 저장파일이 없고(로그인 문제), 로컬 스토리지에 존재함. 가져옴')
-                    setBoxes(JSON.parse(localSavedBoxes))
-                } else {
-                    const boxModels = []
-                    const centerOffset = (bottomCount - 1) / 2
+        if (isLogin) {
 
-                    for (let i = 0; i < bottomCount; i++) {
-                        for (let j = 0; j < bottomCount; j++) {
-                            const x = i - centerOffset
-                            const z = j - centerOffset
-                            boxModels.push({
-                                id: `${i}-${j}`,
-                                position: [x, 0, z],
-                                color: "white"
-                            })
-                        }
-                    }
-
-                    setBoxes(boxModels)
-                }
-            }
+        } else if (isAnonymity) {
+            const savedBoxes = localStorage.getItem(`boxes${currentSlot}`)
+            setBoxes(JSON.parse(savedBoxes))
         }
 
-        loadBoxes()
     }, [currentSlot])  // currentSlot이 변경될 때마다 실행
 
 
@@ -392,9 +393,23 @@ function SidePage6() {
                         >
                             현재 상태 저장
                         </button>
+                        { isLogin && <button
+                            style={{
+                                marginTop: "20px",
+                                padding: "10px",
+                                width: "100%",
+                                backgroundColor: "#007bff",
+                                color: "white",
+                                border: "none",
+                                cursor: "pointer",
+                            }}
+                            onClick={() => logOut()}
+                        >
+                            로그아웃
+                        </button>}
                     </div>
                 </div>}
-                {!isAnonymity && <div>
+                {!(isLogin || isAnonymity) && <div>
                     <div style={{
                         position: "absolute",
                         top: "50%",
@@ -424,6 +439,7 @@ function SidePage6() {
                         {isClickedSignUp ? (
                             <>
                                 <button onClick={() => {
+                                    signUp(email, password, boxes)
                                     setIsClickedSignUp(false)
                                 }}>
                                     회원가입 하기
@@ -433,8 +449,8 @@ function SidePage6() {
                         ) : (
                             <>
                                 <button onClick={() => {
+                                    signIn(email, password)
                                     setIsClickedSignUp(false)
-                                    setIsAuthenticated(true)
                                 }}>
                                     로그인
                                 </button><br />
