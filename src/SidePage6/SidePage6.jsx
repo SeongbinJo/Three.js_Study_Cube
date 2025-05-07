@@ -8,7 +8,7 @@ import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
 import { Physics } from "@react-three/rapier"
 import { OrbitControls } from "@react-three/drei"
-import { getAllDocuments, signUp, signIn, logOut } from "./firebase"
+import { getAllDocuments, signUp, signIn, logOut, setBlockStatus } from "./firebase"
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
 function SidePage6() {
@@ -28,9 +28,9 @@ function SidePage6() {
     // 4. 새로고침하거나 다시 들어올 경우 isLogin 필드 참조해서 자동 로그인
 
     const auth = getAuth()
-    let userUID = `null`
+    const [userUID, setUserUID] = useState(`null`)
 
-    
+
 
     const [isAnonymity, setIsAnonymity] = useState(() => {
         const getIsAnonymity = localStorage.getItem(`isAnonymity`)
@@ -41,9 +41,7 @@ function SidePage6() {
 
         return false
     })
-    const [isLogin, setIsLogin] = useState(() => {
-        // firestore에서 isLogin 가져와서 초기 값 저장
-    })
+    const [isLogin, setIsLogin] = useState(false)
     const [isClickedSignUp, setIsClickedSignUp] = useState(false)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -55,8 +53,8 @@ function SidePage6() {
     onAuthStateChanged(auth, (user) => {
         // 로그인 상태가 바뀔 때 마다 콜백
         if (user) {
-            
-            userUID = `${user.uid}`
+
+            setUserUID(`${user.uid}`)
             setIsLogin(true)
             console.log(`현재 로그인 된 유저: `, userUID)
         } else {
@@ -71,8 +69,10 @@ function SidePage6() {
     const [boxes, setBoxes] = useState()
 
     async function loadFirestoreBoxes(uid) {
+        console.log(uid)
         const savedBoxes = await getAllDocuments(uid, 0)
         if (savedBoxes) {
+            console.log(`loadFirestoreBoxes 내부, 가져온 savedBoxes: `, savedBoxes)
             setBoxes(savedBoxes)
             setIsBoxesLoaded(true)
         }
@@ -125,7 +125,7 @@ function SidePage6() {
         }
 
 
-    }, [])
+    }, [isLogin, isAnonymity])
 
 
     const [createBoxBtn, setCreateBoxBtn] = useState(false)
@@ -137,20 +137,25 @@ function SidePage6() {
     const [showMenu, setShowMenu] = useState(false)
 
     const [savedSlots, setSavedSlots] = useState(() => {
-
         if (isLogin) {
             const savedBox0 = getAllDocuments(0)
             const savedBox1 = getAllDocuments(1)
             const savedBox2 = getAllDocuments(2)
 
             return [savedBox0, savedBox1, savedBox2]
+        } else if (isAnonymity) {
+            const savedBox0 = localStorage.getItem(`boxes0`)
+            const savedBox1 = localStorage.getItem(`boxes1`)
+            const savedBox2 = localStorage.getItem(`boxes2`)
+
+            return [JSON.parse(savedBox0), JSON.parse(savedBox1), JSON.parse(savedBox2)]
+        } else {
+            const savedBox0 = localStorage.getItem(`boxes0`)
+            const savedBox1 = localStorage.getItem(`boxes1`)
+            const savedBox2 = localStorage.getItem(`boxes2`)
+
+            return [JSON.parse(savedBox0), JSON.parse(savedBox1), JSON.parse(savedBox2)]
         }
-
-        const savedBox0 = localStorage.getItem(`boxes0`)
-        const savedBox1 = localStorage.getItem(`boxes1`)
-        const savedBox2 = localStorage.getItem(`boxes2`)
-
-        return [JSON.parse(savedBox0), JSON.parse(savedBox1), JSON.parse(savedBox2)]
     })
     const [currentSlot, setCurrentSlot] = useState(0)
 
@@ -186,41 +191,67 @@ function SidePage6() {
     }
 
 
-    const saveSlot = (slotIndex) => {
-        if (isAnonymity) { // '로그인 없이 플레이' 인 경우
-            // 해당 슬롯의 boxes 상태를 로컬스토리지에 저장
-            localStorage.setItem(`boxes${slotIndex}`, JSON.stringify(boxes))
-
-            // firestore에도 저장
-            // if (isLogin) {
-            // setBlockStatus(boxes, slotIndex)
-            // }
-
-            // savedSlots 배열도 업데이트
-            const newSavedSlots = [...savedSlots]
-            newSavedSlots[slotIndex] = boxes
-            setSavedSlots(newSavedSlots)
-
-
-
-            // firestore 테스트
-            // setBlockStatus(boxes, currentSlot)
-        }
-    }
+    const [allBoxData, setAllBoxData] = useState({
+        boxes0: [],
+        boxes1: [],
+        boxes2: [],
+    })
 
     useEffect(() => {
-        // 현재 슬롯에 해당하는 boxes 데이터를 로컬스토리지에서 불러오기, firestore에 있다면 그것 우선으로
         if (isLogin) {
+            const fetchAllBoxes = async () => {
+                const [data0, data1, data2] = await Promise.all([
+                    getAllDocuments(userUID, 0),
+                    getAllDocuments(userUID, 1),
+                    getAllDocuments(userUID, 2)
+                ])
+                setAllBoxData({
+                    boxes0: data0,
+                    boxes1: data1,
+                    boxes2: data2
+                })
+            }
+            fetchAllBoxes()
+        }
+    }, [isLogin])
 
+
+    useEffect(() => {
+        if (isLogin) {
+            const key = `boxes${currentSlot}`
+            if (allBoxData[key]) {
+                setBoxes(allBoxData[key])
+            }
         } else if (isAnonymity) {
             const savedBoxes = localStorage.getItem(`boxes${currentSlot}`)
-            setBoxes(JSON.parse(savedBoxes))
+            if (savedBoxes) {
+                setBoxes(JSON.parse(savedBoxes))
+            }
+        }
+    }, [currentSlot, allBoxData])
+
+
+    const saveSlot = (slotIndex, uid) => {
+        if (isLogin) {
+            // firestore에도 저장
+            setBlockStatus(boxes, slotIndex, uid)
+
+            setAllBoxData(prev => ({
+                ...prev,
+                [`boxes${currentSlot}`]: boxes, // 현재 상태의 boxes를 해당 슬롯에 덮어쓰기
+            }))
         }
 
-    }, [currentSlot])  // currentSlot이 변경될 때마다 실행
+        if (isAnonymity) {
+            // 해당 슬롯의 boxes 상태를 로컬스토리지에 저장
+            localStorage.setItem(`boxes${slotIndex}`, JSON.stringify(boxes))
+        }
 
-
-
+        // savedSlots 배열도 업데이트
+        // const newSavedSlots = [...savedSlots]
+        // newSavedSlots[slotIndex] = boxes
+        // setSavedSlots(newSavedSlots)
+    }
 
     return (
         <>
@@ -389,11 +420,11 @@ function SidePage6() {
                                 border: "none",
                                 cursor: "pointer",
                             }}
-                            onClick={() => saveSlot(currentSlot)}
+                            onClick={() => saveSlot(currentSlot, userUID)}
                         >
                             현재 상태 저장
                         </button>
-                        { isLogin && <button
+                        <button
                             style={{
                                 marginTop: "20px",
                                 padding: "10px",
@@ -403,10 +434,19 @@ function SidePage6() {
                                 border: "none",
                                 cursor: "pointer",
                             }}
-                            onClick={() => logOut()}
+                            onClick={() => {
+                                if (isLogin) {
+                                    logOut();
+                                } else {
+                                    setIsLogin(false)
+                                    saveIsAnonymityStatus(false)
+                                    setIsAnonymity(false)
+                                }
+                            }}
                         >
-                            로그아웃
-                        </button>}
+                            {isLogin ? "로그아웃" : "로그인"}
+                        </button>
+
                     </div>
                 </div>}
                 {!(isLogin || isAnonymity) && <div>
