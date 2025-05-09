@@ -273,6 +273,8 @@ function SidePage6() {
                         showMenu={showMenu}
                         isGrid={isGrid}
                         backgroundColor={backgroundColor}
+                        isLogin={isLogin}
+                        isAnonymity={isAnonymity}
                     />
                 )}
                 <div className="dot"></div>
