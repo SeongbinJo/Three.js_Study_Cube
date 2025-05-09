@@ -168,18 +168,22 @@ function SidePage6() {
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === "e" || e.key === "E") {
-                setShowInventory(prev => !prev)
+
+            if (isLogin || isAnonymity) {
+                if (e.key === "e" || e.key === "E") {
+                    setShowInventory(prev => !prev)
+                }
+    
+                if (e.key === "q" || e.key === "Q") {
+                    setShowMenu(prev => !prev)
+                }
             }
 
-            if (e.key === "q" || e.key === "Q") {
-                setShowMenu(prev => !prev)
-            }
         }
 
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [])
+    }, [isLogin, isAnonymity])
 
     const handleColorChange = (newColor) => {
         setColor(newColor.hex)
