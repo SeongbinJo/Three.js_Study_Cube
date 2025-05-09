@@ -442,8 +442,10 @@ function SidePage6() {
                             }}
                             onClick={() => {
                                 if (isLogin) {
-                                    logOut();
+                                    setShowMenu(prev => !prev)
+                                    logOut()
                                 } else {
+                                    setShowMenu(prev => !prev)
                                     setIsLogin(false)
                                     saveIsAnonymityStatus(false)
                                     setIsAnonymity(false)
