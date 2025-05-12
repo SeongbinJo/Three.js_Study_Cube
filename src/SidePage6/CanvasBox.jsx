@@ -4,8 +4,9 @@ import { Physics } from "@react-three/rapier"
 import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
 import CameraViewDirection from "./CameraViewDirection"
-import { PointerLockControls } from "@react-three/drei"
+import { PointerLockControls, useCubeCamera } from "@react-three/drei"
 import PlayControl from "./PlayControl"
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter"
 
 
 
@@ -299,8 +300,36 @@ function HeldBox({ box }) {
     )
 }
 
+function exportBoxesToFile(boxes) {
+    const scene = new THREE.Scene()
+    
+    boxes.forEach(box => {
+        const geometry = new THREE.BoxGeometry(1, 1, 1)
+        const material = new THREE.MeshStandardMaterial({ color: box.color })
+        const mesh = new THREE.Mesh(geometry, material)
+        mesh.position.set(...box.position)
+        scene.add(mesh)
+    })
 
-function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, showMenu, isGrid, backgroundColor, isLogin, isAnonymity }) {
+    const exporter = new GLTFExporter()
+    
+    exporter.parse(
+        scene,
+        (gltf) => {
+            const blob = new Blob([JSON.stringify(gltf)], { type: `application/json`})
+            const url = URL.createObjectURL(blob)
+
+            const link = document.createElement(`a`)
+            link.href = url
+            link.download = `Digitmix_boxes_3DFile.gltf`
+            link.click()
+        },
+        { binary: false } // true => .glb, false => .gltf
+    )
+}
+
+
+function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, showMenu, isGrid, backgroundColor, isLogin, isAnonymity, exportButtonClick }) {
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
 
@@ -323,6 +352,15 @@ function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, 
             document.exitPointerLock?.()
         }
     }, [showInventory, showMenu])
+
+    useEffect(() => {
+        if (exportButtonClick) {
+            exportBoxesToFile(boxes)
+            console.log(`3D 모델 파일 추출..`)
+        } else {
+            console.log(`3D 파일 추출 실패: exportButtonClick = `, exportButtonClick)
+        }
+    }, [exportButtonClick])
 
     return (
         <Canvas

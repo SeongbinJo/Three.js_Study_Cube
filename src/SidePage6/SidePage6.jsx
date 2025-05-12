@@ -257,6 +257,8 @@ function SidePage6() {
         // setSavedSlots(newSavedSlots)
     }
 
+    const [exportButtonClick, setExportButtonClick] = useState(false)
+
     return (
         <>
             <div className='sidePage5-box'>
@@ -279,6 +281,7 @@ function SidePage6() {
                         backgroundColor={backgroundColor}
                         isLogin={isLogin}
                         isAnonymity={isAnonymity}
+                        exportButtonClick={exportButtonClick}
                     />
                 )}
                 <div className="dot"></div>
@@ -293,7 +296,7 @@ function SidePage6() {
                     1. 움직임 - W, A, S, D<br />
                     2. C(하강), Spacebar(상승)<br />
                     3. E - 블럭 및 배경 색상 설정<br />
-                    4. Q - 로컬 저장 및 저장 슬롯 변경경
+                    4. Q - 로컬 저장 및 저장 슬롯 변경, 로그인/로그아웃
 
                     <div style={{ marginTop: '10px' }}>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("front")}>앞</button>
@@ -454,7 +457,22 @@ function SidePage6() {
                         >
                             {isLogin ? "로그아웃" : "로그인"}
                         </button>
-
+                        <button
+                            style={{
+                                marginTop: "20px",
+                                padding: "10px",
+                                width: "100%",
+                                backgroundColor: "#007bff",
+                                color: "white",
+                                border: "none",
+                                cursor: "pointer",
+                            }}
+                            onClick={() => {
+                                setExportButtonClick(prev => !prev)
+                            }}
+                        >
+                            3D 파일 추출
+                        </button>
                     </div>
                 </div>}
                 {!(isLogin || isAnonymity) && <div>
