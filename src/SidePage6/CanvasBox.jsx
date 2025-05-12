@@ -304,6 +304,7 @@ function exportBoxesToFile(boxes) {
     const scene = new THREE.Scene()
     
     boxes.forEach(box => {
+        console.log(`추출하는 대상의 박스 색 : `, box.color)
         const geometry = new THREE.BoxGeometry(1, 1, 1)
         const material = new THREE.MeshStandardMaterial({ color: box.color })
         const mesh = new THREE.Mesh(geometry, material)
@@ -354,12 +355,8 @@ function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, 
     }, [showInventory, showMenu])
 
     useEffect(() => {
-        if (exportButtonClick) {
             exportBoxesToFile(boxes)
             console.log(`3D 모델 파일 추출..`)
-        } else {
-            console.log(`3D 파일 추출 실패: exportButtonClick = `, exportButtonClick)
-        }
     }, [exportButtonClick])
 
     return (
