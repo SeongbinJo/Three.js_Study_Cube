@@ -10,6 +10,7 @@ import { Physics } from "@react-three/rapier"
 import { OrbitControls } from "@react-three/drei"
 import { getAllDocuments, signUp, signIn, logOut, setBlockStatus } from "./firebase"
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter"
 
 function SidePage6() {
 
@@ -173,7 +174,7 @@ function SidePage6() {
                 if (e.key === "e" || e.key === "E") {
                     setShowInventory(prev => !prev)
                 }
-    
+
                 if (e.key === "q" || e.key === "Q") {
                     setShowMenu(prev => !prev)
                 }
@@ -257,7 +258,37 @@ function SidePage6() {
         // setSavedSlots(newSavedSlots)
     }
 
-    const [exportButtonClick, setExportButtonClick] = useState(false)
+    // export file ///////////////////////////////////////////////////////////////////////////
+    function exportBoxesToFile(boxes) {
+        const scene = new THREE.Scene()
+
+        boxes.forEach(box => {
+            console.log(`추출하는 대상의 박스 색 : `, box.color)
+            const geometry = new THREE.BoxGeometry(1, 1, 1)
+            const material = new THREE.MeshStandardMaterial({ color: box.color })
+            const mesh = new THREE.Mesh(geometry, material)
+            mesh.position.set(...box.position)
+            scene.add(mesh)
+        })
+
+        const exporter = new GLTFExporter()
+
+        exporter.parse(
+            scene,
+            (gltf) => {
+                const blob = new Blob([JSON.stringify(gltf)], { type: `application/json` })
+                const url = URL.createObjectURL(blob)
+
+                const link = document.createElement(`a`)
+                link.href = url
+                link.download = `Digitmix_boxes_3DFile.gltf`
+                link.click()
+            },
+            { binary: false } // true => .glb, false => .gltf
+        )
+    }
+    // export file ///////////////////////////////////////////////////////////////////////////
+
 
     return (
         <>
@@ -281,7 +312,6 @@ function SidePage6() {
                         backgroundColor={backgroundColor}
                         isLogin={isLogin}
                         isAnonymity={isAnonymity}
-                        exportButtonClick={exportButtonClick}
                     />
                 )}
                 <div className="dot"></div>
@@ -468,7 +498,7 @@ function SidePage6() {
                                 cursor: "pointer",
                             }}
                             onClick={() => {
-                                setExportButtonClick(prev => !prev)
+                                exportBoxesToFile(boxes)
                             }}
                         >
                             3D 파일 추출
