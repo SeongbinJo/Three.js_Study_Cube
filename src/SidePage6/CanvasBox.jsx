@@ -1,6 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { useState, useEffect, useRef } from "react"
-import { Physics } from "@react-three/rapier"
 import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
 import CameraViewDirection from "./CameraViewDirection"
@@ -32,24 +31,25 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
     const [history, setHistory] = useState([])
     const [historyIndex, setHistoryIndex] = useState(0)
-    
+
     function pushHistory(boxInfo) {
         setHistory(prev => {
             const newHistory = [...prev]
-    
+
             if (historyIndex !== 0) {
                 const cutIndex = newHistory.length + historyIndex
                 newHistory.splice(cutIndex)
             }
-    
+
             newHistory.push(boxInfo)
-    
+
             return newHistory
         })
-    
+
         setHistoryIndex(0)
     }
 
+    // <
     function undoAction(target) {
         setBoxes(prev => {
             let newBoxes = [...prev]
@@ -61,15 +61,17 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                     // delete를 undo -> 해당 박스 추가
                     newBoxes = newBoxes.filter(box => box.id !== target.box.id)
                     return [...newBoxes, target.box]
-                // case "move":
-                //     newBoxes = newBoxes.filter(box => box.id !== target.nextBox.id)
-                //     return [...newBoxes, target.prevBox]
+                case "move":
+                    newBoxes = newBoxes.filter(box => box.id !== target.nextBox.id)
+                    return [...newBoxes, target.prevBox]
                 default:
                     return newBoxes
             }
         })
     }
 
+
+    // >
     function redoAction(target) {
         setBoxes(prev => {
             let newBoxes = [...prev]
@@ -80,9 +82,9 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 case "delete":
                     // delete를 redo -> 해당 박스 다시 삭제
                     return newBoxes.filter(box => box.id !== target.box.id)
-                // case "move":
-                //     newBoxes = newBoxes.filter(box => box.id !== target.prevBox.id)
-                //     return [...newBoxes, target.nextBox]
+                case "move":
+                    newBoxes = newBoxes.filter(box => box.id !== target.prevBox.id)
+                    return [...newBoxes, target.nextBox]
                 default:
                     return newBoxes
             }
@@ -149,21 +151,22 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
                 const targetPos = new THREE.Vector3(...position).add(offset)
 
-                const movedBox = {
-                    id: `placed-${Date.now()}`,
-                    position: [targetPos.x, targetPos.y, targetPos.z],
-                    color: heldBox.color,
-                }
 
-                setBoxes(prev => [
-                    ...prev,
-                    movedBox
-                ])
+
+
 
                 // 창작 모드가 아닌 존재하는 블럭을 집어 좌클릭 한 경우
                 if (!heldBox.persistent) {
                     setHeldBox(null)
                     setClickedInfo(null)
+
+                    console.log(`targetPos : `, targetPos.toArray())
+
+                    const movedBox = {
+                        id: heldBox.id,
+                        position: [targetPos.x, targetPos.y, targetPos.z],
+                        color: heldBox.color,
+                    }
 
                     pushHistory({
                         type: "move",
@@ -179,17 +182,49 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                         }
                     })
 
+                    setBoxes(prev => [
+                        ...prev,
+                        movedBox
+                    ])
+
                 } else { // 창작 모드로 생성
+                    const newBox = {
+                        id: `placed-${Date.now()}`,
+                        position: [targetPos.x, targetPos.y, targetPos.z],
+                        color: heldBox.color,
+                    }
+
                     pushHistory({
                         type: "create",
-                        box: movedBox
+                        box: newBox
                     })
+
+                    setBoxes(prev => [
+                        ...prev,
+                        newBox
+                    ])
 
                     console.log('창작 모드, 생성 함')
                 }
 
                 console.log(`블럭을 ${[x, y, z]} 방향으로 놓았음. 옮긴 위치:`, targetPos.toArray())
+
+
                 return
+            }
+
+            // 손에 쥔 블럭이 없는데 좌클릭할 경우우
+            if (!heldBox) {
+                setClickedInfo({ id, position })
+
+                // 블럭 제거
+                setBoxes((prev) => prev.filter((box) => box.id !== id))
+
+                setHeldBox({
+                    id,
+                    color: clickedObject.material.color.getStyle(),
+                    prevPos: [...position],
+                })
             }
 
         }
