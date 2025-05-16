@@ -13,25 +13,10 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter"
 
 function SidePage6() {
-
-
     const [viewDirection, setViewDirection] = useState("front")
-
-    // 로그인 관련 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // 창 나올 조건:
-    // 가입 안 하거나(isAuthenticated), 처음 들어온 사람(isAnonymity)이거나.
-
-    // 1. 가입 안 하고 '로그인 없이 플레이' 누르면 다시 false로 바꿀 수 없게 만들면(로컬 스토리지에 저장)
-    // 새로고침하거나 다시 들어와도 로컬로 플레이 가능                                                  :: 완
-    // 2. 이 사람들은 설정이나 저장 창에 추가할 로그인하기를 눌렀을때 회원가입 가능
-
-    // 3. 가입하면 firestore 계정 저장, 로그인하면 isLogin = true로 firestore 저장
-    // 4. 새로고침하거나 다시 들어올 경우 isLogin 필드 참조해서 자동 로그인
 
     const auth = getAuth()
     const [userUID, setUserUID] = useState(`null`)
-
-
 
     const [isAnonymity, setIsAnonymity] = useState(() => {
         const getIsAnonymity = localStorage.getItem(`isAnonymity`)
@@ -42,19 +27,19 @@ function SidePage6() {
 
         return false
     })
+
     const [isLogin, setIsLogin] = useState(false)
     const [isClickedSignUp, setIsClickedSignUp] = useState(false)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
     const saveIsAnonymityStatus = (isAnonymity) => {
-        const savedStatus = localStorage.setItem(`isAnonymity`, JSON.stringify(isAnonymity))
+        localStorage.setItem(`isAnonymity`, JSON.stringify(isAnonymity))
     }
 
     onAuthStateChanged(auth, (user) => {
         // 로그인 상태가 바뀔 때 마다 콜백
         if (user) {
-
             setUserUID(`${user.uid}`)
             setIsLogin(true)
             console.log(`현재 로그인 된 유저: `, userUID)
@@ -68,48 +53,29 @@ function SidePage6() {
     const [isBoxesLoaded, setIsBoxesLoaded] = useState(false)
     const bottomCount = 20
     const [boxes, setBoxes] = useState()
-
-    async function loadFirestoreBoxes(uid) {
-        console.log(uid)
-        const savedBoxes = await getAllDocuments(uid, 0)
-        if (savedBoxes) {
-            console.log(`loadFirestoreBoxes 내부, 가져온 savedBoxes: `, savedBoxes)
-            setBoxes(savedBoxes)
-            setIsBoxesLoaded(true)
-        }
-    }
+    // 기본 바닥
+    const basicBoxModel = Array.from({ length: bottomCount }, (_, i) =>
+        Array.from({ length: bottomCount }, (_, j) => {
+            const centerOffset = (bottomCount - 1) / 2
+            const x = i - centerOffset
+            const z = j - centerOffset
+            return {
+                id: `${i}-${j}`,
+                position: [x, 0, z],
+                color: "white"
+            }
+        })
+    ).flat()
 
     // isLogin, isAnonymity에 따라 나중에 조건을 달아줘야함함
     useEffect(() => {
-
-        if (isLogin) {
-            console.log(`islogin 내부`)
-            loadFirestoreBoxes(userUID)
-        } else if (isAnonymity) {
-            console.log(`isAnonymity 내부`)
+        if (isAnonymity) {
             const localSavedBoxes = localStorage.getItem("boxes0")
             if (localSavedBoxes) {
-                console.log('firestore에 로그인 되어있지 않고, 로컬 스토리지에 존재함. 가져옴')
                 setBoxes(JSON.parse(localSavedBoxes))
                 setIsBoxesLoaded(true)
             }
         } else {
-            console.log(`나머지 내부`)
-            const boxModels = []
-            const centerOffset = (bottomCount - 1) / 2
-
-            for (let i = 0; i < bottomCount; i++) {
-                for (let j = 0; j < bottomCount; j++) {
-                    const x = i - centerOffset
-                    const z = j - centerOffset
-                    boxModels.push({
-                        id: `${i}-${j}`,
-                        position: [x, 0, z],
-                        color: "white"
-                    })
-                }
-            }
-
             if (
                 localStorage.getItem('boxes0') === null &&
                 localStorage.getItem('boxes1') === null &&
@@ -117,11 +83,11 @@ function SidePage6() {
             ) {
                 for (let i = 0; i < 3; i++) {
                     // localStorage 저장
-                    localStorage.setItem(`boxes${i}`, JSON.stringify(boxModels))
+                    localStorage.setItem(`boxes${i}`, JSON.stringify(basicBoxModel))
                 }
             }
 
-            setBoxes(boxModels)
+            setBoxes(basicBoxModel)
             setIsBoxesLoaded(true)
         }
 
@@ -138,13 +104,7 @@ function SidePage6() {
     const [showMenu, setShowMenu] = useState(false)
 
     const [savedSlots, setSavedSlots] = useState(() => {
-        if (isLogin) {
-            const savedBox0 = getAllDocuments(0)
-            const savedBox1 = getAllDocuments(1)
-            const savedBox2 = getAllDocuments(2)
-
-            return [savedBox0, savedBox1, savedBox2]
-        } else if (isAnonymity) {
+        if (isAnonymity) {
             const savedBox0 = localStorage.getItem(`boxes0`)
             const savedBox1 = localStorage.getItem(`boxes1`)
             const savedBox2 = localStorage.getItem(`boxes2`)
@@ -205,27 +165,50 @@ function SidePage6() {
     useEffect(() => {
         if (isLogin) {
             const fetchAllBoxes = async () => {
-                const [data0, data1, data2] = await Promise.all([
+                const fetchBoxes = await Promise.all([
                     getAllDocuments(userUID, 0),
                     getAllDocuments(userUID, 1),
                     getAllDocuments(userUID, 2)
                 ])
                 setAllBoxData({
-                    boxes0: data0,
-                    boxes1: data1,
-                    boxes2: data2
+                    boxes0: fetchBoxes[0],
+                    boxes1: fetchBoxes[1],
+                    boxes2: fetchBoxes[2]
                 })
+                for (let i = 0; i < 3; i++) {
+                    localStorage.setItem(`boxes${i}`, JSON.stringify(fetchBoxes[i]))
+                }
             }
-            fetchAllBoxes()
+
+            const isFirstLogin = localStorage.getItem(`firstLogin`)
+            if (JSON.parse(isFirstLogin) === true) {
+                // 익명 => 로그인 인 경우
+                console.log(`첫 로그인`)
+                fetchAllBoxes()
+            } else if (JSON.parse(isFirstLogin) === false) {
+                // 로그인 후 새로고침 또는 재 접속 시
+                console.log(`재접속`)
+                const getLocalBox = localStorage.getItem(`boxes${currentSlot}`)
+                setAllBoxData(prev => ({
+                    ...prev,
+                    [`boxes${currentSlot}`]: JSON.parse(getLocalBox),
+                }))
+            }
         }
     }, [isLogin])
 
 
     useEffect(() => {
         if (isLogin) {
-            const key = `boxes${currentSlot}`
-            if (allBoxData[key]) {
-                setBoxes(allBoxData[key])
+            const localBox = localStorage.getItem(`boxes${currentSlot}`)
+            if (localBox) {
+                setBoxes(JSON.parse(localBox))
+            } else {
+                const key = `boxes${currentSlot}`
+                if (allBoxData[key]) {
+                    setBoxes(allBoxData[key])
+                    setIsBoxesLoaded(true)
+                }
             }
         } else if (isAnonymity) {
             const savedBoxes = localStorage.getItem(`boxes${currentSlot}`)
@@ -251,12 +234,53 @@ function SidePage6() {
             // 해당 슬롯의 boxes 상태를 로컬스토리지에 저장
             localStorage.setItem(`boxes${slotIndex}`, JSON.stringify(boxes))
         }
-
-        // savedSlots 배열도 업데이트
-        // const newSavedSlots = [...savedSlots]
-        // newSavedSlots[slotIndex] = boxes
-        // setSavedSlots(newSavedSlots)
     }
+
+    // 로컬 저장소의 boxes들을 기본으로 만들기기
+    const setBasicModelLocalStorage = () => {
+        setBoxes(basicBoxModel)
+        for (let i = 0; i < 3; i++) {
+            localStorage.setItem(`boxes${i}`, JSON.stringify(basicBoxModel))
+        }
+    }
+
+    // 해당 클라이언트로 최로 로그인인지 아닌지 저장
+    const firstLogin = (solution) => {
+        switch (solution) {
+            case `true`:
+                localStorage.setItem(`firstLogin`, true)
+                break
+            case `false`:
+                localStorage.setItem(`firstLogin`, false)
+                break
+            case `remove`:
+                const isExistFirstLogin = localStorage.getItem(`firstLogin`)
+                if (isExistFirstLogin) {
+                    localStorage.removeItem(`firstLogin`)
+                    break
+                } else {
+                    break
+                }
+            default:
+                console.log(`firstLogin solution error`)
+        }
+    }
+
+    // 임시 저장 /////////////////////////////////////////////////////////////////////////
+    const [autoSaveEnabled, setAutoSaveEnabled] = useState(true)
+
+    useEffect(() => {
+        if (!autoSaveEnabled) return
+
+        const interval = setInterval(() => {
+            localStorage.setItem(`boxes${currentSlot}`, JSON.stringify(boxes))
+            firstLogin(`false`)
+            console.log(`autosave 작동, `, new Date().toLocaleTimeString())
+        }, 600_000)
+
+        return () => clearInterval(interval)
+    })
+    // 임시 저장 /////////////////////////////////////////////////////////////////////////
 
     // export file ///////////////////////////////////////////////////////////////////////////
     function exportBoxesToFile(boxes) {
@@ -284,7 +308,7 @@ function SidePage6() {
                 link.download = `Digitmix_boxes_3DFile.gltf`
                 link.click()
             },
-            { binary: false } // true => .glb, false => .gltf
+            { binary: false } // true => .glb, false => .gltfd
         )
     }
     // export file ///////////////////////////////////////////////////////////////////////////
@@ -476,6 +500,8 @@ function SidePage6() {
                             onClick={() => {
                                 if (isLogin) {
                                     setShowMenu(prev => !prev)
+                                    setBasicModelLocalStorage()
+                                    firstLogin(`remove`)
                                     logOut()
                                 } else {
                                     setShowMenu(prev => !prev)
@@ -546,6 +572,7 @@ function SidePage6() {
                             <>
                                 <button onClick={() => {
                                     signIn(email, password)
+                                    firstLogin(`true`)
                                     setIsClickedSignUp(false)
                                 }}>
                                     로그인
@@ -557,6 +584,7 @@ function SidePage6() {
                         <button onClick={() => {
                             setIsAnonymity(true)
                             saveIsAnonymityStatus(true)
+                            firstLogin(`remove`)
                         }}>로그인 없이 플레이하기</button>
                     </div>
                 </div>}
