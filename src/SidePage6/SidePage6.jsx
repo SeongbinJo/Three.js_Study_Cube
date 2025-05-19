@@ -48,7 +48,7 @@ function SidePage6() {
             console.log(`로그인 안되어 있음`)
         }
     })
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     const [isBoxesLoaded, setIsBoxesLoaded] = useState(false)
     const bottomCount = 20
