@@ -1,16 +1,15 @@
-import { useState, useEffect, useRef, Suspense } from "react"
+import { useState, useEffect } from "react"
 import '../App.css'
 import CanvasBox from './CanvasBox'
 import './Crosshair.css'
 import { SketchPicker } from "react-color"
-import { Canvas, useThree } from "@react-three/fiber"
+import { Canvas } from "@react-three/fiber"
 import * as THREE from "three"
-import SidePage6Model from "./SidePage6Model"
-import { Physics } from "@react-three/rapier"
 import { OrbitControls } from "@react-three/drei"
 import { getAllDocuments, signUp, signIn, logOut, setBlockStatus } from "./firebase"
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter"
+import { io } from "socket.io-client"
 
 function SidePage6() {
     const [viewDirection, setViewDirection] = useState("front")
@@ -314,6 +313,55 @@ function SidePage6() {
     // export file ///////////////////////////////////////////////////////////////////////////
 
 
+    // multi play ////////////////////////////////////////////////////////////////////////////
+    // const socket = io("http://localhost:3001")
+
+    const [roomID, setRoomID] = useState(localStorage.getItem("roomID") || null)
+    const [joinRoomClick, setJoinRoomClick] = useState(false)
+    const [inputRoomId, setInputRoomId] = useState("")
+
+    // room ID 생성
+    const generateRoomId = () => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        let id = ''
+        for (let i = 0; i < 8; i++) {
+            id += chars.charAt(Math.floor(Math.random() * chars.length))
+        }
+        return id
+    }
+
+    // room ID 보관
+    const createRoomId = () => {
+        const existRoomId = localStorage.getItem(`roomID`)
+
+        if (existRoomId) {
+            console.log(`이미 roomID가 존재합니다.`)
+            return
+        }
+        const roomID = generateRoomId()
+        localStorage.setItem(`roomID`, roomID)
+        setRoomID(roomID)
+    }
+
+    // room ID 삭제(방 삭제)
+    const removeRoomId = () => {
+        const existRoomId = localStorage.getItem(`roomID`)
+
+        if (existRoomId) {
+            console.log(`roomID를 삭제, 방 삭제`)
+            localStorage.removeItem(`roomID`)
+            return
+        }
+    }
+
+    // 참가하기 클릭
+    const joinRoomClickHandler = () => {
+        setJoinRoomClick(true)
+    }
+    // multi play ////////////////////////////////////////////////////////////////////////////
+
+
+
     return (
         <>
             <div className='sidePage5-box'>
@@ -454,7 +502,8 @@ function SidePage6() {
                         zIndex: 10,
                         padding: "10px",
                         borderRadius: "5px",
-                        maxWidth: "40%",
+                        maxWidth: "50%",
+                        minWidth: "30%",
                         backgroundColor: "#eee"
                     }}>
                         <h3>저장 슬롯</h3>
@@ -475,7 +524,7 @@ function SidePage6() {
                         ))}
                         <button
                             style={{
-                                marginTop: "20px",
+                                marginTop: "30px",
                                 padding: "10px",
                                 width: "100%",
                                 backgroundColor: "#007bff",
@@ -487,12 +536,138 @@ function SidePage6() {
                         >
                             현재 상태 저장
                         </button>
+                        {isLogin && (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    marginTop: "10px",
+                                }}
+                            >
+                                <button
+                                    style={{
+                                        padding: "10px",
+                                        width: "48%",
+                                        backgroundColor: "#28a745",
+                                        color: "white",
+                                        border: "none",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() => {
+                                        createRoomId()
+                                    }}
+                                >
+                                    방 만들기
+                                </button>
+                                <button
+                                    style={{
+                                        padding: "10px",
+                                        width: "48%",
+                                        backgroundColor: "#17a2b8",
+                                        color: "white",
+                                        border: "none",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() => {
+                                        if (!roomID) {
+                                            joinRoomClickHandler()
+                                        }
+                                    }}
+                                >
+                                    참가하기
+                                </button>
+                            </div>
+                        )}
+                        {isLogin && roomID && (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    marginTop: "10px",
+                                    width: "100%",
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        height: "40px",
+                                        lineHeight: "40px",
+                                        width: "60%",
+                                        backgroundColor: "#6c757d",
+                                        color: "white",
+                                        textAlign: "center",
+                                        padding: "0 10px", // 좌우 여백만 주고 상하는 제거
+                                        boxSizing: "border-box",
+                                    }}
+                                >
+                                    {roomID}
+                                </div>
+                                <button
+                                    style={{
+                                        height: "40px",
+                                        width: "30%",
+                                        backgroundColor: "#dc3545",
+                                        color: "white",
+                                        border: "none",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() => {
+                                        removeRoomId()
+                                        setRoomID(null)
+                                        console.log("방에서 나감")
+                                    }}
+                                >
+                                    나가기
+                                </button>
+                            </div>
+                        )}
+                        {isLogin && joinRoomClick && !roomID && (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    marginTop: "10px",
+                                    width: "100%",
+                                }}
+                            >
+                                <input
+                                    type="text"
+                                    placeholder="방 ID 입력"
+                                    value={inputRoomId}
+                                    onChange={(e) => setInputRoomId(e.target.value)}
+                                    style={{
+                                        height: "40px",
+                                        lineHeight: "40px",
+                                        width: "60%",
+                                        padding: "0 10px",
+                                        boxSizing: "border-box",
+                                        border: "1px solid #ccc",
+                                    }}
+                                />
+                                <button
+                                    style={{
+                                        height: "40px",
+                                        width: "30%",
+                                        backgroundColor: "#007bff",
+                                        color: "white",
+                                        border: "none",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() => {
+
+                                    }}
+                                >
+                                    참가하기
+                                </button>
+                            </div>
+                        )}
                         <button
                             style={{
-                                marginTop: "20px",
+                                marginTop: "10px",
                                 padding: "10px",
                                 width: "100%",
-                                backgroundColor: "#007bff",
+                                backgroundColor: isLogin ? "#FC3F3F" : "#7ED321",
                                 color: "white",
                                 border: "none",
                                 cursor: "pointer",
@@ -515,7 +690,7 @@ function SidePage6() {
                         </button>
                         <button
                             style={{
-                                marginTop: "20px",
+                                marginTop: "10px",
                                 padding: "10px",
                                 width: "100%",
                                 backgroundColor: "#007bff",
