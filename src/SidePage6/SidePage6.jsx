@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import '../App.css'
 import CanvasBox from './CanvasBox'
 import './Crosshair.css'
@@ -314,7 +314,15 @@ function SidePage6() {
 
 
     // multi play ////////////////////////////////////////////////////////////////////////////
-    // const socket = io("http://localhost:3001")
+    const socketRef = useRef(null)
+
+    useEffect(() => {
+        socketRef.current = io("http://localhost:3001")
+
+        return () => {
+            socketRef.current.disconnect()
+        }
+    }, [])
 
     const [roomID, setRoomID] = useState(localStorage.getItem("roomID") || null)
     const [joinRoomClick, setJoinRoomClick] = useState(false)
@@ -341,6 +349,7 @@ function SidePage6() {
         const roomID = generateRoomId()
         localStorage.setItem(`roomID`, roomID)
         setRoomID(roomID)
+        socketRef.current.emit(`create_room`, roomID)
     }
 
     // room ID 삭제(방 삭제)
@@ -354,9 +363,14 @@ function SidePage6() {
         }
     }
 
-    // 참가하기 클릭
+    // 들어가기 클릭
     const joinRoomClickHandler = () => {
         setJoinRoomClick(true)
+    }
+
+    // 참가
+    const joinRoom = () => {
+        socketRef.current.emit(`join_room`, inputRoomId)
     }
     // multi play ////////////////////////////////////////////////////////////////////////////
 
@@ -574,7 +588,7 @@ function SidePage6() {
                                         }
                                     }}
                                 >
-                                    참가하기
+                                    들어가기
                                 </button>
                             </div>
                         )}
@@ -658,7 +672,7 @@ function SidePage6() {
 
                                     }}
                                 >
-                                    참가하기
+                                    참가
                                 </button>
                             </div>
                         )}
