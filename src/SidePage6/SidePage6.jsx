@@ -313,12 +313,12 @@ function SidePage6() {
     // export file ///////////////////////////////////////////////////////////////////////////
 
 
-    
+
     // multi play ////////////////////////////////////////////////////////////////////////////
     const socketRef = useRef(null)
 
     useEffect(() => {
-        socketRef.current = io(import.meta.env.SIDEPAGE6_DOMAIN)
+        socketRef.current = io(`localhost:3001`)
 
         return () => {
             socketRef.current.disconnect()
