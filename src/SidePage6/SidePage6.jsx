@@ -318,7 +318,7 @@ function SidePage6() {
     const socketRef = useRef(null)
 
     useEffect(() => {
-        socketRef.current = io(`localhost:3001`)
+        socketRef.current = io(`http://localhost:3001`)
 
         return () => {
             socketRef.current.disconnect()
