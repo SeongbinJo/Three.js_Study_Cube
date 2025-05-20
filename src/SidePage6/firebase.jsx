@@ -26,12 +26,18 @@ export async function getAllDocuments(uid, index) {
 }
 
 
-  export async function setBlockStatus(boxes, index, uid) {
+  export async function setBlockStatus(boxes, index, uid, email) {
     try {
         await setDoc(doc(db, `Users`, `UserID`, `${uid}` ,`BlockStatus` ,`boxes${index}`, `boxes${index}-0`), {
             boxes: boxes,
             updatedAt: new Date().toISOString(),
         })
+
+        await setDoc(doc(db, `Users`, `UserID`, `${uid}`, `UserEmail`), {
+          email: email,
+          signUpTimestamp: new Date().toISOString(),
+        })
+
         console.log(`Firestore - BlockStatus/testid 문서에 저장 완료`)
     } catch (error) {
         console.log(`Firestore 저장 실패 : `, error)
@@ -50,7 +56,7 @@ export async function getAllDocuments(uid, index) {
 
       // Firestore에 유저 데이터 넣기
       for (let i = 0; i < 3; i++) {
-        setBlockStatus(boxes, i, user.uid)
+        setBlockStatus(boxes, i, user.uid, email)
       }
 
       logOut()
@@ -89,3 +95,22 @@ export async function getAllDocuments(uid, index) {
       console.error(`로그아웃 실패: `, error.message)
     }
   }
+
+
+// 유저 email 가져오기
+export async function fetchUserEmail(uid) {
+  try {
+    const emailDocRef = doc(db, `Users`, `UserID`, uid, `UserEmail`)
+    const emailDocSnap = await getDoc(emailDocRef)
+
+    if (emailDocSnap.exists()) {
+      const data = emailDocSnap.data()
+      console.log(`이메일 가져오기 성공: `, data.email)
+      return data.email
+    } else {
+      console.warn(`해당 유저의 이메일 문서가 존재하지 않음.`)
+    }
+  } catch (error) {
+    console.error(`이메일 가져오기 실패: `, error)
+  }
+}

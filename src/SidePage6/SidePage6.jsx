@@ -6,7 +6,7 @@ import { SketchPicker } from "react-color"
 import { Canvas } from "@react-three/fiber"
 import * as THREE from "three"
 import { OrbitControls } from "@react-three/drei"
-import { getAllDocuments, signUp, signIn, logOut, setBlockStatus } from "./firebase"
+import { getAllDocuments, signUp, signIn, logOut, setBlockStatus, fetchUserEmail } from "./firebase"
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter"
 import { io } from "socket.io-client"
@@ -369,8 +369,23 @@ function SidePage6() {
     }
 
     // 참가
-    const joinRoom = () => {
-        socketRef.current.emit(`join_room`, inputRoomId)
+    const joinRoom = async () => {
+        try {
+            const userEmail = await fetchUserEmail(userUID)
+            if (!userEmail) {
+                console.warn(`userEmail이 없음. 소켓 emit 생략함.`)
+                return
+            }
+
+            socketRef.current.emit(`join_room`, {
+                roomId: inputRoomId,
+                userEmail: userEmail
+            })
+            console.log(inputRoomId)
+        } catch (error) {
+            console.error(`joinRoom(join_room) 실행 중 오류 발생 : `, error)
+        }
+        
     }
     // multi play ////////////////////////////////////////////////////////////////////////////
 
@@ -669,7 +684,7 @@ function SidePage6() {
                                         cursor: "pointer",
                                     }}
                                     onClick={() => {
-
+                                        joinRoom()
                                     }}
                                 >
                                     참가
