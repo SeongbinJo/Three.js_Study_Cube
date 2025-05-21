@@ -421,12 +421,36 @@ function SidePage6() {
 
     }
 
+    const removeRoom = async () => {
+        try {
+            const userEmail = await fetchUserEmail(userUID)
+            if (!userEmail) {
+                console.warn(`userEmail이 없음. 소켓 emit 생략함.`)
+                return
+            }
+
+            socketRef.current.emit(`remove_room`, {
+                roomId: roomID,
+                userEmail: userEmail
+            })
+
+            setRoomID(null)
+            setUserRole({ isHost: false, isParticipant: false })
+        } catch (error) {
+            console.error(`remove_room 실행 중 오류 발생 : `, error)
+        }
+    }
+
     useEffect(() => {
         socketRef.current.on(`room_user_list`, (users) => {
-            console.log(`유저가 입장/퇴장 하였습니다. 현재 방의 유저: `, users)
-
             const userEmailList = users.map(user => user.email)
-            setUsersInRoom(userEmailList)
+            if (userEmailList.length > 0) {
+                setUsersInRoom(userEmailList)
+            } else {
+                setUsersInRoom([])
+                setUserRole({ isHost: false, isParticipant: false })
+                setInputRoomId("")
+            }
         })
 
         socketRef.current.on("join_room_success", ({ roomId, userEmail }) => {
@@ -438,8 +462,6 @@ function SidePage6() {
         })
     }, [])
     // multi play ////////////////////////////////////////////////////////////////////////////
-
-
 
     return (
         <>
@@ -691,10 +713,7 @@ function SidePage6() {
                                         cursor: "pointer",
                                     }}
                                     onClick={() => {
-                                        setRoomID(null)
-                                        setUserRole({ isHost: false, isParticipant: false })
-                                        setUsersInRoom([])
-                                        console.log("방 삭제")
+                                        removeRoom()
                                     }}
                                 >
                                     방 삭제
