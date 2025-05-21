@@ -333,18 +333,17 @@ function SidePage6() {
     })
     const [joinRoomClick, setJoinRoomClick] = useState(false)
     const [inputRoomId, setInputRoomId] = useState("")
+    const [usersInRoom, setUsersInRoom] = useState([])
 
     // room ID 생성
     const generateRoomId = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghqijklmnopqrstuvwxyz0123456789'
         let id = ''
         for (let i = 0; i < 8; i++) {
             id += chars.charAt(Math.floor(Math.random() * chars.length))
         }
         return id
     }
-
-
 
     // room 생성
     const createRoomId = async () => {
@@ -363,6 +362,7 @@ function SidePage6() {
             const newRoomID = generateRoomId()
             setRoomID(newRoomID)
             setUserRole({ isHost: true, isParticipant: false })
+            setUsersInRoom([userEmail])
             socketRef.current.emit(`create_room`, {
                 roomId: newRoomID,
                 userEmail: userEmail
@@ -413,6 +413,7 @@ function SidePage6() {
             setRoomID(null)
             setInputRoomId("")
             setUserRole({ isHost: false, isParticipant: false })
+            setUsersInRoom([])
             alert(`방을 나옵니다.`)
         } catch (error) {
             console.error(`quit_room 실행 중 오류 발생 : `, error)
@@ -423,6 +424,9 @@ function SidePage6() {
     useEffect(() => {
         socketRef.current.on(`room_user_list`, (users) => {
             console.log(`유저가 입장/퇴장 하였습니다. 현재 방의 유저: `, users)
+
+            const userEmailList = users.map(user => user.email)
+            setUsersInRoom(userEmailList)
         })
 
         socketRef.current.on("join_room_success", ({ roomId, userEmail }) => {
@@ -433,7 +437,6 @@ function SidePage6() {
             alert(`해당 방(${roomId})이 존재하지 않습니다.`)
         })
     }, [])
-
     // multi play ////////////////////////////////////////////////////////////////////////////
 
 
@@ -690,7 +693,8 @@ function SidePage6() {
                                     onClick={() => {
                                         setRoomID(null)
                                         setUserRole({ isHost: false, isParticipant: false })
-                                        console.log("방에서 나감")
+                                        setUsersInRoom([])
+                                        console.log("방 삭제")
                                     }}
                                 >
                                     방 삭제
@@ -734,6 +738,7 @@ function SidePage6() {
                                     onClick={() => {
                                         if (userRole.isParticipant) {
                                             quitRoom()
+                                            setUsersInRoom([])
                                         } else {
                                             joinRoom()
                                         }
@@ -741,6 +746,32 @@ function SidePage6() {
                                 >
                                     {userRole.isParticipant ? `나가기` : `참가`}
                                 </button>
+                            </div>
+                        )}
+                        {isLogin && usersInRoom.length > 0 && (
+                            <div
+                                style={{
+                                    width: "100%",
+                                    marginTop: "10px",
+                                    display: "grid",
+                                    gridTemplateColumns: "1fr 1fr",
+                                    gap: "10px",
+                                }}
+                            >
+                                {usersInRoom.map((email, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            backgroundColor: "#f1f1f1",
+                                            padding: "10px",
+                                            borderRadius: "4px",
+                                            textAlign: "center",
+                                            border: "1px solid #ccc",
+                                        }}
+                                    >
+                                        {email}
+                                    </div>
+                                ))}
                             </div>
                         )}
                         <button
