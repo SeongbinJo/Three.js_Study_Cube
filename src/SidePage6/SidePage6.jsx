@@ -324,9 +324,13 @@ function SidePage6() {
         }
     }, [])
 
-    
+
 
     const [roomID, setRoomID] = useState("")
+    const [userRole, setUserRole] = useState({
+        isHost: false,
+        isParticipant: false
+    })
     const [joinRoomClick, setJoinRoomClick] = useState(false)
     const [inputRoomId, setInputRoomId] = useState("")
 
@@ -340,11 +344,10 @@ function SidePage6() {
         return id
     }
 
- 
+
 
     // room 생성
     const createRoomId = async () => {
-
         try {
             const userEmail = await fetchUserEmail(userUID)
             if (!userEmail) {
@@ -359,6 +362,7 @@ function SidePage6() {
 
             const newRoomID = generateRoomId()
             setRoomID(newRoomID)
+            setUserRole({ isHost: true, isParticipant: false })
             socketRef.current.emit(`create_room`, {
                 roomId: newRoomID,
                 userEmail: userEmail
@@ -368,10 +372,6 @@ function SidePage6() {
         }
 
     }
-
-       useEffect(() => {
-        console.log(`roomID 변경됨 : `, roomID)
-    }, [roomID])
 
     // 들어가기 클릭
     const joinRoomClickHandler = () => {
@@ -397,15 +397,43 @@ function SidePage6() {
         }
     }
 
+    const quitRoom = async () => {
+        try {
+            const userEmail = await fetchUserEmail(userUID)
+            if (!userEmail) {
+                console.warn(`userEmail이 없음. 소켓 emit 생략함.`)
+                return
+            }
+
+            socketRef.current.emit(`quit_room`, {
+                roomId: inputRoomId,
+                userEmail: userEmail
+            })
+
+            setRoomID(null)
+            setInputRoomId("")
+            setUserRole({ isHost: false, isParticipant: false })
+            alert(`방을 나옵니다.`)
+        } catch (error) {
+            console.error(`quit_room 실행 중 오류 발생 : `, error)
+        }
+
+    }
+
     useEffect(() => {
         socketRef.current.on(`room_user_list`, (users) => {
             console.log(`유저가 입장/퇴장 하였습니다. 현재 방의 유저: `, users)
         })
+
+        socketRef.current.on("join_room_success", ({ roomId, userEmail }) => {
+            setUserRole({ isHost: false, isParticipant: true })
+        })
+
+        socketRef.current.on("room_not_found", (roomId) => {
+            alert(`해당 방(${roomId})이 존재하지 않습니다.`)
+        })
     }, [])
 
-    useEffect(() => {
-
-    }, [])
     // multi play ////////////////////////////////////////////////////////////////////////////
 
 
@@ -661,10 +689,11 @@ function SidePage6() {
                                     }}
                                     onClick={() => {
                                         setRoomID(null)
+                                        setUserRole({ isHost: false, isParticipant: false })
                                         console.log("방에서 나감")
                                     }}
                                 >
-                                    나가기
+                                    방 삭제
                                 </button>
                             </div>
                         )}
@@ -683,6 +712,7 @@ function SidePage6() {
                                     placeholder="방 ID 입력"
                                     value={inputRoomId}
                                     onChange={(e) => setInputRoomId(e.target.value)}
+                                    disabled={userRole.isParticipant}
                                     style={{
                                         height: "40px",
                                         lineHeight: "40px",
@@ -696,16 +726,20 @@ function SidePage6() {
                                     style={{
                                         height: "40px",
                                         width: "30%",
-                                        backgroundColor: "#007bff",
+                                        backgroundColor: userRole.isParticipant ? `#dc3545` : `#007bff`,
                                         color: "white",
                                         border: "none",
                                         cursor: "pointer",
                                     }}
                                     onClick={() => {
-                                        joinRoom()
+                                        if (userRole.isParticipant) {
+                                            quitRoom()
+                                        } else {
+                                            joinRoom()
+                                        }
                                     }}
                                 >
-                                    참가
+                                    {userRole.isParticipant ? `나가기` : `참가`}
                                 </button>
                             </div>
                         )}
