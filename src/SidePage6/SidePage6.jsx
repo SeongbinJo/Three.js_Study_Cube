@@ -324,7 +324,9 @@ function SidePage6() {
         }
     }, [])
 
-    const [roomID, setRoomID] = useState(localStorage.getItem("roomID") || null)
+    
+
+    const [roomID, setRoomID] = useState("")
     const [joinRoomClick, setJoinRoomClick] = useState(false)
     const [inputRoomId, setInputRoomId] = useState("")
 
@@ -338,30 +340,38 @@ function SidePage6() {
         return id
     }
 
-    // room ID 보관
-    const createRoomId = () => {
-        const existRoomId = localStorage.getItem(`roomID`)
+ 
 
-        if (existRoomId) {
-            console.log(`이미 roomID가 존재합니다.`)
-            return
+    // room 생성
+    const createRoomId = async () => {
+
+        try {
+            const userEmail = await fetchUserEmail(userUID)
+            if (!userEmail) {
+                console.warn(`userEmail이 없음. 소켓 emit 생략함.`)
+                return
+            }
+
+            if (roomID) {
+                console.log(`이미 roomID가 존재합니다.`)
+                return
+            }
+
+            const newRoomID = generateRoomId()
+            setRoomID(newRoomID)
+            socketRef.current.emit(`create_room`, {
+                roomId: newRoomID,
+                userEmail: userEmail
+            })
+        } catch (error) {
+            console.error(`createRoomId(create_room) 실행 중 오류 발생 : `, error)
         }
-        const roomID = generateRoomId()
-        localStorage.setItem(`roomID`, roomID)
-        setRoomID(roomID)
-        socketRef.current.emit(`create_room`, roomID)
+
     }
 
-    // room ID 삭제(방 삭제)
-    const removeRoomId = () => {
-        const existRoomId = localStorage.getItem(`roomID`)
-
-        if (existRoomId) {
-            console.log(`roomID를 삭제, 방 삭제`)
-            localStorage.removeItem(`roomID`)
-            return
-        }
-    }
+       useEffect(() => {
+        console.log(`roomID 변경됨 : `, roomID)
+    }, [roomID])
 
     // 들어가기 클릭
     const joinRoomClickHandler = () => {
@@ -381,12 +391,21 @@ function SidePage6() {
                 roomId: inputRoomId,
                 userEmail: userEmail
             })
-            console.log(inputRoomId)
+
         } catch (error) {
             console.error(`joinRoom(join_room) 실행 중 오류 발생 : `, error)
         }
-        
     }
+
+    useEffect(() => {
+        socketRef.current.on(`room_user_list`, (users) => {
+            console.log(`유저가 입장/퇴장 하였습니다. 현재 방의 유저: `, users)
+        })
+    }, [])
+
+    useEffect(() => {
+
+    }, [])
     // multi play ////////////////////////////////////////////////////////////////////////////
 
 
@@ -641,7 +660,6 @@ function SidePage6() {
                                         cursor: "pointer",
                                     }}
                                     onClick={() => {
-                                        removeRoomId()
                                         setRoomID(null)
                                         console.log("방에서 나감")
                                     }}
@@ -706,6 +724,7 @@ function SidePage6() {
                                     setShowMenu(prev => !prev)
                                     setBasicModelLocalStorage()
                                     firstLogin(`remove`)
+                                    socketRef.current.disconnect()
                                     logOut()
                                 } else {
                                     setShowMenu(prev => !prev)

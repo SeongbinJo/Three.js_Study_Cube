@@ -106,6 +106,13 @@ function PlayControl() {
         camera.position.add(moveX)
         camera.position.add(moveZ)
         camera.position.add(moveY)
+
+        // 카메라 위치, 방향 로그 /////////////////////////////////////////////////////////////////
+        // console.log(`카메라 위치 : `, camera.position.toArray())
+
+        // console.log("카메라 회전 (XYZ):", camera.rotation.x, camera.rotation.y, camera.rotation.z)
+        // 카메라 위치, 방향 로그 /////////////////////////////////////////////////////////////////
+
     })
 
     return null
