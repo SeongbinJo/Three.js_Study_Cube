@@ -485,6 +485,7 @@ function SidePage6() {
                         backgroundColor={backgroundColor}
                         isLogin={isLogin}
                         isAnonymity={isAnonymity}
+                        socketRef={socketRef}
                     />
                 )}
                 <div className="dot"></div>

@@ -2,7 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { useRef, useEffect } from "react"
 
-function PlayControl() {
+function PlayControl({ socketRef }) {
     const { camera } = useThree()
     const velocity = useRef(new THREE.Vector3())
     const direction = new THREE.Vector3()
