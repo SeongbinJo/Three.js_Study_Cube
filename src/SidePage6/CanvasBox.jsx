@@ -323,6 +323,8 @@ function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, 
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
 
+    const firstCameraPos = [0, 20, 40]
+
 
     useEffect(() => {
         if (createBoxBtn) {
@@ -345,11 +347,11 @@ function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, 
 
     return (
         <Canvas
-            camera={{ position: [0, 20, 40], fov: 30 }}
+            camera={{ position: firstCameraPos, fov: 30 }}
             style={{ background: backgroundColor }}
         >
             {((isLogin || isAnonymity) && !(showInventory || showMenu)) && <PointerLockControls />}
-            {(isLogin || isAnonymity) && <PlayControl socketRef={socketRef} />}
+            {(isLogin || isAnonymity) && <PlayControl socketRef={socketRef} firstCameraPos={firstCameraPos} />}
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />

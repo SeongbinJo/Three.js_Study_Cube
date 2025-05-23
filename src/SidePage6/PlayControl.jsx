@@ -2,7 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { useRef, useEffect } from "react"
 
-function PlayControl({ socketRef }) {
+function PlayControl({ socketRef, firstCameraPos }) {
     const { camera } = useThree()
     const velocity = useRef(new THREE.Vector3())
     const direction = new THREE.Vector3()
@@ -69,7 +69,7 @@ function PlayControl({ socketRef }) {
                 break
         }
     }
-    
+
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown)
         window.addEventListener("keyup", handleKeyUp)
@@ -78,6 +78,8 @@ function PlayControl({ socketRef }) {
             window.removeEventListener("keyup", handleKeyUp)
         }
     }, [])
+
+    const lastCameraPos = useRef(camera.position.toArray())
 
     useFrame(() => {
         direction.set(0, 0, 0)
@@ -108,7 +110,13 @@ function PlayControl({ socketRef }) {
         camera.position.add(moveY)
 
         // 카메라 위치, 방향 로그 /////////////////////////////////////////////////////////////////
-        // console.log(`카메라 위치 : `, camera.position.toArray())
+        const currentCameraPos = camera.position.toArray()
+        const changed = currentCameraPos.some((v, i) => Math.abs(v - lastCameraPos.current[i]) >= 1)
+
+        if (changed) {
+            console.log(`카메라 위치 : `, camera.position.toArray())
+            lastCameraPos.current = currentCameraPos
+        }
 
         // console.log("카메라 회전 (XYZ):", camera.rotation.x, camera.rotation.y, camera.rotation.z)
         // 카메라 위치, 방향 로그 /////////////////////////////////////////////////////////////////
