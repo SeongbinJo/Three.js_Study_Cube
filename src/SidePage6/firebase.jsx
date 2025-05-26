@@ -77,7 +77,7 @@ export async function getAllDocuments(uid, index) {
       const user = userCredential.user
       console.log(`로그인 성공: `, user.uid)
 
-      return { success: true, uid: user.uid}
+      return { success: true, uid: user.uid, email: user.email}
     } catch (error) {
       console.error(`로그인 실패: `, error.message)
 

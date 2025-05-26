@@ -16,6 +16,7 @@ function SidePage6() {
 
     const auth = getAuth()
     const [userUID, setUserUID] = useState(`null`)
+    const [userEmail, setUserEmail] = useState(`null`)
 
     const [isAnonymity, setIsAnonymity] = useState(() => {
         const getIsAnonymity = localStorage.getItem(`isAnonymity`)
@@ -29,24 +30,30 @@ function SidePage6() {
 
     const [isLogin, setIsLogin] = useState(false)
     const [isClickedSignUp, setIsClickedSignUp] = useState(false)
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const [inputEmail, setInputEmail] = useState("")
+    const [inputPassword, setInputPassword] = useState("")
 
     const saveIsAnonymityStatus = (isAnonymity) => {
         localStorage.setItem(`isAnonymity`, JSON.stringify(isAnonymity))
     }
 
-    onAuthStateChanged(auth, (user) => {
-        // 로그인 상태가 바뀔 때 마다 콜백
-        if (user) {
-            setUserUID(`${user.uid}`)
-            setIsLogin(true)
-            console.log(`현재 로그인 된 유저: `, userUID)
-        } else {
-            setIsLogin(false)
-            console.log(`로그인 안되어 있음`)
-        }
-    })
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserUID(user.uid)
+                setUserEmail(user.email)
+                setIsLogin(true)
+                console.log(`현재 로그인 된 유저: `, user.email)
+            } else {
+                setIsLogin(false)
+                setUserUID(null)
+                setUserEmail(null)
+                console.log(`로그인 안되어 있음`)
+            }
+        })
+
+        return () => unsubscribe() // cleanup
+    }, [])
 
 
     const [isBoxesLoaded, setIsBoxesLoaded] = useState(false)
@@ -317,12 +324,19 @@ function SidePage6() {
     const socketRef = useRef(null)
 
     useEffect(() => {
-        socketRef.current = io(`http://localhost:3001`)
-
-        return () => {
-            socketRef.current.disconnect()
-        }
+        socketRef.current = io("http://localhost:3001")
+        console.log("✅ 소켓 최초 연결")
     }, [])
+
+    useEffect(() => {
+        if (isLogin) {
+            // 로그인 직후 소켓 재연결
+            if (!socketRef.current?.connected) {
+                socketRef.current = io(`http://localhost:3001`)
+                console.log("소켓 연결됨")
+            }
+        }
+    }, [isLogin])
 
 
 
@@ -348,7 +362,7 @@ function SidePage6() {
     // room 생성
     const createRoomId = async () => {
         try {
-            const userEmail = await fetchUserEmail(userUID)
+            console.log(`craetRoomId 호출됨, 현재 소켓상태태: ${socketRef.current.connected}`)
             if (!userEmail) {
                 console.warn(`userEmail이 없음. 소켓 emit 생략함.`)
                 return
@@ -365,7 +379,7 @@ function SidePage6() {
             setUsersInRoom([userEmail])
             socketRef.current.emit(`create_room`, {
                 roomId: newRoomID,
-                userEmail: userEmail
+                userEmail: getAuth().currentUser.email
             })
         } catch (error) {
             console.error(`createRoomId(create_room) 실행 중 오류 발생 : `, error)
@@ -436,6 +450,7 @@ function SidePage6() {
 
             setRoomID(null)
             setUserRole({ isHost: false, isParticipant: false })
+            setUsersInRoom([])
         } catch (error) {
             console.error(`remove_room 실행 중 오류 발생 : `, error)
         }
@@ -444,8 +459,10 @@ function SidePage6() {
     useEffect(() => {
         socketRef.current.on(`room_user_list`, (users) => {
             const userEmailList = users.map(user => user.email)
+            console.log(`유저 참가: ${userEmailList}`)
             if (userEmailList.length > 0) {
                 setUsersInRoom(userEmailList)
+                console.log(`유저 참가: ${userEmailList}`)
             } else {
                 setUsersInRoom([])
                 setUserRole({ isHost: false, isParticipant: false })
@@ -855,21 +872,21 @@ function SidePage6() {
                         <input
                             type="email"
                             placeholder="이메일"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={inputEmail}
+                            onChange={(e) => setInputEmail(e.target.value)}
                             style={{ marginBottom: '10px', padding: '8px' }}
                         /><br />
                         <input
                             type="password"
                             placeholder="비밀번호"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={inputPassword}
+                            onChange={(e) => setInputPassword(e.target.value)}
                             style={{ marginBottom: '10px', padding: '8px' }}
                         /><br />
                         {isClickedSignUp ? (
                             <>
                                 <button onClick={() => {
-                                    signUp(email, password, boxes)
+                                    signUp(inputEmail, inputPassword, boxes)
                                     setIsClickedSignUp(false)
                                 }}>
                                     회원가입 하기
@@ -879,7 +896,7 @@ function SidePage6() {
                         ) : (
                             <>
                                 <button onClick={() => {
-                                    signIn(email, password)
+                                    signIn(inputEmail, inputPassword)
                                     firstLogin(`true`)
                                     setIsClickedSignUp(false)
                                 }}>
