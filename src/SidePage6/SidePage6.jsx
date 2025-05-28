@@ -347,7 +347,7 @@ function SidePage6() {
     })
     const [joinRoomClick, setJoinRoomClick] = useState(false)
     const [inputRoomId, setInputRoomId] = useState("")
-    const [usersInRoom, setUsersInRoom] = useState([])
+    const [usersInRoom, setUsersInRoom] = useState({}) // 방 만들었을때의 유저 리스트 보여주기, 실시간 위치에 이용용
 
     // room ID 생성
     const generateRoomId = () => {
@@ -376,7 +376,6 @@ function SidePage6() {
             const newRoomID = generateRoomId()
             setRoomID(newRoomID)
             setUserRole({ isHost: true, isParticipant: false })
-            setUsersInRoom([userEmail])
             socketRef.current.emit(`create_room`, {
                 roomId: newRoomID,
                 userEmail: getAuth().currentUser.email
@@ -429,7 +428,7 @@ function SidePage6() {
             setRoomID(null)
             setInputRoomId("")
             setUserRole({ isHost: false, isParticipant: false })
-            setUsersInRoom([])
+            setUsersInRoom({})
             alert(`방을 나옵니다.`)
         } catch (error) {
             console.error(`quit_room 실행 중 오류 발생 : `, error)
@@ -451,31 +450,93 @@ function SidePage6() {
             })
 
             setRoomID(null)
-            setUserRole({ isHost: false, isParticipant: false })
-            setUsersInRoom([])
+            setUsersInRoom({})
         } catch (error) {
             console.error(`remove_room 실행 중 오류 발생 : `, error)
         }
     }
 
     useEffect(() => {
-        socketRef.current.on(`room_user_list`, (users) => {
+        // 방 생성시 유저 리스트
+        socketRef.current.on(`room_user_list_createRoom`, (users) => {
             const userEmailList = users.map(user => user.email)
-            console.log(`유저 참가: ${userEmailList}`)
-            if (userEmailList.length > 0) {
-                setUsersInRoom(userEmailList)
-                console.log(`유저 참가: ${userEmailList}`)
-            } else {
-                setUsersInRoom([])
-                setUserRole({ isHost: false, isParticipant: false })
-                setInputRoomId("")
+
+            if (userEmailList) {
+                const emailObject = {}
+                userEmailList.forEach(email => {
+                    emailObject[email] = null
+                })
+
+                setUsersInRoom(emailObject)
             }
         })
 
+        // 유저가 방에 들어왔을때
+        socketRef.current.on(`room_user_list_joinRoom`, (users) => {
+            const userEmailList = users.map(user => user.email)
+
+            if (userEmailList) {
+                setUsersInRoom(prev => {
+                    const prevUsers = { ...prev }
+
+                    userEmailList.forEach(email => {
+                        if (!prevUsers[email]) { // 새로운 유저일 경우 이메일과 기본 카메라 위치 값을 넣어줌
+                            prevUsers[email] = [0, 20, 40]
+                        }
+                    })
+
+                    return prevUsers
+                })
+                console.log(`유저 참가: ${userEmailList}`)
+            }
+            //  else {
+            //     setUsersInRoom({})
+            //     setUserRole({ isHost: false, isParticipant: false })
+            //     setInputRoomId("")
+            // }
+        })
+
+        // 다른 유저가 방에서서 나갔을때
+        socketRef.current.on(`other_user_quitRoom`, (userEmail) => {
+            if (userEmail) {
+                setUsersInRoom(prev => {
+                    const newUsersInRoom = { ...prev }
+                    delete newUsersInRoom[userEmail]
+                    return newUsersInRoom
+                })
+            }
+        })
+
+        // 입장해있던 방의 방장이 방을 삭제했을때
+        socketRef.current.on(`room_user_list_removeRoom`, () => {
+            setRoomID(null)
+            setInputRoomId("")
+            setUsersInRoom({})
+            alert(userRole.isParticipant ? `방장이 방을 삭제했습니다.` : `방을 삭제합니다.`)
+            setUserRole({ isHost: false, isParticipant: false })
+        })
+
+        // 방에 들어가있는 유저가 연결이 끊겼을때
+        socketRef.current.on(`room_user_list_disconnect`, (users) => {
+            const updated = { ...prev }
+            console.log(`ahsdfa`)
+
+            Object.keys(updated).forEach((key) => {
+                if (!users.includes(key)) {
+                    delete updated[key]
+                }
+            })
+
+            return updated
+        })
+
+        // 방에 입장 성공했을때때
         socketRef.current.on("join_room_success", ({ roomId, userEmail }) => {
+            console.log(`입장 성공`)
             setUserRole({ isHost: false, isParticipant: true })
         })
 
+        // 방을 찾지 못했을때때
         socketRef.current.on("room_not_found", (roomId) => {
             alert(`해당 방(${roomId})이 존재하지 않습니다.`)
         })
@@ -779,7 +840,7 @@ function SidePage6() {
                                     onClick={() => {
                                         if (userRole.isParticipant) {
                                             quitRoom()
-                                            setUsersInRoom([])
+                                            setUsersInRoom({})
                                         } else {
                                             joinRoom()
                                         }
@@ -789,7 +850,7 @@ function SidePage6() {
                                 </button>
                             </div>
                         )}
-                        {isLogin && usersInRoom.length > 0 && (
+                        {isLogin && Object.keys(usersInRoom).length > 0 && (
                             <div
                                 style={{
                                     width: "100%",
@@ -799,9 +860,9 @@ function SidePage6() {
                                     gap: "10px",
                                 }}
                             >
-                                {usersInRoom.map((email, index) => (
+                                {Object.entries(usersInRoom).map(([email, cameraPos]) => (
                                     <div
-                                        key={index}
+                                        key={email}
                                         style={{
                                             backgroundColor: "#f1f1f1",
                                             padding: "10px",

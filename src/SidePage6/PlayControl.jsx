@@ -130,7 +130,7 @@ function PlayControl({ socketRef, roomID, userEmail }) {
 
     useEffect(() => {
         socketRef.current.on(`user_moved_position`, ({ roomId, userEmail, cameraPos}) => {
-            console.log(`방(${roomId}), 다른 유저(${userEmail})의 움직임이 감지됨.`)
+            console.log(`유저(${userEmail})가 움직임. 현 위치: ${cameraPos}`)
         })
     }, [])
 
