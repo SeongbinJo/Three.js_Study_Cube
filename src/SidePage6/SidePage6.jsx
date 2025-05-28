@@ -701,7 +701,7 @@ function SidePage6() {
                                 </button>
                             </div>
                         )}
-                        {isLogin && roomID && (
+                        {isLogin && roomID && userRole.isHost && (
                             <div
                                 style={{
                                     display: "flex",
@@ -742,7 +742,7 @@ function SidePage6() {
                                 </button>
                             </div>
                         )}
-                        {isLogin && joinRoomClick && !roomID && (
+                        {isLogin && joinRoomClick && !userRole.isHost && (
                             <div
                                 style={{
                                     display: "flex",
