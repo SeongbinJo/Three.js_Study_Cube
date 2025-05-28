@@ -2,7 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { useRef, useEffect } from "react"
 
-function PlayControl({ socketRef }) {
+function PlayControl({ socketRef, roomID, userEmail }) {
     const { camera } = useThree()
     const velocity = useRef(new THREE.Vector3())
     const direction = new THREE.Vector3()
@@ -113,15 +113,26 @@ function PlayControl({ socketRef }) {
         const currentCameraPos = camera.position.toArray()
         const changed = currentCameraPos.some((v, i) => Math.abs(v - lastCameraPos.current[i]) >= 1)
 
-        if (changed) {
-            console.log(`카메라 위치 : `, camera.position.toArray())
+        if (changed && roomID && userEmail) {
             lastCameraPos.current = currentCameraPos
+
+            socketRef.current.emit(`send_camera_position`, {
+                roomId: roomID,
+                userEmail: userEmail,
+                cameraPos: camera.position.toArray()
+            })
         }
 
         // console.log("카메라 회전 (XYZ):", camera.rotation.x, camera.rotation.y, camera.rotation.z)
         // 카메라 위치, 방향 로그 /////////////////////////////////////////////////////////////////
 
     })
+
+    useEffect(() => {
+        socketRef.current.on(`user_moved_position`, ({ roomId, userEmail, cameraPos}) => {
+            console.log(`방(${roomId}), 다른 유저(${userEmail})의 움직임이 감지됨.`)
+        })
+    }, [])
 
     return null
 }

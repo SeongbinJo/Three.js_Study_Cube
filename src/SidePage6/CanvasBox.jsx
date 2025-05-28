@@ -319,7 +319,12 @@ function HeldBox({ box }) {
 }
 
 
-function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, setCreateBoxBtn, boxColor, showInventory, showMenu, isGrid, backgroundColor, isLogin, isAnonymity, socketRef }) {
+function CanvasBox({ 
+    bottomCount, viewDirection, boxes, 
+    setBoxes, createBoxBtn, setCreateBoxBtn, 
+    boxColor, showInventory, showMenu, 
+    isGrid, backgroundColor, isLogin, 
+    isAnonymity, socketRef, roomID, userEmail }) {
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
 
@@ -351,7 +356,7 @@ function CanvasBox({ bottomCount, viewDirection, boxes, setBoxes, createBoxBtn, 
             style={{ background: backgroundColor }}
         >
             {((isLogin || isAnonymity) && !(showInventory || showMenu)) && <PointerLockControls />}
-            {(isLogin || isAnonymity) && <PlayControl socketRef={socketRef} />}
+            {(isLogin || isAnonymity) && <PlayControl socketRef={socketRef} roomID={roomID} userEmail={userEmail} />}
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />

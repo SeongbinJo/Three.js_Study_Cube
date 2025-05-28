@@ -15,8 +15,8 @@ function SidePage6() {
     const [viewDirection, setViewDirection] = useState("front")
 
     const auth = getAuth()
-    const [userUID, setUserUID] = useState(`null`)
-    const [userEmail, setUserEmail] = useState(`null`)
+    const [userUID, setUserUID] = useState()
+    const [userEmail, setUserEmail] = useState()
 
     const [isAnonymity, setIsAnonymity] = useState(() => {
         const getIsAnonymity = localStorage.getItem(`isAnonymity`)
@@ -52,7 +52,7 @@ function SidePage6() {
             }
         })
 
-        return () => unsubscribe() // cleanup
+        return () => unsubscribe()
     }, [])
 
 
@@ -362,7 +362,7 @@ function SidePage6() {
     // room 생성
     const createRoomId = async () => {
         try {
-            console.log(`craetRoomId 호출됨, 현재 소켓상태태: ${socketRef.current.connected}`)
+            console.log(`craetRoomId 호출됨, 현재 소켓상태: ${socketRef.current.connected}`)
             if (!userEmail) {
                 console.warn(`userEmail이 없음. 소켓 emit 생략함.`)
                 return
@@ -405,6 +405,8 @@ function SidePage6() {
                 roomId: inputRoomId,
                 userEmail: userEmail
             })
+
+            setRoomID(inputRoomId)
 
         } catch (error) {
             console.error(`joinRoom(join_room) 실행 중 오류 발생 : `, error)
@@ -503,6 +505,8 @@ function SidePage6() {
                         isLogin={isLogin}
                         isAnonymity={isAnonymity}
                         socketRef={socketRef}
+                        roomID={roomID}
+                        userEmail={userEmail}
                     />
                 )}
                 <div className="dot"></div>
