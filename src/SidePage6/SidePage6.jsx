@@ -341,10 +341,16 @@ function SidePage6() {
 
 
     const [roomID, setRoomID] = useState("")
+
     const [userRole, setUserRole] = useState({
         isHost: false,
         isParticipant: false
     })
+    const userRoleRef = useRef(userRole)
+    useEffect(() => {
+        userRoleRef.current = userRole
+    }, [userRole])
+
     const [joinRoomClick, setJoinRoomClick] = useState(false)
     const [inputRoomId, setInputRoomId] = useState("")
     const [usersInRoom, setUsersInRoom] = useState({}) // 방 만들었을때의 유저 리스트 보여주기, 실시간 위치에 이용용
@@ -489,11 +495,6 @@ function SidePage6() {
                 })
                 console.log(`유저 참가: ${userEmailList}`)
             }
-            //  else {
-            //     setUsersInRoom({})
-            //     setUserRole({ isHost: false, isParticipant: false })
-            //     setInputRoomId("")
-            // }
         })
 
         // 다른 유저가 방에서서 나갔을때
@@ -508,11 +509,13 @@ function SidePage6() {
         })
 
         // 입장해있던 방의 방장이 방을 삭제했을때
-        socketRef.current.on(`room_user_list_removeRoom`, () => {
+        socketRef.current.on("room_user_list_removeRoom", () => {
+            const role = userRoleRef.current
+            alert(role.isParticipant ? `방장이 방을 삭제했습니다.` : `방을 삭제합니다.`)
+
             setRoomID(null)
             setInputRoomId("")
             setUsersInRoom({})
-            alert(userRole.isParticipant ? `방장이 방을 삭제했습니다.` : `방을 삭제합니다.`)
             setUserRole({ isHost: false, isParticipant: false })
         })
 
