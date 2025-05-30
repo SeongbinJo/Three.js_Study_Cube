@@ -568,6 +568,8 @@ function SidePage6() {
                         socketRef={socketRef}
                         roomID={roomID}
                         userEmail={userEmail}
+                        usersInRoom={usersInRoom}
+                        setUsersInRoom={setUsersInRoom}
                     />
                 )}
                 <div className="dot"></div>

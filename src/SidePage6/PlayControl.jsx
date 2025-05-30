@@ -2,7 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { useRef, useEffect } from "react"
 
-function PlayControl({ socketRef, roomID, userEmail }) {
+function PlayControl({ socketRef, roomID, userEmail, setUsersInRoom }) {
     const { camera } = useThree()
     const velocity = useRef(new THREE.Vector3())
     const direction = new THREE.Vector3()
@@ -131,6 +131,12 @@ function PlayControl({ socketRef, roomID, userEmail }) {
     useEffect(() => {
         socketRef.current.on(`user_moved_position`, ({ roomId, userEmail, cameraPos}) => {
             console.log(`유저(${userEmail})가 움직임. 현 위치: ${cameraPos}`)
+
+            // setUsersInRoom 의 객체 중 움직인 유저의 메일에 맞게 position을 바꿔줘야함
+            setUsersInRoom(prev => ({
+                ...prev,
+                [userEmail]: cameraPos
+            }))
         })
     }, [])
 

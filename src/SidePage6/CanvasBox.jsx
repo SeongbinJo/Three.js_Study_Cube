@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react"
 import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
 import CameraViewDirection from "./CameraViewDirection"
-import { PointerLockControls, useCubeCamera } from "@react-three/drei"
+import { PointerLockControls, Text } from "@react-three/drei"
 import PlayControl from "./PlayControl"
 
 
@@ -324,11 +324,14 @@ function CanvasBox({
     setBoxes, createBoxBtn, setCreateBoxBtn, 
     boxColor, showInventory, showMenu, 
     isGrid, backgroundColor, isLogin, 
-    isAnonymity, socketRef, roomID, userEmail }) {
+    isAnonymity, socketRef, roomID, 
+    userEmail, usersInRoom, setUsersInRoom }) {
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
 
     const firstCameraPos = [0, 20, 40]
+
+    const [userMarkers, setUserMarkers] = useState([])
 
 
     useEffect(() => {
@@ -350,13 +353,24 @@ function CanvasBox({
         }
     }, [showInventory, showMenu])
 
+    useEffect(() => {
+        const updatedMarkers = Object.entries(usersInRoom).filter(([email]) => email !== userEmail).map(([email, pos]) => ({
+            id: email,
+            position: pos,
+            color: `orange`,
+            email: email,
+        }))
+
+        setUserMarkers(updatedMarkers)
+    }, [usersInRoom])
+
     return (
         <Canvas
             camera={{ position: firstCameraPos, fov: 30 }}
             style={{ background: backgroundColor }}
         >
             {((isLogin || isAnonymity) && !(showInventory || showMenu)) && <PointerLockControls />}
-            {(isLogin || isAnonymity) && <PlayControl socketRef={socketRef} roomID={roomID} userEmail={userEmail} />}
+            {(isLogin || isAnonymity) && <PlayControl socketRef={socketRef} roomID={roomID} userEmail={userEmail} setUsersInRoom={setUsersInRoom} />}
             <CameraViewDirection view={viewDirection} />
             <directionalLight position={[10, 15, -30]} />
             <directionalLight position={[10, 30, -30]} />
@@ -372,6 +386,23 @@ function CanvasBox({
                 />
             ))}
             {heldBox && <HeldBox box={heldBox} />}
+            {userMarkers.map((marker) => (
+                <group key={marker.id} position={marker.position}>
+                    <mesh>
+                        <sphereGeometry args={[0.5, 10, 10]} />
+                        <meshStandardMaterial color={marker.color} />
+                    </mesh>
+                    <Text
+                        position={[0, 0.8, 0]}
+                        fontSize={0.3}
+                        color={`black`}
+                        anchorX={`center`}
+                        anchorY={`bottom`}
+                        >
+                            {marker.email}
+                        </Text>
+                </group>
+            ))}
             <ClickHandler
                 clickedInfo={clickedInfo}
                 setClickedInfo={setClickedInfo}
