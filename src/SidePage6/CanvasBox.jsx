@@ -5,6 +5,7 @@ import SidePage6Model from "./SidePage6Model"
 import CameraViewDirection from "./CameraViewDirection"
 import { PointerLockControls, Text } from "@react-three/drei"
 import PlayControl from "./PlayControl"
+import SmoothUserMarker from "./SmoothUserMarker"
 
 
 
@@ -319,12 +320,12 @@ function HeldBox({ box }) {
 }
 
 
-function CanvasBox({ 
-    bottomCount, viewDirection, boxes, 
-    setBoxes, createBoxBtn, setCreateBoxBtn, 
-    boxColor, showInventory, showMenu, 
-    isGrid, backgroundColor, isLogin, 
-    isAnonymity, socketRef, roomID, 
+function CanvasBox({
+    bottomCount, viewDirection, boxes,
+    setBoxes, createBoxBtn, setCreateBoxBtn,
+    boxColor, showInventory, showMenu,
+    isGrid, backgroundColor, isLogin,
+    isAnonymity, socketRef, roomID,
     userEmail, usersInRoom, setUsersInRoom }) {
     const [clickedInfo, setClickedInfo] = useState(null)
     const [heldBox, setHeldBox] = useState(null)
@@ -354,19 +355,20 @@ function CanvasBox({
     }, [showInventory, showMenu])
 
     useEffect(() => {
-        const updatedMarkers = Object.entries(usersInRoom).filter(([email]) => email !== userEmail).map(([email, pos]) => ({
-            id: email,
-            position: pos,
-            color: `orange`,
-            email: email,
-        }))
-
+        const updatedMarkers = Object.entries(usersInRoom)
+            .filter(([email]) => email !== userEmail)
+            .map(([email, pos]) => ({
+                id: email,
+                targetPosition: pos,
+                color: "orange",
+                email,
+            }))
         setUserMarkers(updatedMarkers)
     }, [usersInRoom])
 
     return (
         <Canvas
-            camera={{ position: firstCameraPos, fov: 30 }}
+            camera={{ position: firstCameraPos, fov: 40 }}
             style={{ background: backgroundColor }}
         >
             {((isLogin || isAnonymity) && !(showInventory || showMenu)) && <PointerLockControls />}
@@ -386,22 +388,14 @@ function CanvasBox({
                 />
             ))}
             {heldBox && <HeldBox box={heldBox} />}
-            {userMarkers.map((marker) => (
-                <group key={marker.id} position={marker.position}>
-                    <mesh>
-                        <sphereGeometry args={[0.5, 10, 10]} />
-                        <meshStandardMaterial color={marker.color} />
-                    </mesh>
-                    <Text
-                        position={[0, 0.8, 0]}
-                        fontSize={0.3}
-                        color={`black`}
-                        anchorX={`center`}
-                        anchorY={`bottom`}
-                        >
-                            {marker.email}
-                        </Text>
-                </group>
+            {userMarkers.map(marker => (
+                <SmoothUserMarker
+                    key={marker.id}
+                    id={marker.id}
+                    email={marker.email}
+                    targetPosition={marker.targetPosition}
+                    color={marker.color}
+                />
             ))}
             <ClickHandler
                 clickedInfo={clickedInfo}
