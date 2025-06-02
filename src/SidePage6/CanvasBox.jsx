@@ -10,7 +10,7 @@ import SmoothUserMarker from "./SmoothUserMarker"
 
 
 
-function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory, showMenu }) {
+function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory, showMenu, roomID }) {
     const { scene, camera } = useThree()
 
     const [history, setHistory] = useState([])
@@ -76,6 +76,8 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
     }
 
     useEffect(() => {
+        if (roomID) return
+
         // 키 이벤트 안에서 index 변경 전에 바로 실행
         const handleKeyDown = (e) => {
             if (e.key === "<" || e.key === ",") {
@@ -97,7 +99,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [history, historyIndex])
+    }, [history, historyIndex, roomID])
 
 
 
@@ -405,6 +407,7 @@ function CanvasBox({
                 heldBox={heldBox}
                 showInventory={showInventory}
                 showMenu={showMenu}
+                roomID={roomID}
             />
         </Canvas>
     )

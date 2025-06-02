@@ -353,7 +353,7 @@ function SidePage6() {
 
     const [joinRoomClick, setJoinRoomClick] = useState(false)
     const [inputRoomId, setInputRoomId] = useState("")
-    const [usersInRoom, setUsersInRoom] = useState({}) // 방 만들었을때의 유저 리스트 보여주기, 실시간 위치에 이용용
+    const [usersInRoom, setUsersInRoom] = useState({}) // 방 만들었을때의 유저 리스트 보여주기, 실시간 위치에 이용
 
     // room ID 생성
     const generateRoomId = () => {
@@ -384,7 +384,8 @@ function SidePage6() {
             setUserRole({ isHost: true, isParticipant: false })
             socketRef.current.emit(`create_room`, {
                 roomId: newRoomID,
-                userEmail: getAuth().currentUser.email
+                userEmail: getAuth().currentUser.email,
+                boxes: boxes
             })
         } catch (error) {
             console.error(`createRoomId(create_room) 실행 중 오류 발생 : `, error)
@@ -436,6 +437,7 @@ function SidePage6() {
             setUserRole({ isHost: false, isParticipant: false })
             setUsersInRoom({})
             alert(`방을 나옵니다.`)
+            setBoxes(savedSlots[currentSlot])
         } catch (error) {
             console.error(`quit_room 실행 중 오류 발생 : `, error)
         }
@@ -478,7 +480,7 @@ function SidePage6() {
         })
 
         // 유저가 방에 들어왔을때
-        socketRef.current.on(`room_user_list_joinRoom`, (users) => {
+        socketRef.current.on(`room_user_list_joinRoom`, ({ users, boxes }) => {
             const userEmailList = users.map(user => user.email)
 
             if (userEmailList) {
@@ -533,13 +535,14 @@ function SidePage6() {
             return updated
         })
 
-        // 방에 입장 성공했을때때
-        socketRef.current.on("join_room_success", ({ roomId, userEmail }) => {
+        // 방에 입장 성공했을때
+        socketRef.current.on("join_room_success", ({ roomId, userEmail, boxes }) => {
             console.log(`입장 성공`)
+            setBoxes(boxes)
             setUserRole({ isHost: false, isParticipant: true })
         })
 
-        // 방을 찾지 못했을때때
+        // 방을 찾지 못했을때
         socketRef.current.on("room_not_found", (roomId) => {
             alert(`해당 방(${roomId})이 존재하지 않습니다.`)
         })
