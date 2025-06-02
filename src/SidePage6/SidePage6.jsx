@@ -10,6 +10,7 @@ import { getAllDocuments, signUp, signIn, logOut, setBlockStatus, fetchUserEmail
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter"
 import { io } from "socket.io-client"
+import { v4 as uuidv4 } from "uuid"
 
 function SidePage6() {
     const [viewDirection, setViewDirection] = useState("front")
@@ -58,7 +59,13 @@ function SidePage6() {
 
     const [isBoxesLoaded, setIsBoxesLoaded] = useState(false)
     const bottomCount = 20
-    const [boxes, setBoxes] = useState()
+    const [boxes, setBoxes] = useState([])
+    const boxesRef = useRef(boxes)
+
+    useEffect(() => {
+        boxesRef.current = boxes
+    }, [boxes])
+
     // 기본 바닥
     const basicBoxModel = Array.from({ length: bottomCount }, (_, i) =>
         Array.from({ length: bottomCount }, (_, j) => {
@@ -66,7 +73,7 @@ function SidePage6() {
             const x = i - centerOffset
             const z = j - centerOffset
             return {
-                id: `${i}-${j}`,
+                id: uuidv4(),
                 position: [x, 0, z],
                 color: "white"
             }
@@ -230,10 +237,7 @@ function SidePage6() {
             // firestore에도 저장
             setBlockStatus(boxes, slotIndex, uid)
 
-            setAllBoxData(prev => ({
-                ...prev,
-                [`boxes${currentSlot}`]: boxes, // 현재 상태의 boxes를 해당 슬롯에 덮어쓰기
-            }))
+            localStorage.setItem(`boxes${slotIndex}`, JSON.stringify(boxes))
         }
 
         if (isAnonymity) {
@@ -519,6 +523,7 @@ function SidePage6() {
             setInputRoomId("")
             setUsersInRoom({})
             setUserRole({ isHost: false, isParticipant: false })
+            setBoxes(savedSlots[currentSlot])
         })
 
         // 방에 들어가있는 유저가 연결이 끊겼을때
@@ -536,15 +541,23 @@ function SidePage6() {
         })
 
         // 방에 입장 성공했을때
-        socketRef.current.on("join_room_success", ({ roomId, userEmail, boxes }) => {
+        socketRef.current.on(`join_room_success`, ({ roomId, userEmail, boxes }) => {
             console.log(`입장 성공`)
             setBoxes(boxes)
+            console.log(`boxes!!!!!!: `, boxes)
             setUserRole({ isHost: false, isParticipant: true })
         })
 
         // 방을 찾지 못했을때
-        socketRef.current.on("room_not_found", (roomId) => {
+        socketRef.current.on(`room_not_found`, (roomId) => {
             alert(`해당 방(${roomId})이 존재하지 않습니다.`)
+        })
+
+        // 유저가 블럭을 생성했을 때
+        socketRef.current.on(`users_created_block`, ({ createdBoxInfo }) => {
+            console.log(`boxes상태: `, boxesRef.current)
+            console.log(`새로 생성된 박스 상태: `, createdBoxInfo)
+            setBoxes(prev => [...prev, createdBoxInfo])
         })
     }, [])
     // multi play ////////////////////////////////////////////////////////////////////////////

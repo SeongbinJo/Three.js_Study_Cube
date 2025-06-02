@@ -1,6 +1,7 @@
 import * as THREE from "three"
 
 function SidePage6Model({ id, position, color, isGrid }) {
+
     return (
       <mesh position={position} userData={{ id, position }}>
         <boxGeometry args={[1, 1, 1]} />

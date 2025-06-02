@@ -6,11 +6,12 @@ import CameraViewDirection from "./CameraViewDirection"
 import { PointerLockControls, Text } from "@react-three/drei"
 import PlayControl from "./PlayControl"
 import SmoothUserMarker from "./SmoothUserMarker"
+import { v4 as uuidv4 } from "uuid"
 
 
 
 
-function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory, showMenu, roomID }) {
+function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory, showMenu, roomID, socketRef }) {
     const { scene, camera } = useThree()
 
     const [history, setHistory] = useState([])
@@ -160,7 +161,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
                 } else { // 창작 모드로 생성
                     const newBox = {
-                        id: `placed-${Date.now()}`,
+                        id: uuidv4(),
                         position: [targetPos.x, targetPos.y, targetPos.z],
                         color: heldBox.color,
                     }
@@ -175,7 +176,12 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                         newBox
                     ])
 
-                    console.log('창작 모드, 생성 함')
+                    socketRef.current.emit(`created_block`, {
+                        roomId: roomID,
+                        createdBoxInfo: newBox
+                    })
+
+                    console.log('창작 모드:: 생성함. boxes: ', roomID)
                 }
 
                 console.log(`블럭을 ${[x, y, z]} 방향으로 놓았음. 옮긴 위치:`, targetPos.toArray())
@@ -362,6 +368,10 @@ function CanvasBox({
         setUserMarkers(updatedMarkers)
     }, [usersInRoom])
 
+    useEffect(() => {
+        console.log("🔍 boxes.length: ", boxes.length)
+    }, [boxes])
+
     return (
         <Canvas
             camera={{ position: firstCameraPos, fov: 40 }}
@@ -374,9 +384,9 @@ function CanvasBox({
             <directionalLight position={[10, 30, -30]} />
             <directionalLight position={[20, -20, 30]} />
             <directionalLight position={[-10, 0, 0]} />
-            {boxes.map((box) => (
+            {boxes.map((box, idx) => (
                 <SidePage6Model
-                    key={box.id}
+                    key={`${box.id}-${idx}`}
                     id={box.id}
                     position={box.position}
                     color={box.color}
@@ -402,6 +412,7 @@ function CanvasBox({
                 showInventory={showInventory}
                 showMenu={showMenu}
                 roomID={roomID}
+                socketRef={socketRef}
             />
         </Canvas>
     )
