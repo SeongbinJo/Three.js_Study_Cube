@@ -45,9 +45,6 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                     // delete를 undo -> 해당 박스 추가
                     newBoxes = newBoxes.filter(box => box.id !== target.box.id)
                     return [...newBoxes, target.box]
-                case "move":
-                    newBoxes = newBoxes.filter(box => box.id !== target.nextBox.id)
-                    return [...newBoxes, target.prevBox]
                 default:
                     return newBoxes
             }
@@ -66,9 +63,6 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 case "delete":
                     // delete를 redo -> 해당 박스 다시 삭제
                     return newBoxes.filter(box => box.id !== target.box.id)
-                case "move":
-                    newBoxes = newBoxes.filter(box => box.id !== target.prevBox.id)
-                    return [...newBoxes, target.nextBox]
                 default:
                     return newBoxes
             }
@@ -148,29 +142,20 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
                     console.log(`targetPos : `, targetPos.toArray())
 
-                    const movedBox = {
+                    const createdBox = {
                         id: heldBox.id,
                         position: [targetPos.x, targetPos.y, targetPos.z],
                         color: heldBox.color,
                     }
 
                     pushHistory({
-                        type: "move",
-                        prevBox: {
-                            id: heldBox.id,
-                            position: heldBox.prevPos,
-                            color: heldBox.color
-                        },
-                        nextBox: {
-                            id: heldBox.id,
-                            position: targetPos.toArray(),
-                            color: heldBox.color
-                        }
+                        type: "create",
+                        box: createdBox
                     })
 
                     setBoxes(prev => [
                         ...prev,
-                        movedBox
+                        createdBox
                     ])
 
                 } else { // 창작 모드로 생성
@@ -199,12 +184,21 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 return
             }
 
-            // 손에 쥔 블럭이 없는데 좌클릭할 경우우
+            // 손에 쥔 블럭이 없는데 좌클릭할 경우
             if (!heldBox) {
                 setClickedInfo({ id, position })
 
                 // 블럭 제거
                 setBoxes((prev) => prev.filter((box) => box.id !== id))
+
+                pushHistory({
+                    type: `delete`,
+                    box: {
+                        id: id,
+                        position: position,
+                        color: clickedObject.material.color.getStyle()
+                    }
+                })
 
                 setHeldBox({
                     id,
