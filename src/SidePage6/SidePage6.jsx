@@ -555,9 +555,15 @@ function SidePage6() {
 
         // 유저가 블럭을 생성했을 때
         socketRef.current.on(`users_created_block`, ({ createdBoxInfo }) => {
-            console.log(`boxes상태: `, boxesRef.current)
+            console.log(`boxes상태: `, boxesRef.current.length)
             console.log(`새로 생성된 박스 상태: `, createdBoxInfo)
             setBoxes(prev => [...prev, createdBoxInfo])
+        })
+
+        // 유저가 블럭을 삭제했을 때
+        socketRef.current.on(`users_deleted_block`, ({ deletedBoxInfo }) => {
+            console.log(`boxes상태: `, boxesRef.current.length)
+            setBoxes((prev) => prev.filter((box) => box.id !== deletedBoxInfo.id))
         })
     }, [])
     // multi play ////////////////////////////////////////////////////////////////////////////
