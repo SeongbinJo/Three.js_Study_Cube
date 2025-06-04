@@ -526,16 +526,17 @@ function SidePage6() {
 
         // 방에 들어가있는 유저가 연결이 끊겼을때
         socketRef.current.on(`room_user_list_disconnect`, (users) => {
-            const updated = { ...prev }
-            console.log(`ahsdfa`)
+            console.log(`같은 방의 유저의 접속이 끊김!`)
 
-            Object.keys(updated).forEach((key) => {
-                if (!users.includes(key)) {
-                    delete updated[key]
-                }
+            setUsersInRoom(prev => {
+                const updated = { ...prev }
+                Object.keys(updated).forEach((key) => {
+                    if (!users.some(user => user.email === key)) {
+                        delete updated[key]
+                    }
+                })
+                return updated
             })
-
-            return updated
         })
 
         // 방에 입장 성공했을때
