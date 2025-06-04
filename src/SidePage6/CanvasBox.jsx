@@ -159,10 +159,12 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                         createdBox
                     ])
 
-                    socketRef.current.emit(`created_block`, {
-                        roomId: roomID,
-                        createdBoxInfo: createdBox
-                    })
+                    if (roomID) {
+                        socketRef.current.emit(`created_block`, {
+                            roomId: roomID,
+                            createdBoxInfo: createdBox
+                        })
+                    }
 
                 } else { // 창작 모드로 생성
                     const newBox = {
@@ -181,10 +183,12 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                         newBox
                     ])
 
-                    socketRef.current.emit(`created_block`, {
-                        roomId: roomID,
-                        createdBoxInfo: newBox
-                    })
+                    if (roomID) {
+                        socketRef.current.emit(`created_block`, {
+                            roomId: roomID,
+                            createdBoxInfo: newBox
+                        })
+                    }
 
                     console.log('창작 모드:: 생성함. boxes: ', roomID)
                 }
@@ -199,16 +203,18 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
             if (!heldBox) {
                 setClickedInfo({ id, position })
 
+                const deletedBox = {
+                    id: id,
+                    position: position,
+                    color: clickedObject.material.color.getStyle()
+                }
+
                 // 블럭 제거
                 setBoxes((prev) => prev.filter((box) => box.id !== id))
 
                 pushHistory({
                     type: `delete`,
-                    box: {
-                        id: id,
-                        position: position,
-                        color: clickedObject.material.color.getStyle()
-                    }
+                    box: deletedBox
                 })
 
                 setHeldBox({
@@ -217,14 +223,12 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                     prevPos: [...position],
                 })
 
-                socketRef.current.emit(`deleted_block`, {
-                    roomId: roomID,
-                    deletedBoxInfo: {
-                        id: id,
-                        position: position,
-                        color: clickedObject.material.color.getStyle()
-                    }
-                })
+                if (roomID) {
+                    socketRef.current.emit(`deleted_block`, {
+                        roomId: roomID,
+                        deletedBoxInfo: deletedBox
+                    })
+                }
             }
 
         }
@@ -281,11 +285,12 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                             box: deletedBox
                         })
 
-                        socketRef.current.emit(`deleted_block`, {
-                            roomId: roomID,
-                            deletedBoxInfo: deletedBox
-                        })
-
+                        if (roomID) {
+                            socketRef.current.emit(`deleted_block`, {
+                                roomId: roomID,
+                                deletedBoxInfo: deletedBox
+                            })
+                        }
                         console.log(`손에 아무것도 없을 때 fixed 블럭 ${id} 우클릭 → 삭제함`)
                     }
                 }
