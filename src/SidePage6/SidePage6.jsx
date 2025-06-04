@@ -416,8 +416,6 @@ function SidePage6() {
                 userEmail: userEmail
             })
 
-            setRoomID(inputRoomId)
-
         } catch (error) {
             console.error(`joinRoom(join_room) 실행 중 오류 발생 : `, error)
         }
@@ -543,6 +541,7 @@ function SidePage6() {
         // 방에 입장 성공했을때
         socketRef.current.on(`join_room_success`, ({ roomId, userEmail, boxes }) => {
             console.log(`입장 성공`)
+            setRoomID(roomId)
             setBoxes(boxes)
             console.log(`boxes!!!!!!: `, boxes)
             setUserRole({ isHost: false, isParticipant: true })

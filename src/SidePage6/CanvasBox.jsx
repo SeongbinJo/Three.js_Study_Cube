@@ -251,7 +251,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                     const id = userData.id
 
                     // 블럭을 들고 있을 경우
-                    if (heldBox) {
+                    if (heldBox && !roomID) {
                         if (heldBox.persistent) {
                             console.log("persistent 블럭 내려놓기")
                             setHeldBox(null)
