@@ -614,8 +614,14 @@ function SidePage6() {
                     4. Q - 로컬 저장 및 저장 슬롯 변경, 로그인/로그아웃
 
                     <div style={{ marginTop: '10px' }}>
-                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("front")}>앞</button>
-                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("back")}>뒤</button>
+                        <button style={{ marginRight: '10px' }} onClick={() =>
+                            // setViewDirection("front")
+                            setShowInventory(true)
+                            }>앞</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => 
+                            // setViewDirection("back")
+                            setShowInventory(false)
+                            }>뒤</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("left")}>왼쪽</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("right")}>오른쪽</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("top")}>위</button>
