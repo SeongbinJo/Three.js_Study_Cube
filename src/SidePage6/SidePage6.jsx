@@ -624,13 +624,14 @@ function SidePage6() {
                 </div>
                 {showInventory && <InventoryPanel
                     color={color}
+                    setColor={setColor}
                     isGrid={isGrid}
                     setIsGrid={setIsGrid}
                     setBackgroundColor={setBackgroundColor}
                     handleColorChange={handleColorChange}
                     swatches={swatches}
                     selectedSwatchIndex={selectedSwatchIndex}
-                    setSelectedSwatchIndex={selectedSwatchIndex}
+                    setSelectedSwatchIndex={setSelectedSwatchIndex}
                     setCreateBoxBtn={setCreateBoxBtn}
                     setShowInventory={setShowInventory}
                 />}

@@ -4,6 +4,7 @@ import { SketchPicker } from "react-color"
 
 function InventoryPanel({
   color,
+  setColor,
   isGrid,
   setIsGrid,
   setBackgroundColor,
@@ -76,6 +77,7 @@ function InventoryPanel({
                     setSelectedSwatchIndex(null)
                   } else {
                     setSelectedSwatchIndex(index)
+                    setColor(swatchColor)
                   }
                 }}
                 style={{
