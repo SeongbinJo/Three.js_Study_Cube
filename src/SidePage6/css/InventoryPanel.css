@@ -1,0 +1,101 @@
+.inventory-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background-color: green;
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 90vw;
+  width: 60vw;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.inventory-items {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  flex-direction: row;
+}
+
+.inventory-canvas {
+  flex: 1;
+  background-color: lightgray;
+  border-radius: 5px;
+  /* height: 30vw; */
+  min-height: 200px;
+  max-height: 300px;
+}
+
+.inventory-color {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.swatch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 50px;
+}
+
+.swatch-color {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid pink;
+  cursor: pointer;
+}
+
+.swatch-color.selected {
+  border: 3px solid pink;
+}
+
+.inventory-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+/* 모바일 (세로) */
+@media (max-width: 768px) {
+  .inventory-items {
+    flex-direction: column;
+  }
+
+  .inventory-canvas {
+    height: 50vw;
+  }
+
+  .inventory-color {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+/* 태블릿 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .inventory-panel {
+    width: 80vw;
+  }
+
+  .inventory-canvas {
+    height: 40vw;
+  }
+}
