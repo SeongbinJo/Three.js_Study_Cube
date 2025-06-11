@@ -620,7 +620,7 @@ function SidePage6() {
                             }>앞</button>
                         <button style={{ marginRight: '10px' }} onClick={() => 
                             // setViewDirection("back")
-                            setShowInventory(false)
+                            setShowMenu(true)
                             }>뒤</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("left")}>왼쪽</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("right")}>오른쪽</button>
