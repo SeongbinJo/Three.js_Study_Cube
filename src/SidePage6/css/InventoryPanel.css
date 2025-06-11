@@ -9,14 +9,12 @@
     border-radius: 5px;
     max-width: 800px;
     max-height: 500px;
-    /* overflow: hidden; */
     width: 90vw;
     height: auto;
     display: flex;
     flex-direction: row;
     gap: 10px;
     align-items: center;
-    /* box-sizing: border-box; */
 }
 
 .inventory-items {
@@ -30,7 +28,6 @@
 }
 
 .inventory-canvas {
-    /* flex: 1; */
     background-color: lightgray;
     border-radius: 5px;
     max-width: 300px;
@@ -40,18 +37,6 @@
     max-height: 300px;
 }
 
-/* .inventory-color {
-    display: flex;
-    max-width: 300px;
-    height: 30vw;
-    min-height: 10px;
-    max-height: 300px;
-    gap: 10px;
-    flex-direction: row;
-    align-items: center;
-    background-color: red;
-} */
-
 .picker-wrapper {
     display: flex;
     height: 35vw;
@@ -60,7 +45,6 @@
     max-height: 300px;
     max-width: 300px;
     align-items: center;
-    background-color: blue;
 }
 
 .swatch-list {
