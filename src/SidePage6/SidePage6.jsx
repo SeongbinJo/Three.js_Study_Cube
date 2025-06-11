@@ -13,6 +13,7 @@ import { io } from "socket.io-client"
 import { v4 as uuidv4 } from "uuid"
 import InventoryPanel from "./Panel/InventoryPanel"
 import MenuPanel from "./Panel/MenuPanel"
+import AuthPanel from "./Panel/AuthPanel"
 
 function SidePage6() {
     const [viewDirection, setViewDirection] = useState("front")
@@ -671,63 +672,20 @@ function SidePage6() {
                     boxes={boxes}
                     joinRoomClickHandler={joinRoomClickHandler}
                 />}
-                {!(isLogin || isAnonymity) && <div>
-                    <div style={{
-                        position: "absolute",
-                        top: "50%",
-                        right: "50%",
-                        transform: "translate(-50%, -50%)",
-                        zIndex: 10,
-                        padding: "10px",
-                        borderRadius: "5px",
-                        maxWidth: "40%",
-                        backgroundColor: "#eee"
-                    }}>
-                        <h1>{isClickedSignUp ? "회원가입" : "로그인"}</h1>
-                        <input
-                            type="email"
-                            placeholder="이메일"
-                            value={inputEmail}
-                            onChange={(e) => setInputEmail(e.target.value)}
-                            style={{ marginBottom: '10px', padding: '8px' }}
-                        /><br />
-                        <input
-                            type="password"
-                            placeholder="비밀번호"
-                            value={inputPassword}
-                            onChange={(e) => setInputPassword(e.target.value)}
-                            style={{ marginBottom: '10px', padding: '8px' }}
-                        /><br />
-                        {isClickedSignUp ? (
-                            <>
-                                <button onClick={() => {
-                                    signUp(inputEmail, inputPassword, boxes)
-                                    setIsClickedSignUp(false)
-                                }}>
-                                    회원가입 하기
-                                </button><br />
-                                <button onClick={() => setIsClickedSignUp(false)}>뒤로가기</button>
-                            </>
-                        ) : (
-                            <>
-                                <button onClick={() => {
-                                    signIn(inputEmail, inputPassword)
-                                    firstLogin(`true`)
-                                    setIsClickedSignUp(false)
-                                }}>
-                                    로그인
-                                </button><br />
-                                <button onClick={() => setIsClickedSignUp(true)}>회원가입</button>
-                            </>
-                        )}
-                        <br /><br />
-                        <button onClick={() => {
-                            setIsAnonymity(true)
-                            saveIsAnonymityStatus(true)
-                            firstLogin(`remove`)
-                        }}>로그인 없이 플레이하기</button>
-                    </div>
-                </div>}
+                {!(isLogin || isAnonymity) && <AuthPanel
+                     isClickedSignUp={isClickedSignUp}
+                     setIsClickedSignUp={setIsClickedSignUp}
+                     inputEmail={inputEmail}
+                     setInputEmail={setInputEmail}
+                     inputPassword={inputPassword}
+                     setInputPassword={setInputPassword}
+                     signUp={signUp}
+                     signIn={signIn}
+                     firstLogin={firstLogin}
+                     setIsAnonymity={setIsAnonymity}
+                     saveIsAnonymityStatus={saveIsAnonymityStatus}
+                     boxes={boxes}
+                />}
             </div>
         </>
     )
