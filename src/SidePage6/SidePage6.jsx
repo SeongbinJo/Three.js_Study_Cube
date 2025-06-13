@@ -627,11 +627,11 @@ function SidePage6() {
                             }>뒤</button>
                         <button style={{ marginRight: '10px' }} onClick={() =>
                             //  setViewDirection("left")
-                            fullScreenHandle.enter
+                            fullScreenHandle.enter()
                              }>왼쪽</button>
                         <button style={{ marginRight: '10px' }} onClick={() => 
                             // setViewDirection("right")
-                            fullScreenHandle.exit
+                            fullScreenHandle.exit()
                             }>오른쪽</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("top")}>위</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("bottom")}>아래</button>
