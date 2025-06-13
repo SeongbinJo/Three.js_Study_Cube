@@ -2,10 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import '../App.css'
 import CanvasBox from './CanvasBox'
 import './Crosshair.css'
-import { SketchPicker } from "react-color"
-import { Canvas } from "@react-three/fiber"
 import * as THREE from "three"
-import { OrbitControls } from "@react-three/drei"
 import { getAllDocuments, signUp, signIn, logOut, setBlockStatus, fetchUserEmail } from "./firebase"
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter"
@@ -14,19 +11,11 @@ import { v4 as uuidv4 } from "uuid"
 import InventoryPanel from "./Panel/InventoryPanel"
 import MenuPanel from "./Panel/MenuPanel"
 import AuthPanel from "./Panel/AuthPanel"
+import { FullScreen, useFullScreenHandle } from "react-full-screen"
 
 function SidePage6() {
 
-    const enterFullscreen = () => {
-    const elem = document.documentElement // 또는 특정 요소
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen()
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen()
-    } else if (elem.msRequestFullscreen) {
-      elem.msRequestFullscreen()
-    }
-  }
+    const fullScreenHandle = useFullScreenHandle()
 
     const [viewDirection, setViewDirection] = useState("front")
 
@@ -585,8 +574,9 @@ function SidePage6() {
 
     return (
         <>
+                        <FullScreen handle={fullScreenHandle}>
             <div className='sidePage5-box'>
-                {!isBoxesLoaded ? (
+                    {!isBoxesLoaded ? (
                     <div style={{ color: 'white', padding: '20px', zIndex: 10 }}>
                         🔄 박스를 불러오는 중 🔄
                     </div>
@@ -637,9 +627,12 @@ function SidePage6() {
                             }>뒤</button>
                         <button style={{ marginRight: '10px' }} onClick={() =>
                             //  setViewDirection("left")
-                            enterFullscreen
+                            fullScreenHandle.enter
                              }>왼쪽</button>
-                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("right")}>오른쪽</button>
+                        <button style={{ marginRight: '10px' }} onClick={() => 
+                            // setViewDirection("right")
+                            fullScreenHandle.exit
+                            }>오른쪽</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("top")}>위</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("bottom")}>아래</button>
                     </div>
@@ -702,6 +695,7 @@ function SidePage6() {
                      boxes={boxes}
                 />}
             </div>
+            </FullScreen>
         </>
     )
 }
