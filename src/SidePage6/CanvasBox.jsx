@@ -4,7 +4,8 @@ import * as THREE from "three"
 import SidePage6Model from "./SidePage6Model"
 import CameraViewDirection from "./CameraViewDirection"
 import { PointerLockControls, Text } from "@react-three/drei"
-import PlayControl from "./PlayControl"
+import PlayControlR3F from "./PlayControlR3F"
+import PlayControlUI from "./PlayControlUI"
 import SmoothUserMarker from "./SmoothUserMarker"
 import { v4 as uuidv4 } from "uuid"
 
@@ -361,6 +362,16 @@ function CanvasBox({
 
     const [userMarkers, setUserMarkers] = useState([])
 
+    const keys = useRef({
+        forward: false,
+        backward: false,
+        left: false,
+        right: false,
+        up: false,
+        down: false
+    })
+    const currentSpeed = useRef(0.3)
+    const mobileDirection = useRef({ x: 0, y: 0 })
 
     useEffect(() => {
         if (createBoxBtn) {
@@ -398,48 +409,65 @@ function CanvasBox({
     }, [boxes])
 
     return (
-        <Canvas
-            camera={{ position: firstCameraPos, fov: 40 }}
-            style={{ background: backgroundColor }}
-        >
-            {((isLogin || isAnonymity) && !(showInventory || showMenu)) && <PointerLockControls />}
-            {(isLogin || isAnonymity) && <PlayControl socketRef={socketRef} roomID={roomID} userEmail={userEmail} setUsersInRoom={setUsersInRoom} />}
-            <CameraViewDirection view={viewDirection} />
-            <directionalLight position={[10, 15, -30]} />
-            <directionalLight position={[10, 30, -30]} />
-            <directionalLight position={[20, -20, 30]} />
-            <directionalLight position={[-10, 0, 0]} />
-            {boxes.map((box, idx) => (
-                <SidePage6Model
-                    key={`${box.id}-${idx}`}
-                    id={box.id}
-                    position={box.position}
-                    color={box.color}
-                    isGrid={isGrid}
+        <>
+            <Canvas
+                camera={{ position: firstCameraPos, fov: 40 }}
+                style={{ background: backgroundColor }}
+            >
+                {((isLogin || isAnonymity) && !(showInventory || showMenu)) && <PointerLockControls />}
+                {(isLogin || isAnonymity) &&
+                    <PlayControlR3F
+                        socketRef={socketRef}
+                        roomID={roomID}
+                        userEmail={userEmail}
+                        setUsersInRoom={setUsersInRoom}
+                        keys={keys}
+                        currentSpeed={currentSpeed}
+                        mobileDirection={mobileDirection}
+                    />
+                }
+                <CameraViewDirection view={viewDirection} />
+                <directionalLight position={[10, 15, -30]} />
+                <directionalLight position={[10, 30, -30]} />
+                <directionalLight position={[20, -20, 30]} />
+                <directionalLight position={[-10, 0, 0]} />
+                {boxes.map((box, idx) => (
+                    <SidePage6Model
+                        key={`${box.id}-${idx}`}
+                        id={box.id}
+                        position={box.position}
+                        color={box.color}
+                        isGrid={isGrid}
+                    />
+                ))}
+                {heldBox && <HeldBox box={heldBox} />}
+                {userMarkers.map(marker => (
+                    <SmoothUserMarker
+                        key={marker.id}
+                        id={marker.id}
+                        email={marker.email}
+                        targetPosition={marker.targetPosition}
+                        color={marker.color}
+                    />
+                ))}
+                <ClickHandler
+                    clickedInfo={clickedInfo}
+                    setClickedInfo={setClickedInfo}
+                    setBoxes={setBoxes}
+                    setHeldBox={setHeldBox}
+                    heldBox={heldBox}
+                    showInventory={showInventory}
+                    showMenu={showMenu}
+                    roomID={roomID}
+                    socketRef={socketRef}
                 />
-            ))}
-            {heldBox && <HeldBox box={heldBox} />}
-            {userMarkers.map(marker => (
-                <SmoothUserMarker
-                    key={marker.id}
-                    id={marker.id}
-                    email={marker.email}
-                    targetPosition={marker.targetPosition}
-                    color={marker.color}
-                />
-            ))}
-            <ClickHandler
-                clickedInfo={clickedInfo}
-                setClickedInfo={setClickedInfo}
-                setBoxes={setBoxes}
-                setHeldBox={setHeldBox}
-                heldBox={heldBox}
-                showInventory={showInventory}
-                showMenu={showMenu}
-                roomID={roomID}
-                socketRef={socketRef}
+            </Canvas>
+            <PlayControlUI
+                keys={keys}
+                mobileDirection={mobileDirection}
+                currentSpeed={currentSpeed}
             />
-        </Canvas>
+        </>
     )
 }
 
