@@ -619,12 +619,12 @@ function SidePage6() {
                     top: 30,
                     zIndex: 10
                 }}>
-                    [SidePage6_Minecraft2] - ing<br />
+                    {/* [SidePage6_Minecraft2] - ing<br />
                     [조작법]<br />
                     1. 움직임 - W, A, S, D<br />
                     2. C(하강), Spacebar(상승)<br />
                     3. E - 블럭 및 배경 색상 설정<br />
-                    4. Q - 로컬 저장 및 저장 슬롯 변경, 로그인/로그아웃
+                    4. Q - 로컬 저장 및 저장 슬롯 변경, 로그인/로그아웃 */}
 
                     <div style={{ marginTop: '10px' }}>
                         <button style={{ marginRight: '10px' }} onClick={() =>
