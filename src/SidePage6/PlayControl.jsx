@@ -1,10 +1,10 @@
 import { useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
+import { Joystick } from "react-joystick-component"
 
 function PlayControl({ socketRef, roomID, userEmail, setUsersInRoom }) {
     const { camera } = useThree()
-    const velocity = useRef(new THREE.Vector3())
     const direction = new THREE.Vector3()
 
     const keys = useRef({
@@ -19,6 +19,8 @@ function PlayControl({ socketRef, roomID, userEmail, setUsersInRoom }) {
     const moveSpeed = 0.3
     const sprintSpeed = 0.6
     const currentSpeed = useRef(moveSpeed)
+
+    const [mobileDirection, setMobileDirection] = useState({ x: 0, y: 0 })
 
     const handleKeyDown = (e) => {
         if (e.code === "ShiftLeft") currentSpeed.current = sprintSpeed
@@ -84,10 +86,17 @@ function PlayControl({ socketRef, roomID, userEmail, setUsersInRoom }) {
     useFrame(() => {
         direction.set(0, 0, 0)
 
-        if (keys.current.forward) direction.z += 1
-        if (keys.current.backward) direction.z -= 1
-        if (keys.current.left) direction.x += 1
-        if (keys.current.right) direction.x -= 1
+        // if (keys.current.forward) direction.z += 1
+        // if (keys.current.backward) direction.z -= 1
+        // if (keys.current.left) direction.x += 1
+        // if (keys.current.right) direction.x -= 1
+        // if (keys.current.up) direction.y += 1
+        // if (keys.current.down) direction.y -= 1
+
+        if (keys.current.forward || mobileDirection.y > 0.1) direction.z += 1
+        if (keys.current.backward || mobileDirection.y < -0.1) direction.z -= 1
+        if (keys.current.left || mobileDirection.x < -0.1) direction.x += 1
+        if (keys.current.right || mobileDirection.x > 0.1) direction.x -= 1
         if (keys.current.up) direction.y += 1
         if (keys.current.down) direction.y -= 1
 
@@ -129,7 +138,7 @@ function PlayControl({ socketRef, roomID, userEmail, setUsersInRoom }) {
     })
 
     useEffect(() => {
-        socketRef.current.on(`user_moved_position`, ({ roomId, userEmail, cameraPos}) => {
+        socketRef.current.on(`user_moved_position`, ({ roomId, userEmail, cameraPos }) => {
             console.log(`유저(${userEmail})가 움직임. 현 위치: ${cameraPos}`)
 
             // setUsersInRoom 의 객체 중 움직인 유저의 메일에 맞게 position을 바꿔줘야함
@@ -140,7 +149,35 @@ function PlayControl({ socketRef, roomID, userEmail, setUsersInRoom }) {
         })
     }, [])
 
-    return null
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
+    return (
+        isMobile && (
+            <>
+                <div style={{ position: "fixed", bottom: 20, left: 20, zIndex: 1000 }}>
+                    <Joystick
+                        size={80}
+                        baseColor="gray"
+                        stickColor="white"
+                        move={e => setMobileDirection({ x: e.x, y: e.y })}
+                        stop={() => setMobileDirection({ x: 0, y: 0 })}
+                    />
+                </div>
+                <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <button
+                        onTouchStart={() => keys.current.up = true}
+                        onTouchEnd={() => keys.current.up = false}
+                        style={{ padding: 10, backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 5 }}
+                    >점프</button>
+                    <button
+                        onTouchStart={() => keys.current.down = true}
+                        onTouchEnd={() => keys.current.down = false}
+                        style={{ padding: 10, backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: 5 }}
+                    >앉기</button>
+                </div>
+            </>
+        )
+    )
 }
 
 export default PlayControl
