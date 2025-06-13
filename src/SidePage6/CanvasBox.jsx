@@ -416,9 +416,12 @@ function CanvasBox({
             <Canvas
                 camera={{ position: firstCameraPos, fov: 40 }}
                 style={{ background: backgroundColor }}
-            >
-                {((isLogin || isAnonymity) && !(showInventory || showMenu)) && !isMobile && <PointerLockControls />}
-                {((isLogin || isAnonymity && isMobile && <MobileTouchControl />))}
+            >  
+            {(isLogin || isAnonymity) && !(showInventory || showMenu) && (
+                isMobile ? <MobileTouchControl /> : <PointerLockControls />
+            )}
+                {/* {((isLogin || isAnonymity) && !(showInventory || showMenu)) && !isMobile && <PointerLockControls />} */}
+                {/* {((isLogin || isAnonymity && isMobile && <MobileTouchControl />))} */}
                 {(isLogin || isAnonymity) &&
                     <PlayControlR3F
                         socketRef={socketRef}

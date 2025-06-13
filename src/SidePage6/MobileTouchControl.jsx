@@ -2,11 +2,13 @@ import { useEffect, useRef } from "react"
 import { useThree } from "@react-three/fiber"
 
 function MobileTouchControl() {
-  const { camera } = useThree()
+  const { camera, gl } = useThree()
   const isTouching = useRef(false)
   const lastTouch = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
+    const canvas = gl.domElement
+
     const handleTouchStart = (e) => {
       if (e.touches.length === 1) {
         isTouching.current = true
@@ -14,6 +16,7 @@ function MobileTouchControl() {
           x: e.touches[0].clientX,
           y: e.touches[0].clientY
         }
+        e.preventDefault()
       }
     }
 
@@ -32,22 +35,24 @@ function MobileTouchControl() {
       camera.rotation.y -= dx * sensitivity
       camera.rotation.x -= dy * sensitivity
       camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
+
+      e.preventDefault()
     }
 
     const handleTouchEnd = () => {
       isTouching.current = false
     }
 
-    window.addEventListener("touchstart", handleTouchStart, { passive: false })
-    window.addEventListener("touchmove", handleTouchMove, { passive: false })
-    window.addEventListener("touchend", handleTouchEnd)
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false })
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false })
+    canvas.addEventListener("touchend", handleTouchEnd)
 
     return () => {
-      window.removeEventListener("touchstart", handleTouchStart)
-      window.removeEventListener("touchmove", handleTouchMove)
-      window.removeEventListener("touchend", handleTouchEnd)
+      canvas.removeEventListener("touchstart", handleTouchStart)
+      canvas.removeEventListener("touchmove", handleTouchMove)
+      canvas.removeEventListener("touchend", handleTouchEnd)
     }
-  }, [camera])
+  }, [camera, gl])
 
   return null
 }

@@ -16,6 +16,18 @@ import MenuPanel from "./Panel/MenuPanel"
 import AuthPanel from "./Panel/AuthPanel"
 
 function SidePage6() {
+
+    const enterFullscreen = () => {
+    const elem = document.documentElement // 또는 특정 요소
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen()
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen()
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen()
+    }
+  }
+
     const [viewDirection, setViewDirection] = useState("front")
 
     const auth = getAuth()
@@ -623,7 +635,10 @@ function SidePage6() {
                             // setViewDirection("back")
                             setShowMenu(true)
                             }>뒤</button>
-                        <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("left")}>왼쪽</button>
+                        <button style={{ marginRight: '10px' }} onClick={() =>
+                            //  setViewDirection("left")
+                            enterFullscreen
+                             }>왼쪽</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("right")}>오른쪽</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("top")}>위</button>
                         <button style={{ marginRight: '10px' }} onClick={() => setViewDirection("bottom")}>아래</button>
