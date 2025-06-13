@@ -8,7 +8,8 @@ import PlayControlR3F from "./PlayControlR3F"
 import PlayControlUI from "./PlayControlUI"
 import SmoothUserMarker from "./SmoothUserMarker"
 import { v4 as uuidv4 } from "uuid"
-
+import MobileTouchControl from "./MobileTouchControl"
+import { useMediaQuery } from "react-responsive"
 
 
 
@@ -408,13 +409,16 @@ function CanvasBox({
         console.log("🔍 boxes.length: ", boxes.length)
     }, [boxes])
 
+    const isMobile = useMediaQuery({ maxWidth: 768 })
+
     return (
         <>
             <Canvas
                 camera={{ position: firstCameraPos, fov: 40 }}
                 style={{ background: backgroundColor }}
             >
-                {((isLogin || isAnonymity) && !(showInventory || showMenu)) && <PointerLockControls />}
+                {((isLogin || isAnonymity) && !(showInventory || showMenu)) && !isMobile && <PointerLockControls />}
+                {((isLogin || isAnonymity && isMobile && <MobileTouchControl />))}
                 {(isLogin || isAnonymity) &&
                     <PlayControlR3F
                         socketRef={socketRef}
