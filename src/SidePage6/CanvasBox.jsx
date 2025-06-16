@@ -412,92 +412,92 @@ function CanvasBox({
 
     const isMobile = useMediaQuery({ maxWidth: 768 })
 
-return (
-  <div
-    id="canvas-container"
-    style={{ position: "relative", width: "100vw", height: "100vh", touchAction: "none" }}
-  >
-    <Canvas
-      camera={{ position: firstCameraPos, fov: 40 }}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        background: backgroundColor
-      }}
-    >
-      {(isLogin || isAnonymity) && !(showInventory || showMenu) && (
-        isMobile ? <MobileTouchControl /> : <PointerLockControls />
-      )}
-      {(isLogin || isAnonymity) && isMobile && (
-        <PlayControlR3F
-          socketRef={socketRef}
-          roomID={roomID}
-          userEmail={userEmail}
-          setUsersInRoom={setUsersInRoom}
-          keys={keys}
-          currentSpeed={currentSpeed}
-          mobileDirection={mobileDirection}
-        />
-      )}
-      <CameraViewDirection view={viewDirection} />
-      <directionalLight position={[10, 15, -30]} />
-      <directionalLight position={[10, 30, -30]} />
-      <directionalLight position={[20, -20, 30]} />
-      <directionalLight position={[-10, 0, 0]} />
-      {boxes.map((box, idx) => (
-        <SidePage6Model
-          key={`${box.id}-${idx}`}
-          id={box.id}
-          position={box.position}
-          color={box.color}
-          isGrid={isGrid}
-        />
-      ))}
-      {heldBox && <HeldBox box={heldBox} />}
-      {userMarkers.map(marker => (
-        <SmoothUserMarker
-          key={marker.id}
-          id={marker.id}
-          email={marker.email}
-          targetPosition={marker.targetPosition}
-          color={marker.color}
-        />
-      ))}
-      <ClickHandler
-        clickedInfo={clickedInfo}
-        setClickedInfo={setClickedInfo}
-        setBoxes={setBoxes}
-        setHeldBox={setHeldBox}
-        heldBox={heldBox}
-        showInventory={showInventory}
-        showMenu={showMenu}
-        roomID={roomID}
-        socketRef={socketRef}
-      />
-    </Canvas>
+    return (
+        <div
+            id="canvas-container"
+            style={{ position: "relative", width: "100vw", height: "100vh", touchAction: "none" }}
+        >
+            <Canvas
+                camera={{ position: firstCameraPos, fov: 40 }}
+                style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    background: backgroundColor
+                }}
+            >
+                {(isLogin || isAnonymity) && !(showInventory || showMenu) && (
+                    isMobile ? <MobileTouchControl /> : <PointerLockControls />
+                )}
+                {(isLogin || isAnonymity) && isMobile && (
+                    <PlayControlR3F
+                        socketRef={socketRef}
+                        roomID={roomID}
+                        userEmail={userEmail}
+                        setUsersInRoom={setUsersInRoom}
+                        keys={keys}
+                        currentSpeed={currentSpeed}
+                        mobileDirection={mobileDirection}
+                    />
+                )}
+                <CameraViewDirection view={viewDirection} />
+                <directionalLight position={[10, 15, -30]} />
+                <directionalLight position={[10, 30, -30]} />
+                <directionalLight position={[20, -20, 30]} />
+                <directionalLight position={[-10, 0, 0]} />
+                {boxes.map((box, idx) => (
+                    <SidePage6Model
+                        key={`${box.id}-${idx}`}
+                        id={box.id}
+                        position={box.position}
+                        color={box.color}
+                        isGrid={isGrid}
+                    />
+                ))}
+                {heldBox && <HeldBox box={heldBox} />}
+                {userMarkers.map(marker => (
+                    <SmoothUserMarker
+                        key={marker.id}
+                        id={marker.id}
+                        email={marker.email}
+                        targetPosition={marker.targetPosition}
+                        color={marker.color}
+                    />
+                ))}
+                <ClickHandler
+                    clickedInfo={clickedInfo}
+                    setClickedInfo={setClickedInfo}
+                    setBoxes={setBoxes}
+                    setHeldBox={setHeldBox}
+                    heldBox={heldBox}
+                    showInventory={showInventory}
+                    showMenu={showMenu}
+                    roomID={roomID}
+                    socketRef={socketRef}
+                />
+            </Canvas>
 
-    <div
-      className="joystick-wrapper"
-      style={{
-        position: "absolute",
-        bottom: 20,
-        left: 20,
-        zIndex: 10,
-        touchAction: "none", // 터치 제어 위해 꼭 필요
-        pointerEvents: "auto"
-      }}
-    >
-      <PlayControlUI
-        keys={keys}
-        mobileDirection={mobileDirection}
-        currentSpeed={currentSpeed}
-      />
-    </div>
-  </div>
-)
+            <div
+                className="joystick-wrapper"
+                style={{
+                    position: "absolute",
+                    bottom: 20,
+                    left: 20,
+                    zIndex: 10,
+                    touchAction: "none", // 터치 제어 위해 꼭 필요
+                    pointerEvents: "auto"
+                }}
+            >
+                <PlayControlUI
+                    keys={keys}
+                    mobileDirection={mobileDirection}
+                    currentSpeed={currentSpeed}
+                />
+            </div>
+        </div>
+    )
 
 }
 
