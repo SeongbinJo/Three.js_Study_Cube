@@ -422,7 +422,7 @@ function CanvasBox({
             )}
                 {/* {((isLogin || isAnonymity) && !(showInventory || showMenu)) && !isMobile && <PointerLockControls />} */}
                 {/* {((isLogin || isAnonymity && isMobile && <MobileTouchControl />))} */}
-                {(isLogin || isAnonymity) &&
+                {(isLogin || isAnonymity) && isMobile &&
                     <PlayControlR3F
                         socketRef={socketRef}
                         roomID={roomID}

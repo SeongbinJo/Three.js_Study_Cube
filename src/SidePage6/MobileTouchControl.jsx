@@ -10,41 +10,44 @@ function MobileTouchControl() {
     const canvas = gl.domElement
 
     const handleTouchStart = (e) => {
-      if (e.touches.length === 1) {
-        isTouching.current = true
-        lastTouch.current = {
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY
-        }
-        e.preventDefault()
+      const touch = e.touches[0]
+      const isRightHalf = touch.clientX > window.innerWidth / 2
+      if (!isRightHalf) return
+
+      isTouching.current = true
+      lastTouch.current = {
+        x: touch.clientX,
+        y: touch.clientY
       }
     }
 
     const handleTouchMove = (e) => {
       if (!isTouching.current || e.touches.length !== 1) return
 
-      const dx = e.touches[0].clientX - lastTouch.current.x
-      const dy = e.touches[0].clientY - lastTouch.current.y
+      const touch = e.touches[0]
+      const isRightHalf = touch.clientX > window.innerWidth / 2
+      if (!isRightHalf) return
+
+      const dx = touch.clientX - lastTouch.current.x
+      const dy = touch.clientY - lastTouch.current.y
 
       lastTouch.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY
+        x: touch.clientX,
+        y: touch.clientY
       }
 
       const sensitivity = 0.002
       camera.rotation.y -= dx * sensitivity
       camera.rotation.x -= dy * sensitivity
       camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
-
-      e.preventDefault()
     }
 
     const handleTouchEnd = () => {
       isTouching.current = false
     }
 
-    canvas.addEventListener("touchstart", handleTouchStart, { passive: false })
-    canvas.addEventListener("touchmove", handleTouchMove, { passive: false })
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: true })
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: true })
     canvas.addEventListener("touchend", handleTouchEnd)
 
     return () => {
