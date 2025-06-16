@@ -5,14 +5,17 @@ function MobileTouchControl() {
   const { camera, gl } = useThree()
   const isTouching = useRef(false)
   const lastTouch = useRef({ x: 0, y: 0 })
-  const activeTouchId = useRef(null) // 현재 조작 중인 터치 ID 저장
+  const activeTouchId = useRef(null)
 
   useEffect(() => {
     const canvas = gl.domElement
 
     const handleTouchStart = (e) => {
-      if (activeTouchId.current === null) {
-        const touch = e.touches[0] // 첫 번째 손가락만 회전용으로 사용
+      // 오른쪽 절반에서 발생한 첫 터치만 처리
+      const canvasRect = canvas.getBoundingClientRect()
+      const touch = Array.from(e.changedTouches).find(t => t.clientX > canvasRect.width / 2)
+
+      if (touch) {
         activeTouchId.current = touch.identifier
         isTouching.current = true
         lastTouch.current = { x: touch.clientX, y: touch.clientY }
@@ -35,16 +38,15 @@ function MobileTouchControl() {
     }
 
     const handleTouchEnd = (e) => {
-      // 사용하던 손가락이 떨어졌는지 확인
-      const stillActive = Array.from(e.touches).some(t => t.identifier === activeTouchId.current)
-      if (!stillActive) {
+      const remainingTouch = Array.from(e.touches).find(t => t.identifier === activeTouchId.current)
+      if (!remainingTouch) {
         isTouching.current = false
         activeTouchId.current = null
       }
     }
 
-    canvas.addEventListener("touchstart", handleTouchStart, { passive: true })
-    canvas.addEventListener("touchmove", handleTouchMove, { passive: true })
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false })
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false })
     canvas.addEventListener("touchend", handleTouchEnd)
     canvas.addEventListener("touchcancel", handleTouchEnd)
 
@@ -58,5 +60,6 @@ function MobileTouchControl() {
 
   return null
 }
+
 
 export default MobileTouchControl
