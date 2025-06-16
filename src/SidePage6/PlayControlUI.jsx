@@ -44,7 +44,7 @@ function PlayControlUI({ keys, mobileDirection, currentSpeed }) {
 
   return (
     <>
-      <div style={{ position: "fixed", bottom: 20, left: 20, zIndex: 1000 }}>
+      <div style={{ position: "fixed", bottom: 20, left: 20, zIndex: 1000, touchAction: "none", }}>
         <Joystick
           size={80}
           baseColor="gray"
