@@ -28,4 +28,5 @@ body {
 
 .joystick-wrapper {
   pointer-events: auto; /* 이 영역은 터치 이벤트 정상 처리 */
+  touch-action: none;
 }

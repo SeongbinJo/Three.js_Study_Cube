@@ -49,6 +49,8 @@ function PlayControlUI({ keys, mobileDirection, currentSpeed }) {
           size={80}
           baseColor="gray"
           stickColor="white"
+          touchStartPeventDefault={false}
+          touchMovePreventDefault={false}
           move={e => mobileDirection.current = { x: e.x, y: e.y }}
           stop={() => mobileDirection.current = { x: 0, y: 0 }}
         />
