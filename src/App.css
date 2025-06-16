@@ -19,3 +19,13 @@ body {
   height: 100vh;
   background: white;
 }
+
+#canvas-container {
+  width: 100%;
+  height: 100vh;
+  touch-action: none; /* 기본 스크롤, 확대 등 막음 */
+}
+
+.joystick-wrapper {
+  pointer-events: auto; /* 이 영역은 터치 이벤트 정상 처리 */
+}
