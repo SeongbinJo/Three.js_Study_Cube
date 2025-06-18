@@ -319,10 +319,10 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
         const clickedObject = intersection.object
         const { id } = clickedObject.userData
 
-        if (heldBox && roomID) {
+        if (heldBox) {
             if (heldBox.persistent) {
                 setHeldBox(null)
-            } else if (clickedInfo) {
+            } else if (clickedInfo && !roomID) {
                 setBoxes(prev => [...prev, {
                     id: heldBox.id,
                     position: clickedInfo.position,
@@ -364,7 +364,7 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
         window.addEventListener("mousedown", handleMouseClick)
         return () => window.removeEventListener("mousedown", handleMouseClick)
-    }, [isMobile, heldBox, clickedInfo])
+    }, [isMobile, heldBox, clickedInfo, roomID, showMenu, showInventory])
 
     return null
 }
