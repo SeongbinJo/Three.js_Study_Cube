@@ -97,14 +97,15 @@ function PlayControlUI({ keys, mobileDirection, currentSpeed, onTap, onLongPress
             padding: 10,
             fontSize: 14,
             backgroundColor: "#444",
-            color: "#fff"
+            color: "#fff",
+            userSelect: "none",
           }}
         >
           create<br />/delete
         </button>
 
         {/* 상승/하강 버튼 세로 정렬 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', userSelect: "none", }}>
           <button
             onTouchStart={() => keys.current.up = true}
             onTouchEnd={() => keys.current.up = false}
