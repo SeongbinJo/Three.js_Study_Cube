@@ -14,7 +14,7 @@ import "../App.css"
 
 
 
-function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory, showMenu, roomID, socketRef }) {
+function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldBox, showInventory, showMenu, roomID, socketRef, isMobile, onTapRef, onLongPressRef }) {
     const { scene, camera } = useThree()
 
     const [history, setHistory] = useState([])
@@ -101,15 +101,14 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
 
 
 
-    const handleClick = (event) => {
-        if (event.button !== 0 || showInventory || showMenu) return // 왼쪽 클릭만 처리
+    const handleLeftClick = () => {
+        if (showInventory || showMenu) return // 왼쪽 클릭만 처리
 
-        event.stopPropagation()
 
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2(0, 0) // 항상 화면 중심
-
         raycaster.setFromCamera(mouse, camera)
+
         const intersects = raycaster.intersectObjects(scene.children, true).filter(i => !i.object.userData.ignoreRaycast)
 
         if (intersects.length > 0) {
@@ -134,10 +133,6 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
                 else if (z === -1) offset.set(0, 0, -1)
 
                 const targetPos = new THREE.Vector3(...position).add(offset)
-
-
-
-
 
                 // 창작 모드가 아닌 존재하는 블럭을 집어 좌클릭 한 경우
                 if (!heldBox.persistent) {
@@ -237,77 +232,139 @@ function ClickHandler({ clickedInfo, setClickedInfo, setBoxes, setHeldBox, heldB
         }
     }
 
-    useEffect(() => {
-        const handleMouseDown = (event) => {
-            if ((event.button === 2 && showInventory === false && showMenu === false)) { // 우클릭
-                event.preventDefault()
+    // useEffect(() => {
+    //     const handleMouseDown = (event) => {
+    //         if ((event.button === 2 && showInventory === false && showMenu === false)) { // 우클릭
+    //             event.preventDefault()
 
-                const raycaster = new THREE.Raycaster()
-                const mouse = new THREE.Vector2(0, 0) // 중앙 고정
-                raycaster.setFromCamera(mouse, camera)
-                const intersects = raycaster.intersectObjects(scene.children, true).filter(i => !i.object.userData.ignoreRaycast)
+    //             const raycaster = new THREE.Raycaster()
+    //             const mouse = new THREE.Vector2(0, 0) // 중앙 고정
+    //             raycaster.setFromCamera(mouse, camera)
+    //             const intersects = raycaster.intersectObjects(scene.children, true).filter(i => !i.object.userData.ignoreRaycast)
 
-                if (intersects.length > 0) {
-                    const intersection = intersects[0]
-                    const clickedObject = intersection.object
-                    const userData = clickedObject.userData || {}
-                    const id = userData.id
+    //             if (intersects.length > 0) {
+    //                 const intersection = intersects[0]
+    //                 const clickedObject = intersection.object
+    //                 const userData = clickedObject.userData || {}
+    //                 const id = userData.id
 
-                    // 블럭을 들고 있을 경우
-                    if (heldBox && !roomID) {
-                        if (heldBox.persistent) {
-                            console.log("persistent 블럭 내려놓기")
-                            setHeldBox(null)
-                        } else if (clickedInfo) {
-                            console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
+    //                 // 블럭을 들고 있을 경우
+    //                 if (heldBox && !roomID) {
+    //                     if (heldBox.persistent) {
+    //                         console.log("persistent 블럭 내려놓기")
+    //                         setHeldBox(null)
+    //                     } else if (clickedInfo) {
+    //                         console.log("블럭을 가져온 상태에서 마우스 우클릭을 함. → 원래 자리로 돌려놓기")
 
-                            setBoxes(prev => [
-                                ...prev,
-                                {
-                                    id: heldBox.id,
-                                    position: clickedInfo.position,
-                                    color: heldBox.color,
-                                }
-                            ])
-                            setHeldBox(null)
-                            setClickedInfo(null)
-                        }
-                    }
-                    // 아무것도 안 들고 있으면 삭제
-                    else if (id) {
-                        setBoxes((prev) => prev.filter((box) => box.id !== id))
+    //                         setBoxes(prev => [
+    //                             ...prev,
+    //                             {
+    //                                 id: heldBox.id,
+    //                                 position: clickedInfo.position,
+    //                                 color: heldBox.color,
+    //                             }
+    //                         ])
+    //                         setHeldBox(null)
+    //                         setClickedInfo(null)
+    //                     }
+    //                 }
+    //                 // 아무것도 안 들고 있으면 삭제
+    //                 else if (id) {
+    //                     setBoxes((prev) => prev.filter((box) => box.id !== id))
 
-                        const deletedBox = {
-                            id: id,
-                            position: clickedObject.position.clone(),
-                            color: clickedObject.material.color.getStyle()
-                        }
+    //                     const deletedBox = {
+    //                         id: id,
+    //                         position: clickedObject.position.clone(),
+    //                         color: clickedObject.material.color.getStyle()
+    //                     }
 
-                        pushHistory({
-                            type: "delete",
-                            box: deletedBox
-                        })
+    //                     pushHistory({
+    //                         type: "delete",
+    //                         box: deletedBox
+    //                     })
 
-                        if (roomID) {
-                            socketRef.current.emit(`deleted_block`, {
-                                roomId: roomID,
-                                deletedBoxInfo: deletedBox
-                            })
-                        }
-                        console.log(`손에 아무것도 없을 때 fixed 블럭 ${id} 우클릭 → 삭제함`)
-                    }
-                }
+    //                     if (roomID) {
+    //                         socketRef.current.emit(`deleted_block`, {
+    //                             roomId: roomID,
+    //                             deletedBoxInfo: deletedBox
+    //                         })
+    //                     }
+    //                     console.log(`손에 아무것도 없을 때 fixed 블럭 ${id} 우클릭 → 삭제함`)
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     window.addEventListener("click", handleLeftClick)
+    //     window.addEventListener("mousedown", handleMouseDown)
+
+    //     return () => {
+    //         window.removeEventListener("click", handleLeftClick)
+    //         window.removeEventListener("mousedown", handleMouseDown)
+    //     }
+    // }, [heldBox, clickedInfo, showInventory, showMenu])
+
+    const handleRightClick = () => {
+        if (showInventory || showMenu) return
+
+        const raycaster = new THREE.Raycaster()
+        const mouse = new THREE.Vector2(0, 0)
+
+        raycaster.setFromCamera(mouse, camera)
+        const intersects = raycaster.intersectObjects(scene.children, true).filter(i => !i.object.userData.ignoreRaycast)
+
+        if (intersects.length === 0) return
+
+        const intersection = intersects[0]
+        const clickedObject = intersection.object
+        const { id } = clickedObject.userData
+
+        if (heldBox && roomID) {
+            if (heldBox.persistent) {
+                setHeldBox(null)
+            } else if (clickedInfo) {
+                setBoxes(prev => [...prev, {
+                    id: heldBox.id,
+                    position: clickedInfo.position,
+                    color: heldBox.color
+                }])
+                setHeldBox(null)
+                setClickedInfo(null)
+            }
+        } else if (id) {
+            const deletedBox = {
+                id,
+                position: clickedObject.position.clone(),
+                color: clickedObject.material.color.getStyle()
+            }
+
+            setBoxes(prev => prev.filter(box => box.id !== id))
+            pushHistory({ type: "delete", box: deletedBox })
+
+            if (roomID) {
+                socketRef.current.emit("deleted_block", {
+                    roomId: roomID,
+                    deletedBoxInfo: deletedBox
+                })
             }
         }
+    }
 
-        window.addEventListener("click", handleClick)
-        window.addEventListener("mousedown", handleMouseDown)
-
-        return () => {
-            window.removeEventListener("click", handleClick)
-            window.removeEventListener("mousedown", handleMouseDown)
+    useEffect(() => {
+        if (isMobile) {
+            if (onTapRef) onTapRef.current = handleLeftClick
+            if (onLongPressRef) onLongPressRef.current = handleRightClick
+            return
         }
-    }, [heldBox, clickedInfo, showInventory, showMenu])
+
+        const handleMouseClick = (e) => {
+            if (e.button === 0) handleLeftClick()
+            if (e.button === 2) handleRightClick()
+        }
+
+        window.addEventListener("mousedown", handleMouseClick)
+        return () => window.removeEventListener("mousedown", handleMouseClick)
+    }, [isMobile, heldBox, clickedInfo])
 
     return null
 }
@@ -375,6 +432,9 @@ function CanvasBox({
     const currentSpeed = useRef(0.3)
     const mobileDirection = useRef({ x: 0, y: 0 })
 
+    const onTapRef = useRef()
+    const onLongPressRef = useRef()
+
     useEffect(() => {
         if (createBoxBtn) {
             // 새 블럭을 손에 쥐도록 heldBox 상태를 설정
@@ -431,7 +491,7 @@ function CanvasBox({
                 {(isLogin || isAnonymity) && !(showInventory || showMenu) && (
                     isMobile ? <MobileTouchControl /> : <PointerLockControls />
                 )}
-                {(isLogin || isAnonymity) && isMobile && (
+                {(isLogin || isAnonymity) && (
                     <PlayControlR3F
                         socketRef={socketRef}
                         roomID={roomID}
@@ -476,6 +536,9 @@ function CanvasBox({
                     showMenu={showMenu}
                     roomID={roomID}
                     socketRef={socketRef}
+                    isMobile={isMobile}
+                    onTapRef={onTapRef}
+                    onLongPressRef={onLongPressRef}
                 />
             </Canvas>
 
@@ -494,6 +557,8 @@ function CanvasBox({
                     keys={keys}
                     mobileDirection={mobileDirection}
                     currentSpeed={currentSpeed}
+                    onTap={() => onTapRef.current?.()}
+                    onLongPress={() => onLongPressRef.current?.()}
                 />
             </div>
         </div>
