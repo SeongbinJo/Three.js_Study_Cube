@@ -34,7 +34,7 @@ function MobileTouchControl() {
       const sensitivity = 0.002
       camera.rotation.y = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.y))
       // camera.rotation.x -= dy * sensitivity
-      // camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
+      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
     }
 
     const handleTouchEnd = (e) => {
