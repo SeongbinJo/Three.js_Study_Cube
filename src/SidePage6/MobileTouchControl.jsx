@@ -32,8 +32,8 @@ function MobileTouchControl() {
       lastTouch.current = { x: touch.clientX, y: touch.clientY }
 
       const sensitivity = 0.002
-      // camera.rotation.y -= dx * sensitivity
-      camera.rotation.x -= dy * sensitivity
+      camera.rotation.y -= dx * sensitivity
+      // camera.rotation.x -= dy * sensitivity
       // camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
     }
 
