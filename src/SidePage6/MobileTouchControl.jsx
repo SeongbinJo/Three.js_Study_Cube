@@ -1,80 +1,65 @@
-// MobileTouchControl.js
-import { useThree, useFrame } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
-import * as THREE from "three"
+import { useThree } from "@react-three/fiber"
 
 function MobileTouchControl() {
-    const { camera } = useThree()
-    const touchStartRef = useRef(null)
-    const touchDeltaRef = useRef({ x: 0, y: 0 })
-    const isTouchingRef = useRef(false)
+  const { camera, gl } = useThree()
+  const isTouching = useRef(false)
+  const lastTouch = useRef({ x: 0, y: 0 })
+  const activeTouchId = useRef(null)
 
-    // 회전 각도 유지용
-    const yaw = useRef(0)
-    const pitch = useRef(0)
+  useEffect(() => {
+    const canvas = gl.domElement
 
-    // 카메라 기준 벡터
-    const direction = new THREE.Vector3()
-    const euler = new THREE.Euler(0, 0, 0, "YXZ")
+    const handleTouchStart = (e) => {
+      // 오른쪽 절반에서 발생한 첫 터치만 처리
+      const canvasRect = canvas.getBoundingClientRect()
+      const touch = Array.from(e.changedTouches).find(t => t.clientX > canvasRect.width / 2)
 
-    useEffect(() => {
-        const handleTouchStart = (e) => {
-            const touch = e.touches[0]
-            const screenWidth = window.innerWidth
+      if (touch) {
+        activeTouchId.current = touch.identifier
+        isTouching.current = true
+        lastTouch.current = { x: touch.clientX, y: touch.clientY }
+      }
+    }
 
-            if (touch.clientX > screenWidth / 2) {
-                isTouchingRef.current = true
-                touchStartRef.current = { x: touch.clientX, y: touch.clientY }
-            }
-        }
+    const handleTouchMove = (e) => {
+      const touch = Array.from(e.touches).find(t => t.identifier === activeTouchId.current)
+      if (!isTouching.current || !touch) return
 
-        const handleTouchMove = (e) => {
-            if (!isTouchingRef.current) return
+      const dx = touch.clientX - lastTouch.current.x
+      const dy = touch.clientY - lastTouch.current.y
 
-            const touch = e.touches[0]
-            const dx = touch.clientX - touchStartRef.current.x
-            const dy = touch.clientY - touchStartRef.current.y
+      lastTouch.current = { x: touch.clientX, y: touch.clientY }
 
-            // 민감도 조절
-            touchDeltaRef.current.x = dx * 0.002
-            touchDeltaRef.current.y = dy * 0.002
-        }
+      const sensitivity = 0.002
+      camera.rotation.y -= dx * sensitivity
+      camera.rotation.x -= dy * sensitivity
+      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x))
+    }
 
-        const handleTouchEnd = () => {
-            isTouchingRef.current = false
-            touchDeltaRef.current = { x: 0, y: 0 }
-        }
+    const handleTouchEnd = (e) => {
+      const remainingTouch = Array.from(e.touches).find(t => t.identifier === activeTouchId.current)
+      if (!remainingTouch) {
+        isTouching.current = false
+        activeTouchId.current = null
+      }
+    }
 
-        window.addEventListener("touchstart", handleTouchStart)
-        window.addEventListener("touchmove", handleTouchMove)
-        window.addEventListener("touchend", handleTouchEnd)
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false })
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false })
+    canvas.addEventListener("touchend", handleTouchEnd)
+    canvas.addEventListener("touchcancel", handleTouchEnd)
 
-        return () => {
-            window.removeEventListener("touchstart", handleTouchStart)
-            window.removeEventListener("touchmove", handleTouchMove)
-            window.removeEventListener("touchend", handleTouchEnd)
-        }
-    }, [])
+    return () => {
+      canvas.removeEventListener("touchstart", handleTouchStart)
+      canvas.removeEventListener("touchmove", handleTouchMove)
+      canvas.removeEventListener("touchend", handleTouchEnd)
+      canvas.removeEventListener("touchcancel", handleTouchEnd)
+    }
+  }, [camera, gl])
 
-    useFrame(() => {
-        if (isTouchingRef.current) {
-            yaw.current -= touchDeltaRef.current.x
-            pitch.current -= touchDeltaRef.current.y
-
-            // pitch 제한
-            pitch.current = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch.current))
-
-            euler.set(pitch.current, yaw.current, 0)
-            camera.quaternion.setFromEuler(euler)
-
-            // 누적 방지
-            touchStartRef.current.x += touchDeltaRef.current.x / 0.002
-            touchStartRef.current.y += touchDeltaRef.current.y / 0.002
-            touchDeltaRef.current = { x: 0, y: 0 }
-        }
-    })
-
-    return null
+  return null
 }
+
 
 export default MobileTouchControl
