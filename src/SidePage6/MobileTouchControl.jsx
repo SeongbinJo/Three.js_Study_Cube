@@ -1,78 +1,80 @@
+// MobileTouchControl.js
+import { useThree, useFrame } from "@react-three/fiber"
 import { useEffect, useRef } from "react"
-import { useThree } from "@react-three/fiber"
 import * as THREE from "three"
 
 function MobileTouchControl() {
-  const { camera, gl } = useThree()
-  const isTouching = useRef(false)
-  const lastTouch = useRef({ x: 0, y: 0 })
-  const activeTouchId = useRef(null)
+    const { camera } = useThree()
+    const touchStartRef = useRef(null)
+    const touchDeltaRef = useRef({ x: 0, y: 0 })
+    const isTouchingRef = useRef(false)
 
-  const yaw = useRef(0)   // 좌우 회전
-  const pitch = useRef(0) // 상하 회전
+    // 회전 각도 유지용
+    const yaw = useRef(0)
+    const pitch = useRef(0)
 
-  useEffect(() => {
-    const canvas = gl.domElement
+    // 카메라 기준 벡터
+    const direction = new THREE.Vector3()
+    const euler = new THREE.Euler(0, 0, 0, "YXZ")
 
-    const handleTouchStart = (e) => {
-      const canvasRect = canvas.getBoundingClientRect()
-      const touch = Array.from(e.changedTouches).find(t => t.clientX > canvasRect.width / 2)
-      if (touch) {
-        activeTouchId.current = touch.identifier
-        isTouching.current = true
-        lastTouch.current = { x: touch.clientX, y: touch.clientY }
-      }
-    }
+    useEffect(() => {
+        const handleTouchStart = (e) => {
+            const touch = e.touches[0]
+            const screenWidth = window.innerWidth
 
-    const handleTouchMove = (e) => {
-      const touch = Array.from(e.touches).find(t => t.identifier === activeTouchId.current)
-      if (!isTouching.current || !touch) return
+            if (touch.clientX > screenWidth / 2) {
+                isTouchingRef.current = true
+                touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+            }
+        }
 
-      const dx = touch.clientX - lastTouch.current.x
-      const dy = touch.clientY - lastTouch.current.y
-      lastTouch.current = { x: touch.clientX, y: touch.clientY }
+        const handleTouchMove = (e) => {
+            if (!isTouchingRef.current) return
 
-      const sensitivity = 0.003
-      yaw.current += dx * sensitivity
-      pitch.current -= dy * sensitivity
+            const touch = e.touches[0]
+            const dx = touch.clientX - touchStartRef.current.x
+            const dy = touch.clientY - touchStartRef.current.y
 
-      // 수직 회전 제한 (상하 90도)
-      const maxPitch = Math.PI / 2 - 0.01
-      pitch.current = Math.max(-maxPitch, Math.min(maxPitch, pitch.current))
+            // 민감도 조절
+            touchDeltaRef.current.x = dx * 0.002
+            touchDeltaRef.current.y = dy * 0.002
+        }
 
-      // 방향 벡터 계산
-      const direction = new THREE.Vector3(
-        Math.cos(pitch.current) * Math.sin(yaw.current),
-        Math.sin(pitch.current),
-        Math.cos(pitch.current) * Math.cos(yaw.current)
-      )
+        const handleTouchEnd = () => {
+            isTouchingRef.current = false
+            touchDeltaRef.current = { x: 0, y: 0 }
+        }
 
-      const target = new THREE.Vector3().addVectors(camera.position, direction)
-      camera.lookAt(target)
-    }
+        window.addEventListener("touchstart", handleTouchStart)
+        window.addEventListener("touchmove", handleTouchMove)
+        window.addEventListener("touchend", handleTouchEnd)
 
-    const handleTouchEnd = (e) => {
-      const stillTouching = Array.from(e.touches).find(t => t.identifier === activeTouchId.current)
-      if (!stillTouching) {
-        isTouching.current = false
-        activeTouchId.current = null
-      }
-    }
+        return () => {
+            window.removeEventListener("touchstart", handleTouchStart)
+            window.removeEventListener("touchmove", handleTouchMove)
+            window.removeEventListener("touchend", handleTouchEnd)
+        }
+    }, [])
 
-    canvas.addEventListener("touchstart", handleTouchStart, { passive: false })
-    canvas.addEventListener("touchmove", handleTouchMove, { passive: false })
-    canvas.addEventListener("touchend", handleTouchEnd)
-    canvas.addEventListener("touchcancel", handleTouchEnd)
+    useFrame(() => {
+        if (isTouchingRef.current) {
+            yaw.current -= touchDeltaRef.current.x
+            pitch.current -= touchDeltaRef.current.y
 
-    return () => {
-      canvas.removeEventListener("touchstart", handleTouchStart)
-      canvas.removeEventListener("touchmove", handleTouchMove)
-      canvas.removeEventListener("touchend", handleTouchEnd)
-      canvas.removeEventListener("touchcancel", handleTouchEnd)
-    }
-  }, [camera, gl])
+            // pitch 제한
+            pitch.current = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch.current))
 
-  return null
+            euler.set(pitch.current, yaw.current, 0)
+            camera.quaternion.setFromEuler(euler)
+
+            // 누적 방지
+            touchStartRef.current.x += touchDeltaRef.current.x / 0.002
+            touchStartRef.current.y += touchDeltaRef.current.y / 0.002
+            touchDeltaRef.current = { x: 0, y: 0 }
+        }
+    })
+
+    return null
 }
 
 export default MobileTouchControl
